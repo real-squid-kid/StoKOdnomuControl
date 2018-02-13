@@ -71,9 +71,9 @@
                 Answer1ScoreLbl.Text = value
                 RoundScoreLbl.Text = totalscr
                 Select Case sound
-                    Case 1
-                        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
                     Case 2
+                        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                    Case 1
                         My.Computer.Audio.Play(My.Resources.line_wrong, AudioPlayMode.Background)
                 End Select
             Case 2
@@ -81,9 +81,9 @@
                 Answer2ScoreLbl.Text = value
                 RoundScoreLbl.Text = totalscr
                 Select Case sound
-                    Case 1
-                        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
                     Case 2
+                        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                    Case 1
                         My.Computer.Audio.Play(My.Resources.line_wrong, AudioPlayMode.Background)
                 End Select
             Case 3
@@ -91,9 +91,9 @@
                 Answer3ScoreLbl.Text = value
                 RoundScoreLbl.Text = totalscr
                 Select Case sound
-                    Case 1
-                        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
                     Case 2
+                        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                    Case 1
                         My.Computer.Audio.Play(My.Resources.line_wrong, AudioPlayMode.Background)
                 End Select
             Case 4
@@ -101,9 +101,9 @@
                 Answer4ScoreLbl.Text = value
                 RoundScoreLbl.Text = totalscr
                 Select Case sound
-                    Case 1
-                        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
                     Case 2
+                        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                    Case 1
                         My.Computer.Audio.Play(My.Resources.line_wrong, AudioPlayMode.Background)
                 End Select
             Case 5
@@ -111,9 +111,9 @@
                 Answer5ScoreLbl.Text = value
                 RoundScoreLbl.Text = totalscr
                 Select Case sound
-                    Case 1
-                        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
                     Case 2
+                        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                    Case 1
                         My.Computer.Audio.Play(My.Resources.line_wrong, AudioPlayMode.Background)
                 End Select
             Case 6
@@ -121,9 +121,9 @@
                 Answer6ScoreLbl.Text = value
                 RoundScoreLbl.Text = totalscr
                 Select Case sound
-                    Case 1
-                        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
                     Case 2
+                        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                    Case 1
                         My.Computer.Audio.Play(My.Resources.line_wrong, AudioPlayMode.Background)
                 End Select
         End Select
