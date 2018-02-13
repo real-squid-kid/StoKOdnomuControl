@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class Tablo
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,7 +20,7 @@ Partial Class Tablo
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.RoundScoreLbl = New System.Windows.Forms.Label()
         Me.ScoreLeftLbl = New System.Windows.Forms.Label()
@@ -47,7 +47,7 @@ Partial Class Tablo
         '
         'RoundScoreLbl
         '
-        Me.RoundScoreLbl.Font = New System.Drawing.Font("Microsoft Sans Serif", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.RoundScoreLbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.RoundScoreLbl.ForeColor = System.Drawing.Color.White
         Me.RoundScoreLbl.Location = New System.Drawing.Point(538, 9)
         Me.RoundScoreLbl.Name = "RoundScoreLbl"
@@ -58,7 +58,7 @@ Partial Class Tablo
         '
         'ScoreLeftLbl
         '
-        Me.ScoreLeftLbl.Font = New System.Drawing.Font("Microsoft Sans Serif", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.ScoreLeftLbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.ScoreLeftLbl.ForeColor = System.Drawing.Color.White
         Me.ScoreLeftLbl.Location = New System.Drawing.Point(12, 9)
         Me.ScoreLeftLbl.Name = "ScoreLeftLbl"
@@ -69,7 +69,7 @@ Partial Class Tablo
         '
         'ScoreRightLbl
         '
-        Me.ScoreRightLbl.Font = New System.Drawing.Font("Microsoft Sans Serif", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.ScoreRightLbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.ScoreRightLbl.ForeColor = System.Drawing.Color.White
         Me.ScoreRightLbl.Location = New System.Drawing.Point(1065, 9)
         Me.ScoreRightLbl.Name = "ScoreRightLbl"
@@ -80,7 +80,7 @@ Partial Class Tablo
         '
         'Answer1Lbl
         '
-        Me.Answer1Lbl.Font = New System.Drawing.Font("Microsoft Sans Serif", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Answer1Lbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer1Lbl.ForeColor = System.Drawing.Color.White
         Me.Answer1Lbl.Location = New System.Drawing.Point(275, 154)
         Me.Answer1Lbl.Name = "Answer1Lbl"
@@ -91,7 +91,7 @@ Partial Class Tablo
         '
         'Answer2Lbl
         '
-        Me.Answer2Lbl.Font = New System.Drawing.Font("Microsoft Sans Serif", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Answer2Lbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer2Lbl.ForeColor = System.Drawing.Color.White
         Me.Answer2Lbl.Location = New System.Drawing.Point(275, 230)
         Me.Answer2Lbl.Name = "Answer2Lbl"
@@ -102,7 +102,7 @@ Partial Class Tablo
         '
         'Answer3Lbl
         '
-        Me.Answer3Lbl.Font = New System.Drawing.Font("Microsoft Sans Serif", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Answer3Lbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer3Lbl.ForeColor = System.Drawing.Color.White
         Me.Answer3Lbl.Location = New System.Drawing.Point(275, 306)
         Me.Answer3Lbl.Name = "Answer3Lbl"
@@ -113,7 +113,7 @@ Partial Class Tablo
         '
         'Answer4Lbl
         '
-        Me.Answer4Lbl.Font = New System.Drawing.Font("Microsoft Sans Serif", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Answer4Lbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer4Lbl.ForeColor = System.Drawing.Color.White
         Me.Answer4Lbl.Location = New System.Drawing.Point(275, 382)
         Me.Answer4Lbl.Name = "Answer4Lbl"
@@ -124,7 +124,7 @@ Partial Class Tablo
         '
         'Answer5Lbl
         '
-        Me.Answer5Lbl.Font = New System.Drawing.Font("Microsoft Sans Serif", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Answer5Lbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer5Lbl.ForeColor = System.Drawing.Color.White
         Me.Answer5Lbl.Location = New System.Drawing.Point(275, 458)
         Me.Answer5Lbl.Name = "Answer5Lbl"
@@ -135,7 +135,7 @@ Partial Class Tablo
         '
         'Answer6Lbl
         '
-        Me.Answer6Lbl.Font = New System.Drawing.Font("Microsoft Sans Serif", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Answer6Lbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer6Lbl.ForeColor = System.Drawing.Color.White
         Me.Answer6Lbl.Location = New System.Drawing.Point(275, 534)
         Me.Answer6Lbl.Name = "Answer6Lbl"
@@ -146,7 +146,7 @@ Partial Class Tablo
         '
         'Answer1ScoreLbl
         '
-        Me.Answer1ScoreLbl.Font = New System.Drawing.Font("Microsoft Sans Serif", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Answer1ScoreLbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer1ScoreLbl.ForeColor = System.Drawing.Color.White
         Me.Answer1ScoreLbl.Location = New System.Drawing.Point(862, 154)
         Me.Answer1ScoreLbl.Name = "Answer1ScoreLbl"
@@ -157,7 +157,7 @@ Partial Class Tablo
         '
         'Answer2ScoreLbl
         '
-        Me.Answer2ScoreLbl.Font = New System.Drawing.Font("Microsoft Sans Serif", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Answer2ScoreLbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer2ScoreLbl.ForeColor = System.Drawing.Color.White
         Me.Answer2ScoreLbl.Location = New System.Drawing.Point(862, 230)
         Me.Answer2ScoreLbl.Name = "Answer2ScoreLbl"
@@ -168,7 +168,7 @@ Partial Class Tablo
         '
         'Answer3ScoreLbl
         '
-        Me.Answer3ScoreLbl.Font = New System.Drawing.Font("Microsoft Sans Serif", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Answer3ScoreLbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer3ScoreLbl.ForeColor = System.Drawing.Color.White
         Me.Answer3ScoreLbl.Location = New System.Drawing.Point(862, 306)
         Me.Answer3ScoreLbl.Name = "Answer3ScoreLbl"
@@ -179,7 +179,7 @@ Partial Class Tablo
         '
         'Answer4ScoreLbl
         '
-        Me.Answer4ScoreLbl.Font = New System.Drawing.Font("Microsoft Sans Serif", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Answer4ScoreLbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer4ScoreLbl.ForeColor = System.Drawing.Color.White
         Me.Answer4ScoreLbl.Location = New System.Drawing.Point(862, 382)
         Me.Answer4ScoreLbl.Name = "Answer4ScoreLbl"
@@ -190,7 +190,7 @@ Partial Class Tablo
         '
         'Answer5ScoreLbl
         '
-        Me.Answer5ScoreLbl.Font = New System.Drawing.Font("Microsoft Sans Serif", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Answer5ScoreLbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer5ScoreLbl.ForeColor = System.Drawing.Color.White
         Me.Answer5ScoreLbl.Location = New System.Drawing.Point(862, 458)
         Me.Answer5ScoreLbl.Name = "Answer5ScoreLbl"
@@ -201,7 +201,7 @@ Partial Class Tablo
         '
         'Answer6ScoreLbl
         '
-        Me.Answer6ScoreLbl.Font = New System.Drawing.Font("Microsoft Sans Serif", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Answer6ScoreLbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer6ScoreLbl.ForeColor = System.Drawing.Color.White
         Me.Answer6ScoreLbl.Location = New System.Drawing.Point(862, 534)
         Me.Answer6ScoreLbl.Name = "Answer6ScoreLbl"
@@ -212,7 +212,7 @@ Partial Class Tablo
         '
         'RightStrike3Lbl
         '
-        Me.RightStrike3Lbl.Font = New System.Drawing.Font("Microsoft Sans Serif", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.RightStrike3Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.RightStrike3Lbl.ForeColor = System.Drawing.Color.Red
         Me.RightStrike3Lbl.Location = New System.Drawing.Point(1065, 306)
         Me.RightStrike3Lbl.Name = "RightStrike3Lbl"
@@ -223,7 +223,7 @@ Partial Class Tablo
         '
         'RightStrike2Lbl
         '
-        Me.RightStrike2Lbl.Font = New System.Drawing.Font("Microsoft Sans Serif", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.RightStrike2Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.RightStrike2Lbl.ForeColor = System.Drawing.Color.Red
         Me.RightStrike2Lbl.Location = New System.Drawing.Point(1065, 405)
         Me.RightStrike2Lbl.Name = "RightStrike2Lbl"
@@ -234,7 +234,7 @@ Partial Class Tablo
         '
         'RightStrike1Lbl
         '
-        Me.RightStrike1Lbl.Font = New System.Drawing.Font("Microsoft Sans Serif", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.RightStrike1Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.RightStrike1Lbl.ForeColor = System.Drawing.Color.Red
         Me.RightStrike1Lbl.Location = New System.Drawing.Point(1065, 504)
         Me.RightStrike1Lbl.Name = "RightStrike1Lbl"
@@ -245,7 +245,7 @@ Partial Class Tablo
         '
         'LeftStrike3Lbl
         '
-        Me.LeftStrike3Lbl.Font = New System.Drawing.Font("Microsoft Sans Serif", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.LeftStrike3Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.LeftStrike3Lbl.ForeColor = System.Drawing.Color.Red
         Me.LeftStrike3Lbl.Location = New System.Drawing.Point(12, 306)
         Me.LeftStrike3Lbl.Name = "LeftStrike3Lbl"
@@ -256,7 +256,7 @@ Partial Class Tablo
         '
         'LeftStrike2Lbl
         '
-        Me.LeftStrike2Lbl.Font = New System.Drawing.Font("Microsoft Sans Serif", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.LeftStrike2Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.LeftStrike2Lbl.ForeColor = System.Drawing.Color.Red
         Me.LeftStrike2Lbl.Location = New System.Drawing.Point(12, 405)
         Me.LeftStrike2Lbl.Name = "LeftStrike2Lbl"
@@ -267,7 +267,7 @@ Partial Class Tablo
         '
         'LeftStrike1Lbl
         '
-        Me.LeftStrike1Lbl.Font = New System.Drawing.Font("Microsoft Sans Serif", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.LeftStrike1Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.LeftStrike1Lbl.ForeColor = System.Drawing.Color.Red
         Me.LeftStrike1Lbl.Location = New System.Drawing.Point(12, 504)
         Me.LeftStrike1Lbl.Name = "LeftStrike1Lbl"

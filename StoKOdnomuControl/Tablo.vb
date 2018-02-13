@@ -1,4 +1,5 @@
 ﻿Public Class Tablo
+    Dim Player As New AxWMPLib.AxWindowsMediaPlayer
     Private Sub Tablo_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         'hide all
         ScoreLeftLbl.Visible = False
@@ -69,26 +70,62 @@
                 Answer1Lbl.Text = "1. " & text
                 Answer1ScoreLbl.Text = value
                 RoundScoreLbl.Text = totalscr
+                Select Case sound
+                    Case 1
+                        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                    Case 2
+                        My.Computer.Audio.Play(My.Resources.line_wrong, AudioPlayMode.Background)
+                End Select
             Case 2
                 Answer2Lbl.Text = "2. " & text
                 Answer2ScoreLbl.Text = value
                 RoundScoreLbl.Text = totalscr
+                Select Case sound
+                    Case 1
+                        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                    Case 2
+                        My.Computer.Audio.Play(My.Resources.line_wrong, AudioPlayMode.Background)
+                End Select
             Case 3
                 Answer3Lbl.Text = "3. " & text
                 Answer3ScoreLbl.Text = value
                 RoundScoreLbl.Text = totalscr
+                Select Case sound
+                    Case 1
+                        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                    Case 2
+                        My.Computer.Audio.Play(My.Resources.line_wrong, AudioPlayMode.Background)
+                End Select
             Case 4
                 Answer4Lbl.Text = "4. " & text
                 Answer4ScoreLbl.Text = value
                 RoundScoreLbl.Text = totalscr
+                Select Case sound
+                    Case 1
+                        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                    Case 2
+                        My.Computer.Audio.Play(My.Resources.line_wrong, AudioPlayMode.Background)
+                End Select
             Case 5
                 Answer5Lbl.Text = "5. " & text
                 Answer5ScoreLbl.Text = value
                 RoundScoreLbl.Text = totalscr
+                Select Case sound
+                    Case 1
+                        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                    Case 2
+                        My.Computer.Audio.Play(My.Resources.line_wrong, AudioPlayMode.Background)
+                End Select
             Case 6
                 Answer6Lbl.Text = "6. " & text
                 Answer6ScoreLbl.Text = value
                 RoundScoreLbl.Text = totalscr
+                Select Case sound
+                    Case 1
+                        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                    Case 2
+                        My.Computer.Audio.Play(My.Resources.line_wrong, AudioPlayMode.Background)
+                End Select
         End Select
     End Sub
 
@@ -128,21 +165,21 @@
                     Case 1
                         If show = True Then
                             LeftStrike1Lbl.Visible = True
-                            'sound here
+                            My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
                         Else
                             LeftStrike1Lbl.Visible = False
                         End If
                     Case 2
                         If show = True Then
                             LeftStrike2Lbl.Visible = True
-                            'sound here
+                            My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
                         Else
                             LeftStrike2Lbl.Visible = False
                         End If
                     Case 3
                         If show = True Then
                             LeftStrike3Lbl.Visible = True
-                            'sound here
+                            My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
                         Else
                             LeftStrike3Lbl.Visible = False
                         End If
@@ -152,21 +189,21 @@
                     Case 1
                         If show = True Then
                             RightStrike1Lbl.Visible = True
-                            'sound here
+                            My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
                         Else
                             RightStrike1Lbl.Visible = False
                         End If
                     Case 2
                         If show = True Then
                             RightStrike2Lbl.Visible = True
-                            'sound here
+                            My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
                         Else
                             RightStrike2Lbl.Visible = False
                         End If
                     Case 3
                         If show = True Then
                             RightStrike3Lbl.Visible = True
-                            'sound here
+                            My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
                         Else
                             RightStrike3Lbl.Visible = False
                         End If
@@ -178,10 +215,10 @@
         Select Case pos
             Case "L"
                 ScoreLeftLbl.Text = value
-                'sound here
+                If sound = True Then My.Computer.Audio.Play(My.Resources.bing, AudioPlayMode.Background)
             Case "R"
                 ScoreRightLbl.Text = value
-                'sound here
+                If sound = True Then My.Computer.Audio.Play(My.Resources.bing, AudioPlayMode.Background)
             Case "C"
                 RoundScoreLbl.Text = value
         End Select
