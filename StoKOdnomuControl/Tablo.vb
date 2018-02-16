@@ -72,7 +72,7 @@
                 RoundScoreLbl.Text = totalscr
                 Select Case sound
                     Case 2
-                        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                        My.Computer.Audio.Play(My.Resources.prosto_open_first, AudioPlayMode.Background)
                     Case 1
                         My.Computer.Audio.Play(My.Resources.line_wrong, AudioPlayMode.Background)
                 End Select
@@ -82,7 +82,7 @@
                 RoundScoreLbl.Text = totalscr
                 Select Case sound
                     Case 2
-                        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                        My.Computer.Audio.Play(My.Resources.prosto_open, AudioPlayMode.Background)
                     Case 1
                         My.Computer.Audio.Play(My.Resources.line_wrong, AudioPlayMode.Background)
                 End Select
@@ -92,7 +92,7 @@
                 RoundScoreLbl.Text = totalscr
                 Select Case sound
                     Case 2
-                        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                        My.Computer.Audio.Play(My.Resources.prosto_open, AudioPlayMode.Background)
                     Case 1
                         My.Computer.Audio.Play(My.Resources.line_wrong, AudioPlayMode.Background)
                 End Select
@@ -102,7 +102,7 @@
                 RoundScoreLbl.Text = totalscr
                 Select Case sound
                     Case 2
-                        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                        My.Computer.Audio.Play(My.Resources.prosto_open, AudioPlayMode.Background)
                     Case 1
                         My.Computer.Audio.Play(My.Resources.line_wrong, AudioPlayMode.Background)
                 End Select
@@ -112,7 +112,7 @@
                 RoundScoreLbl.Text = totalscr
                 Select Case sound
                     Case 2
-                        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                        My.Computer.Audio.Play(My.Resources.prosto_open, AudioPlayMode.Background)
                     Case 1
                         My.Computer.Audio.Play(My.Resources.line_wrong, AudioPlayMode.Background)
                 End Select
@@ -122,7 +122,7 @@
                 RoundScoreLbl.Text = totalscr
                 Select Case sound
                     Case 2
-                        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                        My.Computer.Audio.Play(My.Resources.prosto_open, AudioPlayMode.Background)
                     Case 1
                         My.Computer.Audio.Play(My.Resources.line_wrong, AudioPlayMode.Background)
                 End Select
@@ -165,21 +165,21 @@
                     Case 1
                         If show = True Then
                             LeftStrike1Lbl.Visible = True
-                            My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
+                            My.Computer.Audio.Play(My.Resources.prosto_wrong, AudioPlayMode.Background)
                         Else
                             LeftStrike1Lbl.Visible = False
                         End If
                     Case 2
                         If show = True Then
                             LeftStrike2Lbl.Visible = True
-                            My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
+                            My.Computer.Audio.Play(My.Resources.prosto_wrong, AudioPlayMode.Background)
                         Else
                             LeftStrike2Lbl.Visible = False
                         End If
                     Case 3
                         If show = True Then
                             LeftStrike3Lbl.Visible = True
-                            My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
+                            My.Computer.Audio.Play(My.Resources.prosto_wrong, AudioPlayMode.Background)
                         Else
                             LeftStrike3Lbl.Visible = False
                         End If
@@ -189,21 +189,21 @@
                     Case 1
                         If show = True Then
                             RightStrike1Lbl.Visible = True
-                            My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
+                            My.Computer.Audio.Play(My.Resources.prosto_wrong, AudioPlayMode.Background)
                         Else
                             RightStrike1Lbl.Visible = False
                         End If
                     Case 2
                         If show = True Then
                             RightStrike2Lbl.Visible = True
-                            My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
+                            My.Computer.Audio.Play(My.Resources.prosto_wrong, AudioPlayMode.Background)
                         Else
                             RightStrike2Lbl.Visible = False
                         End If
                     Case 3
                         If show = True Then
                             RightStrike3Lbl.Visible = True
-                            My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
+                            My.Computer.Audio.Play(My.Resources.prosto_wrong, AudioPlayMode.Background)
                         Else
                             RightStrike3Lbl.Visible = False
                         End If

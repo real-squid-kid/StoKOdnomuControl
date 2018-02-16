@@ -90,6 +90,33 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         '''</summary>
+        Friend ReadOnly Property prosto_open() As System.IO.UnmanagedMemoryStream
+            Get
+                Return ResourceManager.GetStream("prosto_open", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        '''</summary>
+        Friend ReadOnly Property prosto_open_first() As System.IO.UnmanagedMemoryStream
+            Get
+                Return ResourceManager.GetStream("prosto_open_first", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        '''</summary>
+        Friend ReadOnly Property prosto_wrong() As System.IO.UnmanagedMemoryStream
+            Get
+                Return ResourceManager.GetStream("prosto_wrong", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        '''</summary>
         Friend ReadOnly Property wrong() As System.IO.UnmanagedMemoryStream
             Get
                 Return ResourceManager.GetStream("wrong", resourceCulture)

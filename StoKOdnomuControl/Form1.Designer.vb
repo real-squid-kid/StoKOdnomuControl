@@ -63,6 +63,7 @@ Partial Class Form1
         Me.Answer6RevealBtn = New System.Windows.Forms.Button()
         Me.ShowTabloBtn = New System.Windows.Forms.Button()
         Me.TabloPrepareBtn = New System.Windows.Forms.Button()
+        Me.GrayChk = New System.Windows.Forms.CheckBox()
         Me.SuspendLayout()
         '
         'OpenQuestionsBtn
@@ -473,11 +474,23 @@ Partial Class Form1
         Me.TabloPrepareBtn.Text = "Показать инфу на табло"
         Me.TabloPrepareBtn.UseVisualStyleBackColor = True
         '
+        'GrayChk
+        '
+        Me.GrayChk.AutoSize = True
+        Me.GrayChk.Font = New System.Drawing.Font("Microsoft Sans Serif", 27.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.GrayChk.Location = New System.Drawing.Point(872, 21)
+        Me.GrayChk.Name = "GrayChk"
+        Me.GrayChk.Size = New System.Drawing.Size(223, 46)
+        Me.GrayChk.TabIndex = 20
+        Me.GrayChk.Text = "Затемнить"
+        Me.GrayChk.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1264, 681)
+        Me.Controls.Add(Me.GrayChk)
         Me.Controls.Add(Me.TabloPrepareBtn)
         Me.Controls.Add(Me.Answer6RevealBtn)
         Me.Controls.Add(Me.Answer5RevealBtn)
@@ -569,4 +582,5 @@ Partial Class Form1
     Friend WithEvents Answer6RevealBtn As Button
     Friend WithEvents ShowTabloBtn As Button
     Friend WithEvents TabloPrepareBtn As Button
+    Friend WithEvents GrayChk As CheckBox
 End Class
