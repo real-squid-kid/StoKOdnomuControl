@@ -46,4 +46,12 @@
             Answer10CostTxt.ForeColor = Color.Black
         End If
     End Sub
+
+    Private Sub ShowInfoBtn_Click(sender As Object, e As EventArgs) Handles ShowInfoBtn.Click
+        BigGameTablo.Prepare()
+    End Sub
+
+    Private Sub SameAnswerBtn_Click(sender As Object, e As EventArgs) Handles SameAnswerBtn.Click
+        My.Computer.Audio.Play(My.Resources.)
+    End Sub
 End Class

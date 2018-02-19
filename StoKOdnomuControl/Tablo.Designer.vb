@@ -47,6 +47,7 @@ Partial Class Tablo
         '
         'RoundScoreLbl
         '
+        Me.RoundScoreLbl.BackColor = System.Drawing.Color.Transparent
         Me.RoundScoreLbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.RoundScoreLbl.ForeColor = System.Drawing.Color.White
         Me.RoundScoreLbl.Location = New System.Drawing.Point(538, 9)
@@ -58,6 +59,7 @@ Partial Class Tablo
         '
         'ScoreLeftLbl
         '
+        Me.ScoreLeftLbl.BackColor = System.Drawing.Color.Transparent
         Me.ScoreLeftLbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.ScoreLeftLbl.ForeColor = System.Drawing.Color.White
         Me.ScoreLeftLbl.Location = New System.Drawing.Point(12, 9)
@@ -69,6 +71,7 @@ Partial Class Tablo
         '
         'ScoreRightLbl
         '
+        Me.ScoreRightLbl.BackColor = System.Drawing.Color.Transparent
         Me.ScoreRightLbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.ScoreRightLbl.ForeColor = System.Drawing.Color.White
         Me.ScoreRightLbl.Location = New System.Drawing.Point(1065, 9)
@@ -80,6 +83,7 @@ Partial Class Tablo
         '
         'Answer1Lbl
         '
+        Me.Answer1Lbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer1Lbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer1Lbl.ForeColor = System.Drawing.Color.White
         Me.Answer1Lbl.Location = New System.Drawing.Point(275, 154)
@@ -91,6 +95,7 @@ Partial Class Tablo
         '
         'Answer2Lbl
         '
+        Me.Answer2Lbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer2Lbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer2Lbl.ForeColor = System.Drawing.Color.White
         Me.Answer2Lbl.Location = New System.Drawing.Point(275, 230)
@@ -102,6 +107,7 @@ Partial Class Tablo
         '
         'Answer3Lbl
         '
+        Me.Answer3Lbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer3Lbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer3Lbl.ForeColor = System.Drawing.Color.White
         Me.Answer3Lbl.Location = New System.Drawing.Point(275, 306)
@@ -113,6 +119,7 @@ Partial Class Tablo
         '
         'Answer4Lbl
         '
+        Me.Answer4Lbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer4Lbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer4Lbl.ForeColor = System.Drawing.Color.White
         Me.Answer4Lbl.Location = New System.Drawing.Point(275, 382)
@@ -124,6 +131,7 @@ Partial Class Tablo
         '
         'Answer5Lbl
         '
+        Me.Answer5Lbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer5Lbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer5Lbl.ForeColor = System.Drawing.Color.White
         Me.Answer5Lbl.Location = New System.Drawing.Point(275, 458)
@@ -135,6 +143,7 @@ Partial Class Tablo
         '
         'Answer6Lbl
         '
+        Me.Answer6Lbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer6Lbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer6Lbl.ForeColor = System.Drawing.Color.White
         Me.Answer6Lbl.Location = New System.Drawing.Point(275, 534)
@@ -146,6 +155,7 @@ Partial Class Tablo
         '
         'Answer1ScoreLbl
         '
+        Me.Answer1ScoreLbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer1ScoreLbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer1ScoreLbl.ForeColor = System.Drawing.Color.White
         Me.Answer1ScoreLbl.Location = New System.Drawing.Point(862, 154)
@@ -157,6 +167,7 @@ Partial Class Tablo
         '
         'Answer2ScoreLbl
         '
+        Me.Answer2ScoreLbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer2ScoreLbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer2ScoreLbl.ForeColor = System.Drawing.Color.White
         Me.Answer2ScoreLbl.Location = New System.Drawing.Point(862, 230)
@@ -168,6 +179,7 @@ Partial Class Tablo
         '
         'Answer3ScoreLbl
         '
+        Me.Answer3ScoreLbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer3ScoreLbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer3ScoreLbl.ForeColor = System.Drawing.Color.White
         Me.Answer3ScoreLbl.Location = New System.Drawing.Point(862, 306)
@@ -179,6 +191,7 @@ Partial Class Tablo
         '
         'Answer4ScoreLbl
         '
+        Me.Answer4ScoreLbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer4ScoreLbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer4ScoreLbl.ForeColor = System.Drawing.Color.White
         Me.Answer4ScoreLbl.Location = New System.Drawing.Point(862, 382)
@@ -190,6 +203,7 @@ Partial Class Tablo
         '
         'Answer5ScoreLbl
         '
+        Me.Answer5ScoreLbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer5ScoreLbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer5ScoreLbl.ForeColor = System.Drawing.Color.White
         Me.Answer5ScoreLbl.Location = New System.Drawing.Point(862, 458)
@@ -201,6 +215,7 @@ Partial Class Tablo
         '
         'Answer6ScoreLbl
         '
+        Me.Answer6ScoreLbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer6ScoreLbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer6ScoreLbl.ForeColor = System.Drawing.Color.White
         Me.Answer6ScoreLbl.Location = New System.Drawing.Point(862, 534)
@@ -212,6 +227,7 @@ Partial Class Tablo
         '
         'RightStrike3Lbl
         '
+        Me.RightStrike3Lbl.BackColor = System.Drawing.Color.Transparent
         Me.RightStrike3Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.RightStrike3Lbl.ForeColor = System.Drawing.Color.Red
         Me.RightStrike3Lbl.Location = New System.Drawing.Point(1065, 306)
@@ -223,6 +239,7 @@ Partial Class Tablo
         '
         'RightStrike2Lbl
         '
+        Me.RightStrike2Lbl.BackColor = System.Drawing.Color.Transparent
         Me.RightStrike2Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.RightStrike2Lbl.ForeColor = System.Drawing.Color.Red
         Me.RightStrike2Lbl.Location = New System.Drawing.Point(1065, 405)
@@ -234,6 +251,7 @@ Partial Class Tablo
         '
         'RightStrike1Lbl
         '
+        Me.RightStrike1Lbl.BackColor = System.Drawing.Color.Transparent
         Me.RightStrike1Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.RightStrike1Lbl.ForeColor = System.Drawing.Color.Red
         Me.RightStrike1Lbl.Location = New System.Drawing.Point(1065, 504)
@@ -245,6 +263,7 @@ Partial Class Tablo
         '
         'LeftStrike3Lbl
         '
+        Me.LeftStrike3Lbl.BackColor = System.Drawing.Color.Transparent
         Me.LeftStrike3Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.LeftStrike3Lbl.ForeColor = System.Drawing.Color.Red
         Me.LeftStrike3Lbl.Location = New System.Drawing.Point(12, 306)
@@ -256,6 +275,7 @@ Partial Class Tablo
         '
         'LeftStrike2Lbl
         '
+        Me.LeftStrike2Lbl.BackColor = System.Drawing.Color.Transparent
         Me.LeftStrike2Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.LeftStrike2Lbl.ForeColor = System.Drawing.Color.Red
         Me.LeftStrike2Lbl.Location = New System.Drawing.Point(12, 405)
@@ -267,6 +287,7 @@ Partial Class Tablo
         '
         'LeftStrike1Lbl
         '
+        Me.LeftStrike1Lbl.BackColor = System.Drawing.Color.Transparent
         Me.LeftStrike1Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.LeftStrike1Lbl.ForeColor = System.Drawing.Color.Red
         Me.LeftStrike1Lbl.Location = New System.Drawing.Point(12, 504)
@@ -281,6 +302,7 @@ Partial Class Tablo
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.Green
+        Me.BackgroundImage = Global.StoKOdnomuControl.My.Resources.Resources.sto_layout_main
         Me.ClientSize = New System.Drawing.Size(1264, 681)
         Me.Controls.Add(Me.LeftStrike3Lbl)
         Me.Controls.Add(Me.LeftStrike2Lbl)

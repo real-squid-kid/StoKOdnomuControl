@@ -165,6 +165,8 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Digital Dismay.otf" />
+    <None Include="Resources\digital-7 %28mono%29.ttf" />
     <None Include="Resources\line_wrong.wav" />
   </ItemGroup>
   <ItemGroup>
@@ -181,6 +183,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\prosto_open.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sto_layout_main.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sto_layout_big.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

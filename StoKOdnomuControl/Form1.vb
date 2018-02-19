@@ -272,4 +272,9 @@ Public Class Form1
             Answer6CostTxt.ForeColor = Color.Black
         End If
     End Sub
+
+    Private Sub BigRoundBtn_Click(sender As Object, e As EventArgs) Handles BigRoundBtn.Click
+        BigGameControl.Show()
+        BigGameTablo.Show()
+    End Sub
 End Class

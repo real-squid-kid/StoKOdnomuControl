@@ -51,6 +51,7 @@ Partial Class BigGameControl
         Me.NextBtn = New System.Windows.Forms.Button()
         Me.Button1 = New System.Windows.Forms.Button()
         Me.GrayChk = New System.Windows.Forms.CheckBox()
+        Me.SameAnswerBtn = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'Answer5CostTxt
@@ -325,6 +326,16 @@ Partial Class BigGameControl
         Me.GrayChk.Text = "Затемнить"
         Me.GrayChk.UseVisualStyleBackColor = True
         '
+        'SameAnswerBtn
+        '
+        Me.SameAnswerBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.SameAnswerBtn.Location = New System.Drawing.Point(144, 93)
+        Me.SameAnswerBtn.Name = "SameAnswerBtn"
+        Me.SameAnswerBtn.Size = New System.Drawing.Size(125, 75)
+        Me.SameAnswerBtn.TabIndex = 18
+        Me.SameAnswerBtn.Text = "Тот же ответ"
+        Me.SameAnswerBtn.UseVisualStyleBackColor = True
+        '
         'BigGameControl
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -335,6 +346,7 @@ Partial Class BigGameControl
         Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.NextBtn)
         Me.Controls.Add(Me.ShowInfoBtn)
+        Me.Controls.Add(Me.SameAnswerBtn)
         Me.Controls.Add(Me.StartStopBtn)
         Me.Controls.Add(Me.Timer20Btn)
         Me.Controls.Add(Me.Timer15Btn)
@@ -397,4 +409,5 @@ Partial Class BigGameControl
     Friend WithEvents NextBtn As Button
     Friend WithEvents Button1 As Button
     Friend WithEvents GrayChk As CheckBox
+    Friend WithEvents SameAnswerBtn As Button
 End Class
