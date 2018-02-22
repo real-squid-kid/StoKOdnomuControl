@@ -60,7 +60,7 @@ Partial Class BigGameControl
         Me.Answer5CostTxt.Location = New System.Drawing.Point(448, 481)
         Me.Answer5CostTxt.Name = "Answer5CostTxt"
         Me.Answer5CostTxt.Size = New System.Drawing.Size(81, 62)
-        Me.Answer5CostTxt.TabIndex = 8
+        Me.Answer5CostTxt.TabIndex = 29
         Me.Answer5CostTxt.Text = "00"
         '
         'Answer5Txt
@@ -69,7 +69,7 @@ Partial Class BigGameControl
         Me.Answer5Txt.Location = New System.Drawing.Point(98, 481)
         Me.Answer5Txt.Name = "Answer5Txt"
         Me.Answer5Txt.Size = New System.Drawing.Size(344, 62)
-        Me.Answer5Txt.TabIndex = 9
+        Me.Answer5Txt.TabIndex = 24
         Me.Answer5Txt.Text = "ОТВЕТ"
         '
         'Answer4CostTxt
@@ -78,7 +78,7 @@ Partial Class BigGameControl
         Me.Answer4CostTxt.Location = New System.Drawing.Point(448, 413)
         Me.Answer4CostTxt.Name = "Answer4CostTxt"
         Me.Answer4CostTxt.Size = New System.Drawing.Size(81, 62)
-        Me.Answer4CostTxt.TabIndex = 10
+        Me.Answer4CostTxt.TabIndex = 28
         Me.Answer4CostTxt.Text = "00"
         '
         'Answer4Txt
@@ -87,7 +87,7 @@ Partial Class BigGameControl
         Me.Answer4Txt.Location = New System.Drawing.Point(98, 413)
         Me.Answer4Txt.Name = "Answer4Txt"
         Me.Answer4Txt.Size = New System.Drawing.Size(344, 62)
-        Me.Answer4Txt.TabIndex = 11
+        Me.Answer4Txt.TabIndex = 23
         Me.Answer4Txt.Text = "ОТВЕТ"
         '
         'Answer3CostTxt
@@ -96,7 +96,7 @@ Partial Class BigGameControl
         Me.Answer3CostTxt.Location = New System.Drawing.Point(448, 345)
         Me.Answer3CostTxt.Name = "Answer3CostTxt"
         Me.Answer3CostTxt.Size = New System.Drawing.Size(81, 62)
-        Me.Answer3CostTxt.TabIndex = 12
+        Me.Answer3CostTxt.TabIndex = 27
         Me.Answer3CostTxt.Text = "00"
         '
         'Answer3Txt
@@ -105,7 +105,7 @@ Partial Class BigGameControl
         Me.Answer3Txt.Location = New System.Drawing.Point(98, 345)
         Me.Answer3Txt.Name = "Answer3Txt"
         Me.Answer3Txt.Size = New System.Drawing.Size(344, 62)
-        Me.Answer3Txt.TabIndex = 13
+        Me.Answer3Txt.TabIndex = 22
         Me.Answer3Txt.Text = "ОТВЕТ"
         '
         'Answer2CostTxt
@@ -114,7 +114,7 @@ Partial Class BigGameControl
         Me.Answer2CostTxt.Location = New System.Drawing.Point(448, 277)
         Me.Answer2CostTxt.Name = "Answer2CostTxt"
         Me.Answer2CostTxt.Size = New System.Drawing.Size(81, 62)
-        Me.Answer2CostTxt.TabIndex = 14
+        Me.Answer2CostTxt.TabIndex = 26
         Me.Answer2CostTxt.Text = "00"
         '
         'Answer2Txt
@@ -123,7 +123,7 @@ Partial Class BigGameControl
         Me.Answer2Txt.Location = New System.Drawing.Point(98, 277)
         Me.Answer2Txt.Name = "Answer2Txt"
         Me.Answer2Txt.Size = New System.Drawing.Size(344, 62)
-        Me.Answer2Txt.TabIndex = 15
+        Me.Answer2Txt.TabIndex = 21
         Me.Answer2Txt.Text = "ОТВЕТ"
         '
         'Answer1CostTxt
@@ -132,7 +132,7 @@ Partial Class BigGameControl
         Me.Answer1CostTxt.Location = New System.Drawing.Point(448, 209)
         Me.Answer1CostTxt.Name = "Answer1CostTxt"
         Me.Answer1CostTxt.Size = New System.Drawing.Size(81, 62)
-        Me.Answer1CostTxt.TabIndex = 16
+        Me.Answer1CostTxt.TabIndex = 25
         Me.Answer1CostTxt.Text = "00"
         '
         'Answer1Txt
@@ -141,7 +141,7 @@ Partial Class BigGameControl
         Me.Answer1Txt.Location = New System.Drawing.Point(98, 209)
         Me.Answer1Txt.Name = "Answer1Txt"
         Me.Answer1Txt.Size = New System.Drawing.Size(344, 62)
-        Me.Answer1Txt.TabIndex = 17
+        Me.Answer1Txt.TabIndex = 20
         Me.Answer1Txt.Text = "ОТВЕТ"
         '
         'Answer6Txt
@@ -150,7 +150,7 @@ Partial Class BigGameControl
         Me.Answer6Txt.Location = New System.Drawing.Point(713, 209)
         Me.Answer6Txt.Name = "Answer6Txt"
         Me.Answer6Txt.Size = New System.Drawing.Size(344, 62)
-        Me.Answer6Txt.TabIndex = 17
+        Me.Answer6Txt.TabIndex = 30
         Me.Answer6Txt.Text = "ОТВЕТ"
         '
         'Answer6CostTxt
@@ -159,7 +159,7 @@ Partial Class BigGameControl
         Me.Answer6CostTxt.Location = New System.Drawing.Point(1063, 209)
         Me.Answer6CostTxt.Name = "Answer6CostTxt"
         Me.Answer6CostTxt.Size = New System.Drawing.Size(81, 62)
-        Me.Answer6CostTxt.TabIndex = 16
+        Me.Answer6CostTxt.TabIndex = 35
         Me.Answer6CostTxt.Text = "00"
         '
         'Answer7Txt
@@ -168,7 +168,7 @@ Partial Class BigGameControl
         Me.Answer7Txt.Location = New System.Drawing.Point(713, 277)
         Me.Answer7Txt.Name = "Answer7Txt"
         Me.Answer7Txt.Size = New System.Drawing.Size(344, 62)
-        Me.Answer7Txt.TabIndex = 15
+        Me.Answer7Txt.TabIndex = 31
         Me.Answer7Txt.Text = "ОТВЕТ"
         '
         'Answer7CostTxt
@@ -177,7 +177,7 @@ Partial Class BigGameControl
         Me.Answer7CostTxt.Location = New System.Drawing.Point(1063, 277)
         Me.Answer7CostTxt.Name = "Answer7CostTxt"
         Me.Answer7CostTxt.Size = New System.Drawing.Size(81, 62)
-        Me.Answer7CostTxt.TabIndex = 14
+        Me.Answer7CostTxt.TabIndex = 36
         Me.Answer7CostTxt.Text = "00"
         '
         'Answer8Txt
@@ -186,7 +186,7 @@ Partial Class BigGameControl
         Me.Answer8Txt.Location = New System.Drawing.Point(713, 345)
         Me.Answer8Txt.Name = "Answer8Txt"
         Me.Answer8Txt.Size = New System.Drawing.Size(344, 62)
-        Me.Answer8Txt.TabIndex = 13
+        Me.Answer8Txt.TabIndex = 32
         Me.Answer8Txt.Text = "ОТВЕТ"
         '
         'Answer8CostTxt
@@ -195,7 +195,7 @@ Partial Class BigGameControl
         Me.Answer8CostTxt.Location = New System.Drawing.Point(1063, 345)
         Me.Answer8CostTxt.Name = "Answer8CostTxt"
         Me.Answer8CostTxt.Size = New System.Drawing.Size(81, 62)
-        Me.Answer8CostTxt.TabIndex = 12
+        Me.Answer8CostTxt.TabIndex = 37
         Me.Answer8CostTxt.Text = "00"
         '
         'Answer9Txt
@@ -204,7 +204,7 @@ Partial Class BigGameControl
         Me.Answer9Txt.Location = New System.Drawing.Point(713, 413)
         Me.Answer9Txt.Name = "Answer9Txt"
         Me.Answer9Txt.Size = New System.Drawing.Size(344, 62)
-        Me.Answer9Txt.TabIndex = 11
+        Me.Answer9Txt.TabIndex = 33
         Me.Answer9Txt.Text = "ОТВЕТ"
         '
         'Answer9CostTxt
@@ -213,7 +213,7 @@ Partial Class BigGameControl
         Me.Answer9CostTxt.Location = New System.Drawing.Point(1063, 413)
         Me.Answer9CostTxt.Name = "Answer9CostTxt"
         Me.Answer9CostTxt.Size = New System.Drawing.Size(81, 62)
-        Me.Answer9CostTxt.TabIndex = 10
+        Me.Answer9CostTxt.TabIndex = 38
         Me.Answer9CostTxt.Text = "00"
         '
         'Answer10Txt
@@ -222,7 +222,7 @@ Partial Class BigGameControl
         Me.Answer10Txt.Location = New System.Drawing.Point(713, 481)
         Me.Answer10Txt.Name = "Answer10Txt"
         Me.Answer10Txt.Size = New System.Drawing.Size(344, 62)
-        Me.Answer10Txt.TabIndex = 9
+        Me.Answer10Txt.TabIndex = 34
         Me.Answer10Txt.Text = "ОТВЕТ"
         '
         'Answer10CostTxt
@@ -231,7 +231,7 @@ Partial Class BigGameControl
         Me.Answer10CostTxt.Location = New System.Drawing.Point(1063, 481)
         Me.Answer10CostTxt.Name = "Answer10CostTxt"
         Me.Answer10CostTxt.Size = New System.Drawing.Size(81, 62)
-        Me.Answer10CostTxt.TabIndex = 8
+        Me.Answer10CostTxt.TabIndex = 39
         Me.Answer10CostTxt.Text = "00"
         '
         'Timer15Btn

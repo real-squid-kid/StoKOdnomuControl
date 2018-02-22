@@ -189,10 +189,10 @@ Public Class Form1
                 Dim a As Integer
                 a = Int(RoundScoreTxt.Text) + Int(Answer4CostTxt.Text)
                 RoundScoreTxt.Text = a
-                Tablo.Reveal(4, Answer1Txt.Text, Answer4CostTxt.Text, RoundScoreTxt.Text, 2)
+                Tablo.Reveal(4, Answer4Txt.Text, Answer4CostTxt.Text, RoundScoreTxt.Text, 2)
                 Answer4RevealBtn.BackColor = Color.LightGreen
             Else
-                Tablo.Reveal(4, Answer1Txt.Text, Answer4CostTxt.Text, RoundScoreTxt.Text, 1)
+                Tablo.Reveal(4, Answer4Txt.Text, Answer4CostTxt.Text, RoundScoreTxt.Text, 1)
                 Answer4RevealBtn.BackColor = Color.LightGreen
             End If
         Else
@@ -276,5 +276,93 @@ Public Class Form1
     Private Sub BigRoundBtn_Click(sender As Object, e As EventArgs) Handles BigRoundBtn.Click
         BigGameControl.Show()
         BigGameTablo.Show()
+    End Sub
+
+    Private Sub FirstRoundBtn_Click(sender As Object, e As EventArgs) Handles FirstRoundBtn.Click
+        Dim Answers1() As String = Answers(0).Split("&")
+        Dim Answers2() As String = Answers(1).Split("&")
+        Dim Answers3() As String = Answers(2).Split("&")
+        Dim Answers4() As String = Answers(3).Split("&")
+        Dim Answers5() As String = Answers(4).Split("&")
+        Dim Answers6() As String = Answers(5).Split("&")
+        Answer1Txt.Text = Answers1(0)
+        Answer2Txt.Text = Answers2(0)
+        Answer3Txt.Text = Answers3(0)
+        Answer4Txt.Text = Answers4(0)
+        Answer5Txt.Text = Answers5(0)
+        Answer6Txt.Text = Answers6(0)
+        Answer1CostTxt.Text = Answers1(1)
+        Answer2CostTxt.Text = Answers2(1)
+        Answer3CostTxt.Text = Answers3(1)
+        Answer4CostTxt.Text = Answers4(1)
+        Answer5CostTxt.Text = Answers5(1)
+        Answer6CostTxt.Text = Answers6(1)
+        Tablo.Prepare()
+    End Sub
+
+    Private Sub SecondRoundBtn_Click(sender As Object, e As EventArgs) Handles SecondRoundBtn.Click
+        Dim Answers1() As String = Answers(6).Split("&")
+        Dim Answers2() As String = Answers(7).Split("&")
+        Dim Answers3() As String = Answers(8).Split("&")
+        Dim Answers4() As String = Answers(9).Split("&")
+        Dim Answers5() As String = Answers(10).Split("&")
+        Dim Answers6() As String = Answers(11).Split("&")
+        Answer1Txt.Text = Answers1(0)
+        Answer2Txt.Text = Answers2(0)
+        Answer3Txt.Text = Answers3(0)
+        Answer4Txt.Text = Answers4(0)
+        Answer5Txt.Text = Answers5(0)
+        Answer6Txt.Text = Answers6(0)
+        Answer1CostTxt.Text = Answers1(1)
+        Answer2CostTxt.Text = Answers2(1)
+        Answer3CostTxt.Text = Answers3(1)
+        Answer4CostTxt.Text = Answers4(1)
+        Answer5CostTxt.Text = Answers5(1)
+        Answer6CostTxt.Text = Answers6(1)
+        Tablo.Prepare()
+    End Sub
+
+    Private Sub ThirdRoundBtn_Click(sender As Object, e As EventArgs) Handles ThirdRoundBtn.Click
+        Dim Answers1() As String = Answers(12).Split("&")
+        Dim Answers2() As String = Answers(13).Split("&")
+        Dim Answers3() As String = Answers(14).Split("&")
+        Dim Answers4() As String = Answers(15).Split("&")
+        Dim Answers5() As String = Answers(16).Split("&")
+        Dim Answers6() As String = Answers(17).Split("&")
+        Answer1Txt.Text = Answers1(0)
+        Answer2Txt.Text = Answers2(0)
+        Answer3Txt.Text = Answers3(0)
+        Answer4Txt.Text = Answers4(0)
+        Answer5Txt.Text = Answers5(0)
+        Answer6Txt.Text = Answers6(0)
+        Answer1CostTxt.Text = Answers1(1)
+        Answer2CostTxt.Text = Answers2(1)
+        Answer3CostTxt.Text = Answers3(1)
+        Answer4CostTxt.Text = Answers4(1)
+        Answer5CostTxt.Text = Answers5(1)
+        Answer6CostTxt.Text = Answers6(1)
+        Tablo.Prepare()
+    End Sub
+
+    Private Sub FourthRoundBtn_Click(sender As Object, e As EventArgs) Handles FourthRoundBtn.Click
+        Dim Answers1 As String = Answers(18)
+        Dim Answers2 As String = Answers(19)
+        Dim Answers3 As String = Answers(20)
+        Dim Answers4 As String = Answers(21)
+        Dim Answers5 As String = Answers(22)
+        Dim Answers6 As String = Answers(23)
+        Answer1Txt.Text = Answers1
+        Answer2Txt.Text = Answers2
+        Answer3Txt.Text = Answers3
+        Answer4Txt.Text = Answers4
+        Answer5Txt.Text = Answers5
+        Answer6Txt.Text = Answers6
+        Answer1CostTxt.Text = 15
+        Answer2CostTxt.Text = 30
+        Answer3CostTxt.Text = 45
+        Answer4CostTxt.Text = 60
+        Answer5CostTxt.Text = 120
+        Answer6CostTxt.Text = 240
+        Tablo.Prepare()
     End Sub
 End Class

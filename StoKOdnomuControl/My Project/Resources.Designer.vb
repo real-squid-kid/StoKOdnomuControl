@@ -70,16 +70,6 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized resource of type System.Byte[].
-        '''</summary>
-        Friend ReadOnly Property DigitalFont() As Byte()
-            Get
-                Dim obj As Object = ResourceManager.GetObject("DigitalFont", resourceCulture)
-                Return CType(obj,Byte())
-            End Get
-        End Property
-        
-        '''<summary>
         '''  Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         '''</summary>
         Friend ReadOnly Property line_open() As System.IO.UnmanagedMemoryStream
@@ -94,6 +84,15 @@ Namespace My.Resources
         Friend ReadOnly Property line_wrong() As System.IO.UnmanagedMemoryStream
             Get
                 Return ResourceManager.GetStream("line_wrong", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        '''</summary>
+        Friend ReadOnly Property prosto_duplicate() As System.IO.UnmanagedMemoryStream
+            Get
+                Return ResourceManager.GetStream("prosto_duplicate", resourceCulture)
             End Get
         End Property
         

@@ -121,14 +121,14 @@
   <data name="bing" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\bing.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="DigitalFont" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\digital-7 (mono).ttf;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="line_open" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\line_open.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="line_wrong" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\line_wrong.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="prosto_duplicate" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\prosto_duplicate.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="prosto_open" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\prosto_open.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>

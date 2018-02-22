@@ -22,6 +22,7 @@ Partial Class BigGameTablo
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
         Me.TotalTxt = New System.Windows.Forms.Label()
         Me.Answer5Lbl = New System.Windows.Forms.Label()
         Me.Answer4Lbl = New System.Windows.Forms.Label()
@@ -46,6 +47,7 @@ Partial Class BigGameTablo
         Me.Answer9Lbl = New System.Windows.Forms.Label()
         Me.Answer10Lbl = New System.Windows.Forms.Label()
         Me.TimerLbl = New System.Windows.Forms.Label()
+        Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         Me.SuspendLayout()
         '
         'TotalTxt
@@ -336,6 +338,10 @@ Partial Class BigGameTablo
         Me.TimerLbl.Text = "000"
         Me.TimerLbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
+        'Timer1
+        '
+        Me.Timer1.Interval = 1000
+        '
         'BigGameTablo
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -399,4 +405,5 @@ Partial Class BigGameTablo
     Friend WithEvents Answer9Lbl As Label
     Friend WithEvents Answer10Lbl As Label
     Friend WithEvents TimerLbl As Label
+    Friend WithEvents Timer1 As Timer
 End Class
