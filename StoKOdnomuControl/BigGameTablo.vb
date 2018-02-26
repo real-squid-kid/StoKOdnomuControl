@@ -62,7 +62,7 @@
     Public Sub SetTimer(e As Integer)
         TimerLbl.Text = e
         TimerLbl.Visible = True
-        My.Computer.Audio.Play(My.Resources.prosto_open, AudioPlayMode.Background)
+        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
     End Sub
 
     Public Sub StartTimer()
@@ -83,7 +83,7 @@
         TimerLbl.Text -= 1
         If TimerLbl.Text < 0 Then
             StopTimer()
-            My.Computer.Audio.Play(My.Resources.prosto_wrong, AudioPlayMode.Background)
+            My.Computer.Audio.Play(My.Resources.alarm, AudioPlayMode.Background)
         End If
     End Sub
 
@@ -98,9 +98,9 @@
                 TotalLbl.Text = BigGameControl.ScoreTxt.Text
                 RoundScoreLbl.Text = TotalLbl.Text
                 If param = 0 Then
-                    My.Computer.Audio.Play(My.Resources.prosto_wrong, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources.prosto_open, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
                 End If
             Case 2
                 Answer2Lbl.Text = param
@@ -111,9 +111,9 @@
                 TotalLbl.Text = BigGameControl.ScoreTxt.Text
                 RoundScoreLbl.Text = TotalLbl.Text
                 If param = 0 Then
-                    My.Computer.Audio.Play(My.Resources.prosto_wrong, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources.prosto_open, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
                 End If
             Case 3
                 Answer3Lbl.Text = param
@@ -124,9 +124,9 @@
                 TotalLbl.Text = BigGameControl.ScoreTxt.Text
                 RoundScoreLbl.Text = TotalLbl.Text
                 If param = 0 Then
-                    My.Computer.Audio.Play(My.Resources.prosto_wrong, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources.prosto_open, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
                 End If
             Case 4
                 Answer4Lbl.Text = param
@@ -137,9 +137,9 @@
                 TotalLbl.Text = BigGameControl.ScoreTxt.Text
                 RoundScoreLbl.Text = TotalLbl.Text
                 If param = 0 Then
-                    My.Computer.Audio.Play(My.Resources.prosto_wrong, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources.prosto_open, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
                 End If
             Case 5
                 Answer5Lbl.Text = param
@@ -150,9 +150,9 @@
                 TotalLbl.Text = BigGameControl.ScoreTxt.Text
                 RoundScoreLbl.Text = TotalLbl.Text
                 If param = 0 Then
-                    My.Computer.Audio.Play(My.Resources.prosto_wrong, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources.prosto_open, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
                 End If
             Case 6
                 Answer6Lbl.Text = param
@@ -163,9 +163,9 @@
                 TotalLbl.Text = BigGameControl.ScoreTxt.Text
                 RoundScoreLbl.Text = TotalLbl.Text
                 If param = 0 Then
-                    My.Computer.Audio.Play(My.Resources.prosto_wrong, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources.prosto_open, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
                 End If
             Case 7
                 Answer7Lbl.Text = param
@@ -176,9 +176,9 @@
                 TotalLbl.Text = BigGameControl.ScoreTxt.Text
                 RoundScoreLbl.Text = TotalLbl.Text
                 If param = 0 Then
-                    My.Computer.Audio.Play(My.Resources.prosto_wrong, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources.prosto_open, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
                 End If
             Case 8
                 Answer8Lbl.Text = param
@@ -189,9 +189,9 @@
                 TotalLbl.Text = BigGameControl.ScoreTxt.Text
                 RoundScoreLbl.Text = TotalLbl.Text
                 If param = 0 Then
-                    My.Computer.Audio.Play(My.Resources.prosto_wrong, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources.prosto_open, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
                 End If
             Case 9
                 Answer9Lbl.Text = param
@@ -202,9 +202,9 @@
                 TotalLbl.Text = BigGameControl.ScoreTxt.Text
                 RoundScoreLbl.Text = TotalLbl.Text
                 If param = 0 Then
-                    My.Computer.Audio.Play(My.Resources.prosto_wrong, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources.prosto_open, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
                 End If
             Case 10
                 Answer10Lbl.Text = param
@@ -215,9 +215,9 @@
                 TotalLbl.Text = BigGameControl.ScoreTxt.Text
                 RoundScoreLbl.Text = TotalLbl.Text
                 If param = 0 Then
-                    My.Computer.Audio.Play(My.Resources.prosto_wrong, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources.prosto_open, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
                 End If
         End Select
     End Sub

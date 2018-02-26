@@ -347,7 +347,7 @@ Partial Class BigGameTablo
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.Green
-        Me.BackgroundImage = Global.StoKOdnomuControl.My.Resources.Resources.sto_layout_big
+        Me.BackgroundImage = Global.StoKOdnomuControl.My.Resources.Resources._1995_sto_big
         Me.ClientSize = New System.Drawing.Size(1264, 681)
         Me.Controls.Add(Me.TotalTxt)
         Me.Controls.Add(Me.Answer10Lbl)
@@ -377,6 +377,7 @@ Partial Class BigGameTablo
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "BigGameTablo"
+        Me.Text = "BigGame"
         Me.ResumeLayout(False)
 
     End Sub

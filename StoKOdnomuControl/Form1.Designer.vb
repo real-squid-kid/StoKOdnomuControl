@@ -64,12 +64,19 @@ Partial Class Form1
         Me.ShowTabloBtn = New System.Windows.Forms.Button()
         Me.TabloPrepareBtn = New System.Windows.Forms.Button()
         Me.GrayChk = New System.Windows.Forms.CheckBox()
+        Me.StoAttractBtn = New System.Windows.Forms.Button()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.SimpleAttractBtn = New System.Windows.Forms.Button()
+        Me.DoubleAttractBtn = New System.Windows.Forms.Button()
+        Me.TripleAttractBtn = New System.Windows.Forms.Button()
+        Me.UnderAttractBtn = New System.Windows.Forms.Button()
+        Me.BigAttractBtn = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'OpenQuestionsBtn
         '
         Me.OpenQuestionsBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.OpenQuestionsBtn.Location = New System.Drawing.Point(12, 594)
+        Me.OpenQuestionsBtn.Location = New System.Drawing.Point(1177, 594)
         Me.OpenQuestionsBtn.Name = "OpenQuestionsBtn"
         Me.OpenQuestionsBtn.Size = New System.Drawing.Size(75, 75)
         Me.OpenQuestionsBtn.TabIndex = 0
@@ -332,7 +339,7 @@ Partial Class Form1
         '
         Me.LeftCross3Btn.BackColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
         Me.LeftCross3Btn.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.LeftCross3Btn.Location = New System.Drawing.Point(175, 269)
+        Me.LeftCross3Btn.Location = New System.Drawing.Point(256, 264)
         Me.LeftCross3Btn.Name = "LeftCross3Btn"
         Me.LeftCross3Btn.Size = New System.Drawing.Size(75, 75)
         Me.LeftCross3Btn.TabIndex = 11
@@ -343,7 +350,7 @@ Partial Class Form1
         '
         Me.LeftCross2Btn.BackColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
         Me.LeftCross2Btn.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.LeftCross2Btn.Location = New System.Drawing.Point(175, 350)
+        Me.LeftCross2Btn.Location = New System.Drawing.Point(256, 345)
         Me.LeftCross2Btn.Name = "LeftCross2Btn"
         Me.LeftCross2Btn.Size = New System.Drawing.Size(75, 75)
         Me.LeftCross2Btn.TabIndex = 11
@@ -354,7 +361,7 @@ Partial Class Form1
         '
         Me.LeftCross1Btn.BackColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
         Me.LeftCross1Btn.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.LeftCross1Btn.Location = New System.Drawing.Point(175, 431)
+        Me.LeftCross1Btn.Location = New System.Drawing.Point(256, 426)
         Me.LeftCross1Btn.Name = "LeftCross1Btn"
         Me.LeftCross1Btn.Size = New System.Drawing.Size(75, 75)
         Me.LeftCross1Btn.TabIndex = 11
@@ -365,7 +372,7 @@ Partial Class Form1
         '
         Me.RightCross3Btn.BackColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
         Me.RightCross3Btn.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.RightCross3Btn.Location = New System.Drawing.Point(994, 264)
+        Me.RightCross3Btn.Location = New System.Drawing.Point(977, 264)
         Me.RightCross3Btn.Name = "RightCross3Btn"
         Me.RightCross3Btn.Size = New System.Drawing.Size(75, 75)
         Me.RightCross3Btn.TabIndex = 11
@@ -376,7 +383,7 @@ Partial Class Form1
         '
         Me.RightCross2Btn.BackColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
         Me.RightCross2Btn.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.RightCross2Btn.Location = New System.Drawing.Point(994, 345)
+        Me.RightCross2Btn.Location = New System.Drawing.Point(977, 345)
         Me.RightCross2Btn.Name = "RightCross2Btn"
         Me.RightCross2Btn.Size = New System.Drawing.Size(75, 75)
         Me.RightCross2Btn.TabIndex = 11
@@ -387,7 +394,7 @@ Partial Class Form1
         '
         Me.RightCross1Btn.BackColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
         Me.RightCross1Btn.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.RightCross1Btn.Location = New System.Drawing.Point(994, 426)
+        Me.RightCross1Btn.Location = New System.Drawing.Point(977, 426)
         Me.RightCross1Btn.Name = "RightCross1Btn"
         Me.RightCross1Btn.Size = New System.Drawing.Size(75, 75)
         Me.RightCross1Btn.TabIndex = 11
@@ -485,11 +492,82 @@ Partial Class Form1
         Me.GrayChk.Text = "Затемнить"
         Me.GrayChk.UseVisualStyleBackColor = True
         '
+        'StoAttractBtn
+        '
+        Me.StoAttractBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.StoAttractBtn.Location = New System.Drawing.Point(13, 158)
+        Me.StoAttractBtn.Name = "StoAttractBtn"
+        Me.StoAttractBtn.Size = New System.Drawing.Size(156, 75)
+        Me.StoAttractBtn.TabIndex = 1
+        Me.StoAttractBtn.Text = "СТО К ОДНОМУ"
+        Me.StoAttractBtn.UseVisualStyleBackColor = True
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Label1.Location = New System.Drawing.Point(30, 117)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(114, 29)
+        Me.Label1.TabIndex = 21
+        Me.Label1.Text = "Надписи"
+        '
+        'SimpleAttractBtn
+        '
+        Me.SimpleAttractBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.SimpleAttractBtn.Location = New System.Drawing.Point(13, 239)
+        Me.SimpleAttractBtn.Name = "SimpleAttractBtn"
+        Me.SimpleAttractBtn.Size = New System.Drawing.Size(156, 75)
+        Me.SimpleAttractBtn.TabIndex = 1
+        Me.SimpleAttractBtn.Text = "ПРОСТАЯ ИГРА"
+        Me.SimpleAttractBtn.UseVisualStyleBackColor = True
+        '
+        'DoubleAttractBtn
+        '
+        Me.DoubleAttractBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.DoubleAttractBtn.Location = New System.Drawing.Point(12, 320)
+        Me.DoubleAttractBtn.Name = "DoubleAttractBtn"
+        Me.DoubleAttractBtn.Size = New System.Drawing.Size(156, 75)
+        Me.DoubleAttractBtn.TabIndex = 1
+        Me.DoubleAttractBtn.Text = "ДВОЙНАЯ ИГРА"
+        Me.DoubleAttractBtn.UseVisualStyleBackColor = True
+        '
+        'TripleAttractBtn
+        '
+        Me.TripleAttractBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.TripleAttractBtn.Location = New System.Drawing.Point(13, 401)
+        Me.TripleAttractBtn.Name = "TripleAttractBtn"
+        Me.TripleAttractBtn.Size = New System.Drawing.Size(156, 75)
+        Me.TripleAttractBtn.TabIndex = 1
+        Me.TripleAttractBtn.Text = "ТРОЙНАЯ ИГРА"
+        Me.TripleAttractBtn.UseVisualStyleBackColor = True
+        '
+        'UnderAttractBtn
+        '
+        Me.UnderAttractBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.UnderAttractBtn.Location = New System.Drawing.Point(12, 482)
+        Me.UnderAttractBtn.Name = "UnderAttractBtn"
+        Me.UnderAttractBtn.Size = New System.Drawing.Size(156, 75)
+        Me.UnderAttractBtn.TabIndex = 1
+        Me.UnderAttractBtn.Text = "ИГРА НАОБОРОТ"
+        Me.UnderAttractBtn.UseVisualStyleBackColor = True
+        '
+        'BigAttractBtn
+        '
+        Me.BigAttractBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.BigAttractBtn.Location = New System.Drawing.Point(12, 563)
+        Me.BigAttractBtn.Name = "BigAttractBtn"
+        Me.BigAttractBtn.Size = New System.Drawing.Size(156, 75)
+        Me.BigAttractBtn.TabIndex = 1
+        Me.BigAttractBtn.Text = "БОЛЬШАЯ ИГРА"
+        Me.BigAttractBtn.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1264, 681)
+        Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.GrayChk)
         Me.Controls.Add(Me.TabloPrepareBtn)
         Me.Controls.Add(Me.Answer6RevealBtn)
@@ -530,6 +608,12 @@ Partial Class Form1
         Me.Controls.Add(Me.FourthRoundBtn)
         Me.Controls.Add(Me.ThirdRoundBtn)
         Me.Controls.Add(Me.SecondRoundBtn)
+        Me.Controls.Add(Me.BigAttractBtn)
+        Me.Controls.Add(Me.UnderAttractBtn)
+        Me.Controls.Add(Me.TripleAttractBtn)
+        Me.Controls.Add(Me.DoubleAttractBtn)
+        Me.Controls.Add(Me.SimpleAttractBtn)
+        Me.Controls.Add(Me.StoAttractBtn)
         Me.Controls.Add(Me.FirstRoundBtn)
         Me.Controls.Add(Me.OpenQuestionsBtn)
         Me.MaximizeBox = False
@@ -583,4 +667,11 @@ Partial Class Form1
     Friend WithEvents ShowTabloBtn As Button
     Friend WithEvents TabloPrepareBtn As Button
     Friend WithEvents GrayChk As CheckBox
+    Friend WithEvents StoAttractBtn As Button
+    Friend WithEvents Label1 As Label
+    Friend WithEvents SimpleAttractBtn As Button
+    Friend WithEvents DoubleAttractBtn As Button
+    Friend WithEvents TripleAttractBtn As Button
+    Friend WithEvents UnderAttractBtn As Button
+    Friend WithEvents BigAttractBtn As Button
 End Class

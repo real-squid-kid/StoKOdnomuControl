@@ -54,7 +54,7 @@
     End Sub
 
     Private Sub SameAnswerBtn_Click(sender As Object, e As EventArgs) Handles SameAnswerBtn.Click
-        My.Computer.Audio.Play(My.Resources.prosto_duplicate, AudioPlayMode.Background)
+        My.Computer.Audio.Play(My.Resources.sto_dulpicate, AudioPlayMode.Background)
     End Sub
 
     Private Sub Timer15Btn_Click(sender As Object, e As EventArgs) Handles Timer15Btn.Click

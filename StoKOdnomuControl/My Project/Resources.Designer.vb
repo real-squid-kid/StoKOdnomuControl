@@ -61,11 +61,49 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property _1995_sto_big() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("_1995_sto_big", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property _1995_sto_main() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("_1995_sto_main", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        '''</summary>
+        Friend ReadOnly Property alarm() As System.IO.UnmanagedMemoryStream
+            Get
+                Return ResourceManager.GetStream("alarm", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         '''</summary>
         Friend ReadOnly Property bing() As System.IO.UnmanagedMemoryStream
             Get
                 Return ResourceManager.GetStream("bing", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        '''</summary>
+        Friend ReadOnly Property duplicate() As System.IO.UnmanagedMemoryStream
+            Get
+                Return ResourceManager.GetStream("duplicate", resourceCulture)
             End Get
         End Property
         
@@ -120,6 +158,15 @@ Namespace My.Resources
         Friend ReadOnly Property prosto_wrong() As System.IO.UnmanagedMemoryStream
             Get
                 Return ResourceManager.GetStream("prosto_wrong", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        '''</summary>
+        Friend ReadOnly Property sto_dulpicate() As System.IO.UnmanagedMemoryStream
+            Get
+                Return ResourceManager.GetStream("sto_dulpicate", resourceCulture)
             End Get
         End Property
         

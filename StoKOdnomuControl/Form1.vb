@@ -279,6 +279,7 @@ Public Class Form1
     End Sub
 
     Private Sub FirstRoundBtn_Click(sender As Object, e As EventArgs) Handles FirstRoundBtn.Click
+        Tablo.SetRound(1)
         Dim Answers1() As String = Answers(0).Split("&")
         Dim Answers2() As String = Answers(1).Split("&")
         Dim Answers3() As String = Answers(2).Split("&")
@@ -301,6 +302,7 @@ Public Class Form1
     End Sub
 
     Private Sub SecondRoundBtn_Click(sender As Object, e As EventArgs) Handles SecondRoundBtn.Click
+        Tablo.SetRound(2)
         Dim Answers1() As String = Answers(6).Split("&")
         Dim Answers2() As String = Answers(7).Split("&")
         Dim Answers3() As String = Answers(8).Split("&")
@@ -323,6 +325,7 @@ Public Class Form1
     End Sub
 
     Private Sub ThirdRoundBtn_Click(sender As Object, e As EventArgs) Handles ThirdRoundBtn.Click
+        Tablo.SetRound(3)
         Dim Answers1() As String = Answers(12).Split("&")
         Dim Answers2() As String = Answers(13).Split("&")
         Dim Answers3() As String = Answers(14).Split("&")
@@ -345,6 +348,7 @@ Public Class Form1
     End Sub
 
     Private Sub FourthRoundBtn_Click(sender As Object, e As EventArgs) Handles FourthRoundBtn.Click
+        Tablo.SetRound(4)
         Dim Answers1 As String = Answers(18)
         Dim Answers2 As String = Answers(19)
         Dim Answers3 As String = Answers(20)
@@ -364,5 +368,29 @@ Public Class Form1
         Answer5CostTxt.Text = 120
         Answer6CostTxt.Text = 240
         Tablo.Prepare()
+    End Sub
+
+    Private Sub StoAttractBtn_Click(sender As Object, e As EventArgs) Handles StoAttractBtn.Click
+        Tablo.AttractMode(0)
+    End Sub
+
+    Private Sub SimpleAttractBtn_Click(sender As Object, e As EventArgs) Handles SimpleAttractBtn.Click
+        Tablo.AttractMode(1)
+    End Sub
+
+    Private Sub DoubleAttractBtn_Click(sender As Object, e As EventArgs) Handles DoubleAttractBtn.Click
+        Tablo.AttractMode(2)
+    End Sub
+
+    Private Sub TripleAttractBtn_Click(sender As Object, e As EventArgs) Handles TripleAttractBtn.Click
+        Tablo.AttractMode(3)
+    End Sub
+
+    Private Sub UnderAttractBtn_Click(sender As Object, e As EventArgs) Handles UnderAttractBtn.Click
+        Tablo.AttractMode(4)
+    End Sub
+
+    Private Sub BigAttractBtn_Click(sender As Object, e As EventArgs) Handles BigAttractBtn.Click
+        Tablo.AttractMode(5)
     End Sub
 End Class

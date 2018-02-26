@@ -193,5 +193,20 @@
   <ItemGroup>
     <None Include="Resources\prosto_duplicate.wav" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\1995_sto_main.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\1995_sto_big.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\duplicate.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\alarm.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sto_dulpicate.wav" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

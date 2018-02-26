@@ -43,6 +43,8 @@ Partial Class Tablo
         Me.LeftStrike3Lbl = New System.Windows.Forms.Label()
         Me.LeftStrike2Lbl = New System.Windows.Forms.Label()
         Me.LeftStrike1Lbl = New System.Windows.Forms.Label()
+        Me.LeftRoundLbl = New System.Windows.Forms.Label()
+        Me.RightRoundLbl = New System.Windows.Forms.Label()
         Me.SuspendLayout()
         '
         'RoundScoreLbl
@@ -112,7 +114,7 @@ Partial Class Tablo
         Me.Answer3Lbl.ForeColor = System.Drawing.Color.White
         Me.Answer3Lbl.Location = New System.Drawing.Point(275, 306)
         Me.Answer3Lbl.Name = "Answer3Lbl"
-        Me.Answer3Lbl.Size = New System.Drawing.Size(581, 76)
+        Me.Answer3Lbl.Size = New System.Drawing.Size(694, 76)
         Me.Answer3Lbl.TabIndex = 0
         Me.Answer3Lbl.Text = "1. ОТВЕТ"
         Me.Answer3Lbl.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -124,7 +126,7 @@ Partial Class Tablo
         Me.Answer4Lbl.ForeColor = System.Drawing.Color.White
         Me.Answer4Lbl.Location = New System.Drawing.Point(275, 382)
         Me.Answer4Lbl.Name = "Answer4Lbl"
-        Me.Answer4Lbl.Size = New System.Drawing.Size(581, 76)
+        Me.Answer4Lbl.Size = New System.Drawing.Size(694, 76)
         Me.Answer4Lbl.TabIndex = 0
         Me.Answer4Lbl.Text = "1. ОТВЕТ"
         Me.Answer4Lbl.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -297,21 +299,45 @@ Partial Class Tablo
         Me.LeftStrike1Lbl.Text = "X"
         Me.LeftStrike1Lbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
+        'LeftRoundLbl
+        '
+        Me.LeftRoundLbl.BackColor = System.Drawing.Color.Transparent
+        Me.LeftRoundLbl.Font = New System.Drawing.Font("Calibri", 48.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.LeftRoundLbl.ForeColor = System.Drawing.Color.Red
+        Me.LeftRoundLbl.Location = New System.Drawing.Point(49, 144)
+        Me.LeftRoundLbl.Name = "LeftRoundLbl"
+        Me.LeftRoundLbl.Size = New System.Drawing.Size(105, 162)
+        Me.LeftRoundLbl.TabIndex = 1
+        Me.LeftRoundLbl.Text = "1"
+        Me.LeftRoundLbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
+        'RightRoundLbl
+        '
+        Me.RightRoundLbl.BackColor = System.Drawing.Color.Transparent
+        Me.RightRoundLbl.Font = New System.Drawing.Font("Calibri", 48.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.RightRoundLbl.ForeColor = System.Drawing.Color.Red
+        Me.RightRoundLbl.Location = New System.Drawing.Point(1104, 144)
+        Me.RightRoundLbl.Name = "RightRoundLbl"
+        Me.RightRoundLbl.Size = New System.Drawing.Size(105, 162)
+        Me.RightRoundLbl.TabIndex = 1
+        Me.RightRoundLbl.Text = "1"
+        Me.RightRoundLbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
         'Tablo
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.Green
-        Me.BackgroundImage = Global.StoKOdnomuControl.My.Resources.Resources.sto_layout_main
+        Me.BackgroundImage = Global.StoKOdnomuControl.My.Resources.Resources._1995_sto_main
         Me.ClientSize = New System.Drawing.Size(1264, 681)
+        Me.Controls.Add(Me.RightRoundLbl)
+        Me.Controls.Add(Me.LeftRoundLbl)
         Me.Controls.Add(Me.LeftStrike3Lbl)
         Me.Controls.Add(Me.LeftStrike2Lbl)
         Me.Controls.Add(Me.LeftStrike1Lbl)
         Me.Controls.Add(Me.ScoreRightLbl)
         Me.Controls.Add(Me.Answer6Lbl)
         Me.Controls.Add(Me.Answer5Lbl)
-        Me.Controls.Add(Me.Answer4Lbl)
-        Me.Controls.Add(Me.Answer3Lbl)
         Me.Controls.Add(Me.Answer2Lbl)
         Me.Controls.Add(Me.Answer6ScoreLbl)
         Me.Controls.Add(Me.Answer5ScoreLbl)
@@ -325,10 +351,13 @@ Partial Class Tablo
         Me.Controls.Add(Me.RightStrike2Lbl)
         Me.Controls.Add(Me.RightStrike3Lbl)
         Me.Controls.Add(Me.RoundScoreLbl)
+        Me.Controls.Add(Me.Answer4Lbl)
+        Me.Controls.Add(Me.Answer3Lbl)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "Tablo"
+        Me.Text = "Tablo"
         Me.ResumeLayout(False)
 
     End Sub
@@ -354,4 +383,6 @@ Partial Class Tablo
     Friend WithEvents LeftStrike3Lbl As Label
     Friend WithEvents LeftStrike2Lbl As Label
     Friend WithEvents LeftStrike1Lbl As Label
+    Friend WithEvents LeftRoundLbl As Label
+    Friend WithEvents RightRoundLbl As Label
 End Class
