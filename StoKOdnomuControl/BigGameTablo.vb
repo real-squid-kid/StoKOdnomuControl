@@ -62,7 +62,7 @@
     Public Sub SetTimer(e As Integer)
         TimerLbl.Text = e
         TimerLbl.Visible = True
-        My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+        My.Computer.Audio.Play(My.Resources.prosto_open, AudioPlayMode.Background)
     End Sub
 
     Public Sub StartTimer()
@@ -220,5 +220,10 @@
                     My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
                 End If
         End Select
+    End Sub
+
+    Public Sub UpdateScores(e As Integer)
+        TotalLbl.Text = e
+        RoundScoreLbl.Text = TotalLbl.Text
     End Sub
 End Class

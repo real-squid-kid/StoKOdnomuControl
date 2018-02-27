@@ -49,9 +49,30 @@ Partial Class BigGameControl
         Me.ScoreTxt = New System.Windows.Forms.TextBox()
         Me.ShowInfoBtn = New System.Windows.Forms.Button()
         Me.NextBtn = New System.Windows.Forms.Button()
-        Me.Button1 = New System.Windows.Forms.Button()
+        Me.BackBtn = New System.Windows.Forms.Button()
         Me.GrayChk = New System.Windows.Forms.CheckBox()
         Me.SameAnswerBtn = New System.Windows.Forms.Button()
+        Me.Upd1Btn = New System.Windows.Forms.Button()
+        Me.ScoreUpdateBtn = New System.Windows.Forms.Button()
+        Me.Upd1ABtn = New System.Windows.Forms.Button()
+        Me.Upd2Btn = New System.Windows.Forms.Button()
+        Me.Upd2ABtn = New System.Windows.Forms.Button()
+        Me.Upd3Btn = New System.Windows.Forms.Button()
+        Me.Upd3ABtn = New System.Windows.Forms.Button()
+        Me.Upd4Btn = New System.Windows.Forms.Button()
+        Me.Upd4ABtn = New System.Windows.Forms.Button()
+        Me.Upd5Btn = New System.Windows.Forms.Button()
+        Me.Upd5ABtn = New System.Windows.Forms.Button()
+        Me.Upd6Btn = New System.Windows.Forms.Button()
+        Me.Upd7Btn = New System.Windows.Forms.Button()
+        Me.Upd8Btn = New System.Windows.Forms.Button()
+        Me.Upd9Btn = New System.Windows.Forms.Button()
+        Me.Upd10Btn = New System.Windows.Forms.Button()
+        Me.Upd6ABtn = New System.Windows.Forms.Button()
+        Me.Upd7ABtn = New System.Windows.Forms.Button()
+        Me.Upd8ABtn = New System.Windows.Forms.Button()
+        Me.Upd9ABtn = New System.Windows.Forms.Button()
+        Me.Upd10ABtn = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'Answer5CostTxt
@@ -305,15 +326,16 @@ Partial Class BigGameControl
         Me.NextBtn.Text = "Далее"
         Me.NextBtn.UseVisualStyleBackColor = True
         '
-        'Button1
+        'BackBtn
         '
-        Me.Button1.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Button1.Location = New System.Drawing.Point(413, 594)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(87, 75)
-        Me.Button1.TabIndex = 18
-        Me.Button1.Text = "Назад"
-        Me.Button1.UseVisualStyleBackColor = True
+        Me.BackBtn.Enabled = False
+        Me.BackBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.BackBtn.Location = New System.Drawing.Point(413, 594)
+        Me.BackBtn.Name = "BackBtn"
+        Me.BackBtn.Size = New System.Drawing.Size(87, 75)
+        Me.BackBtn.TabIndex = 18
+        Me.BackBtn.Text = "Назад"
+        Me.BackBtn.UseVisualStyleBackColor = True
         '
         'GrayChk
         '
@@ -336,6 +358,237 @@ Partial Class BigGameControl
         Me.SameAnswerBtn.Text = "Тот же ответ"
         Me.SameAnswerBtn.UseVisualStyleBackColor = True
         '
+        'Upd1Btn
+        '
+        Me.Upd1Btn.Enabled = False
+        Me.Upd1Btn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Upd1Btn.Location = New System.Drawing.Point(37, 209)
+        Me.Upd1Btn.Name = "Upd1Btn"
+        Me.Upd1Btn.Size = New System.Drawing.Size(55, 62)
+        Me.Upd1Btn.TabIndex = 18
+        Me.Upd1Btn.Text = "F5"
+        Me.Upd1Btn.UseVisualStyleBackColor = True
+        '
+        'ScoreUpdateBtn
+        '
+        Me.ScoreUpdateBtn.Enabled = False
+        Me.ScoreUpdateBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.ScoreUpdateBtn.Location = New System.Drawing.Point(719, 113)
+        Me.ScoreUpdateBtn.Name = "ScoreUpdateBtn"
+        Me.ScoreUpdateBtn.Size = New System.Drawing.Size(55, 62)
+        Me.ScoreUpdateBtn.TabIndex = 18
+        Me.ScoreUpdateBtn.Text = "F5"
+        Me.ScoreUpdateBtn.UseVisualStyleBackColor = True
+        '
+        'Upd1ABtn
+        '
+        Me.Upd1ABtn.Enabled = False
+        Me.Upd1ABtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Upd1ABtn.Location = New System.Drawing.Point(535, 209)
+        Me.Upd1ABtn.Name = "Upd1ABtn"
+        Me.Upd1ABtn.Size = New System.Drawing.Size(55, 62)
+        Me.Upd1ABtn.TabIndex = 18
+        Me.Upd1ABtn.Text = "F5"
+        Me.Upd1ABtn.UseVisualStyleBackColor = True
+        '
+        'Upd2Btn
+        '
+        Me.Upd2Btn.Enabled = False
+        Me.Upd2Btn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Upd2Btn.Location = New System.Drawing.Point(37, 277)
+        Me.Upd2Btn.Name = "Upd2Btn"
+        Me.Upd2Btn.Size = New System.Drawing.Size(55, 62)
+        Me.Upd2Btn.TabIndex = 18
+        Me.Upd2Btn.Text = "F5"
+        Me.Upd2Btn.UseVisualStyleBackColor = True
+        '
+        'Upd2ABtn
+        '
+        Me.Upd2ABtn.Enabled = False
+        Me.Upd2ABtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Upd2ABtn.Location = New System.Drawing.Point(535, 277)
+        Me.Upd2ABtn.Name = "Upd2ABtn"
+        Me.Upd2ABtn.Size = New System.Drawing.Size(55, 62)
+        Me.Upd2ABtn.TabIndex = 18
+        Me.Upd2ABtn.Text = "F5"
+        Me.Upd2ABtn.UseVisualStyleBackColor = True
+        '
+        'Upd3Btn
+        '
+        Me.Upd3Btn.Enabled = False
+        Me.Upd3Btn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Upd3Btn.Location = New System.Drawing.Point(37, 345)
+        Me.Upd3Btn.Name = "Upd3Btn"
+        Me.Upd3Btn.Size = New System.Drawing.Size(55, 62)
+        Me.Upd3Btn.TabIndex = 18
+        Me.Upd3Btn.Text = "F5"
+        Me.Upd3Btn.UseVisualStyleBackColor = True
+        '
+        'Upd3ABtn
+        '
+        Me.Upd3ABtn.Enabled = False
+        Me.Upd3ABtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Upd3ABtn.Location = New System.Drawing.Point(535, 345)
+        Me.Upd3ABtn.Name = "Upd3ABtn"
+        Me.Upd3ABtn.Size = New System.Drawing.Size(55, 62)
+        Me.Upd3ABtn.TabIndex = 18
+        Me.Upd3ABtn.Text = "F5"
+        Me.Upd3ABtn.UseVisualStyleBackColor = True
+        '
+        'Upd4Btn
+        '
+        Me.Upd4Btn.Enabled = False
+        Me.Upd4Btn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Upd4Btn.Location = New System.Drawing.Point(37, 413)
+        Me.Upd4Btn.Name = "Upd4Btn"
+        Me.Upd4Btn.Size = New System.Drawing.Size(55, 62)
+        Me.Upd4Btn.TabIndex = 18
+        Me.Upd4Btn.Text = "F5"
+        Me.Upd4Btn.UseVisualStyleBackColor = True
+        '
+        'Upd4ABtn
+        '
+        Me.Upd4ABtn.Enabled = False
+        Me.Upd4ABtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Upd4ABtn.Location = New System.Drawing.Point(535, 413)
+        Me.Upd4ABtn.Name = "Upd4ABtn"
+        Me.Upd4ABtn.Size = New System.Drawing.Size(55, 62)
+        Me.Upd4ABtn.TabIndex = 18
+        Me.Upd4ABtn.Text = "F5"
+        Me.Upd4ABtn.UseVisualStyleBackColor = True
+        '
+        'Upd5Btn
+        '
+        Me.Upd5Btn.Enabled = False
+        Me.Upd5Btn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Upd5Btn.Location = New System.Drawing.Point(37, 481)
+        Me.Upd5Btn.Name = "Upd5Btn"
+        Me.Upd5Btn.Size = New System.Drawing.Size(55, 62)
+        Me.Upd5Btn.TabIndex = 18
+        Me.Upd5Btn.Text = "F5"
+        Me.Upd5Btn.UseVisualStyleBackColor = True
+        '
+        'Upd5ABtn
+        '
+        Me.Upd5ABtn.Enabled = False
+        Me.Upd5ABtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Upd5ABtn.Location = New System.Drawing.Point(535, 481)
+        Me.Upd5ABtn.Name = "Upd5ABtn"
+        Me.Upd5ABtn.Size = New System.Drawing.Size(55, 62)
+        Me.Upd5ABtn.TabIndex = 18
+        Me.Upd5ABtn.Text = "F5"
+        Me.Upd5ABtn.UseVisualStyleBackColor = True
+        '
+        'Upd6Btn
+        '
+        Me.Upd6Btn.Enabled = False
+        Me.Upd6Btn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Upd6Btn.Location = New System.Drawing.Point(652, 209)
+        Me.Upd6Btn.Name = "Upd6Btn"
+        Me.Upd6Btn.Size = New System.Drawing.Size(55, 62)
+        Me.Upd6Btn.TabIndex = 18
+        Me.Upd6Btn.Text = "F5"
+        Me.Upd6Btn.UseVisualStyleBackColor = True
+        '
+        'Upd7Btn
+        '
+        Me.Upd7Btn.Enabled = False
+        Me.Upd7Btn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Upd7Btn.Location = New System.Drawing.Point(652, 277)
+        Me.Upd7Btn.Name = "Upd7Btn"
+        Me.Upd7Btn.Size = New System.Drawing.Size(55, 62)
+        Me.Upd7Btn.TabIndex = 18
+        Me.Upd7Btn.Text = "F5"
+        Me.Upd7Btn.UseVisualStyleBackColor = True
+        '
+        'Upd8Btn
+        '
+        Me.Upd8Btn.Enabled = False
+        Me.Upd8Btn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Upd8Btn.Location = New System.Drawing.Point(652, 345)
+        Me.Upd8Btn.Name = "Upd8Btn"
+        Me.Upd8Btn.Size = New System.Drawing.Size(55, 62)
+        Me.Upd8Btn.TabIndex = 18
+        Me.Upd8Btn.Text = "F5"
+        Me.Upd8Btn.UseVisualStyleBackColor = True
+        '
+        'Upd9Btn
+        '
+        Me.Upd9Btn.Enabled = False
+        Me.Upd9Btn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Upd9Btn.Location = New System.Drawing.Point(652, 413)
+        Me.Upd9Btn.Name = "Upd9Btn"
+        Me.Upd9Btn.Size = New System.Drawing.Size(55, 62)
+        Me.Upd9Btn.TabIndex = 18
+        Me.Upd9Btn.Text = "F5"
+        Me.Upd9Btn.UseVisualStyleBackColor = True
+        '
+        'Upd10Btn
+        '
+        Me.Upd10Btn.Enabled = False
+        Me.Upd10Btn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Upd10Btn.Location = New System.Drawing.Point(652, 481)
+        Me.Upd10Btn.Name = "Upd10Btn"
+        Me.Upd10Btn.Size = New System.Drawing.Size(55, 62)
+        Me.Upd10Btn.TabIndex = 18
+        Me.Upd10Btn.Text = "F5"
+        Me.Upd10Btn.UseVisualStyleBackColor = True
+        '
+        'Upd6ABtn
+        '
+        Me.Upd6ABtn.Enabled = False
+        Me.Upd6ABtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Upd6ABtn.Location = New System.Drawing.Point(1150, 209)
+        Me.Upd6ABtn.Name = "Upd6ABtn"
+        Me.Upd6ABtn.Size = New System.Drawing.Size(55, 62)
+        Me.Upd6ABtn.TabIndex = 18
+        Me.Upd6ABtn.Text = "F5"
+        Me.Upd6ABtn.UseVisualStyleBackColor = True
+        '
+        'Upd7ABtn
+        '
+        Me.Upd7ABtn.Enabled = False
+        Me.Upd7ABtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Upd7ABtn.Location = New System.Drawing.Point(1150, 277)
+        Me.Upd7ABtn.Name = "Upd7ABtn"
+        Me.Upd7ABtn.Size = New System.Drawing.Size(55, 62)
+        Me.Upd7ABtn.TabIndex = 18
+        Me.Upd7ABtn.Text = "F5"
+        Me.Upd7ABtn.UseVisualStyleBackColor = True
+        '
+        'Upd8ABtn
+        '
+        Me.Upd8ABtn.Enabled = False
+        Me.Upd8ABtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Upd8ABtn.Location = New System.Drawing.Point(1150, 345)
+        Me.Upd8ABtn.Name = "Upd8ABtn"
+        Me.Upd8ABtn.Size = New System.Drawing.Size(55, 62)
+        Me.Upd8ABtn.TabIndex = 18
+        Me.Upd8ABtn.Text = "F5"
+        Me.Upd8ABtn.UseVisualStyleBackColor = True
+        '
+        'Upd9ABtn
+        '
+        Me.Upd9ABtn.Enabled = False
+        Me.Upd9ABtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Upd9ABtn.Location = New System.Drawing.Point(1150, 413)
+        Me.Upd9ABtn.Name = "Upd9ABtn"
+        Me.Upd9ABtn.Size = New System.Drawing.Size(55, 62)
+        Me.Upd9ABtn.TabIndex = 18
+        Me.Upd9ABtn.Text = "F5"
+        Me.Upd9ABtn.UseVisualStyleBackColor = True
+        '
+        'Upd10ABtn
+        '
+        Me.Upd10ABtn.Enabled = False
+        Me.Upd10ABtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Upd10ABtn.Location = New System.Drawing.Point(1150, 481)
+        Me.Upd10ABtn.Name = "Upd10ABtn"
+        Me.Upd10ABtn.Size = New System.Drawing.Size(55, 62)
+        Me.Upd10ABtn.TabIndex = 18
+        Me.Upd10ABtn.Text = "F5"
+        Me.Upd10ABtn.UseVisualStyleBackColor = True
+        '
         'BigGameControl
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -343,7 +596,28 @@ Partial Class BigGameControl
         Me.ClientSize = New System.Drawing.Size(1264, 681)
         Me.Controls.Add(Me.GrayChk)
         Me.Controls.Add(Me.HideAnswersChk)
-        Me.Controls.Add(Me.Button1)
+        Me.Controls.Add(Me.ScoreUpdateBtn)
+        Me.Controls.Add(Me.Upd10ABtn)
+        Me.Controls.Add(Me.Upd5ABtn)
+        Me.Controls.Add(Me.Upd9ABtn)
+        Me.Controls.Add(Me.Upd4ABtn)
+        Me.Controls.Add(Me.Upd8ABtn)
+        Me.Controls.Add(Me.Upd3ABtn)
+        Me.Controls.Add(Me.Upd7ABtn)
+        Me.Controls.Add(Me.Upd2ABtn)
+        Me.Controls.Add(Me.Upd6ABtn)
+        Me.Controls.Add(Me.Upd1ABtn)
+        Me.Controls.Add(Me.Upd10Btn)
+        Me.Controls.Add(Me.Upd5Btn)
+        Me.Controls.Add(Me.Upd9Btn)
+        Me.Controls.Add(Me.Upd4Btn)
+        Me.Controls.Add(Me.Upd8Btn)
+        Me.Controls.Add(Me.Upd3Btn)
+        Me.Controls.Add(Me.Upd7Btn)
+        Me.Controls.Add(Me.Upd2Btn)
+        Me.Controls.Add(Me.Upd6Btn)
+        Me.Controls.Add(Me.Upd1Btn)
+        Me.Controls.Add(Me.BackBtn)
         Me.Controls.Add(Me.NextBtn)
         Me.Controls.Add(Me.ShowInfoBtn)
         Me.Controls.Add(Me.SameAnswerBtn)
@@ -407,7 +681,28 @@ Partial Class BigGameControl
     Friend WithEvents ScoreTxt As TextBox
     Friend WithEvents ShowInfoBtn As Button
     Friend WithEvents NextBtn As Button
-    Friend WithEvents Button1 As Button
+    Friend WithEvents BackBtn As Button
     Friend WithEvents GrayChk As CheckBox
     Friend WithEvents SameAnswerBtn As Button
+    Friend WithEvents Upd1Btn As Button
+    Friend WithEvents ScoreUpdateBtn As Button
+    Friend WithEvents Upd1ABtn As Button
+    Friend WithEvents Upd2Btn As Button
+    Friend WithEvents Upd2ABtn As Button
+    Friend WithEvents Upd3Btn As Button
+    Friend WithEvents Upd3ABtn As Button
+    Friend WithEvents Upd4Btn As Button
+    Friend WithEvents Upd4ABtn As Button
+    Friend WithEvents Upd5Btn As Button
+    Friend WithEvents Upd5ABtn As Button
+    Friend WithEvents Upd6Btn As Button
+    Friend WithEvents Upd7Btn As Button
+    Friend WithEvents Upd8Btn As Button
+    Friend WithEvents Upd9Btn As Button
+    Friend WithEvents Upd10Btn As Button
+    Friend WithEvents Upd6ABtn As Button
+    Friend WithEvents Upd7ABtn As Button
+    Friend WithEvents Upd8ABtn As Button
+    Friend WithEvents Upd9ABtn As Button
+    Friend WithEvents Upd10ABtn As Button
 End Class

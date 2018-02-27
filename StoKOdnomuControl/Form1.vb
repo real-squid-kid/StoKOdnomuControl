@@ -25,11 +25,15 @@ Public Class Form1
                 If Answers.Count <> 24 Then
                     Throw New Exception("Incompatible base format.")
                 End If
+                FirstRoundBtn.Enabled = True
+                SecondRoundBtn.Enabled = True
+                ThirdRoundBtn.Enabled = True
+                FourthRoundBtn.Enabled = True
             Else
             End If
         Catch exc As Exception
             MessageBox.Show("Ошибка: " & exc.Message & " Данные не были внесены.", "Невозможно открыть файл", MessageBoxButtons.OK, MessageBoxIcon.Stop)
-        Answers.Clear()
+            Answers.Clear()
         End Try
     End Sub
 
@@ -315,12 +319,12 @@ Public Class Form1
         Answer4Txt.Text = Answers4(0)
         Answer5Txt.Text = Answers5(0)
         Answer6Txt.Text = Answers6(0)
-        Answer1CostTxt.Text = Answers1(1)
-        Answer2CostTxt.Text = Answers2(1)
-        Answer3CostTxt.Text = Answers3(1)
-        Answer4CostTxt.Text = Answers4(1)
-        Answer5CostTxt.Text = Answers5(1)
-        Answer6CostTxt.Text = Answers6(1)
+        Answer1CostTxt.Text = Answers1(1) * 2
+        Answer2CostTxt.Text = Answers2(1) * 2
+        Answer3CostTxt.Text = Answers3(1) * 2
+        Answer4CostTxt.Text = Answers4(1) * 2
+        Answer5CostTxt.Text = Answers5(1) * 2
+        Answer6CostTxt.Text = Answers6(1) * 2
         Tablo.Prepare()
     End Sub
 
@@ -338,12 +342,12 @@ Public Class Form1
         Answer4Txt.Text = Answers4(0)
         Answer5Txt.Text = Answers5(0)
         Answer6Txt.Text = Answers6(0)
-        Answer1CostTxt.Text = Answers1(1)
-        Answer2CostTxt.Text = Answers2(1)
-        Answer3CostTxt.Text = Answers3(1)
-        Answer4CostTxt.Text = Answers4(1)
-        Answer5CostTxt.Text = Answers5(1)
-        Answer6CostTxt.Text = Answers6(1)
+        Answer1CostTxt.Text = Answers1(1) * 3
+        Answer2CostTxt.Text = Answers2(1) * 3
+        Answer3CostTxt.Text = Answers3(1) * 3
+        Answer4CostTxt.Text = Answers4(1) * 3
+        Answer5CostTxt.Text = Answers5(1) * 3
+        Answer6CostTxt.Text = Answers6(1) * 3
         Tablo.Prepare()
     End Sub
 
@@ -392,5 +396,9 @@ Public Class Form1
 
     Private Sub BigAttractBtn_Click(sender As Object, e As EventArgs) Handles BigAttractBtn.Click
         Tablo.AttractMode(5)
+    End Sub
+
+    Private Sub AboutBtn_Click(sender As Object, e As EventArgs) Handles AboutBtn.Click
+        AboutBox1.Show()
     End Sub
 End Class

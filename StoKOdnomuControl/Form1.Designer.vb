@@ -71,6 +71,7 @@ Partial Class Form1
         Me.TripleAttractBtn = New System.Windows.Forms.Button()
         Me.UnderAttractBtn = New System.Windows.Forms.Button()
         Me.BigAttractBtn = New System.Windows.Forms.Button()
+        Me.AboutBtn = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'OpenQuestionsBtn
@@ -85,6 +86,7 @@ Partial Class Form1
         '
         'FirstRoundBtn
         '
+        Me.FirstRoundBtn.Enabled = False
         Me.FirstRoundBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.FirstRoundBtn.Location = New System.Drawing.Point(13, 13)
         Me.FirstRoundBtn.Name = "FirstRoundBtn"
@@ -95,6 +97,7 @@ Partial Class Form1
         '
         'SecondRoundBtn
         '
+        Me.SecondRoundBtn.Enabled = False
         Me.SecondRoundBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.SecondRoundBtn.Location = New System.Drawing.Point(94, 13)
         Me.SecondRoundBtn.Name = "SecondRoundBtn"
@@ -105,6 +108,7 @@ Partial Class Form1
         '
         'ThirdRoundBtn
         '
+        Me.ThirdRoundBtn.Enabled = False
         Me.ThirdRoundBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.ThirdRoundBtn.Location = New System.Drawing.Point(175, 13)
         Me.ThirdRoundBtn.Name = "ThirdRoundBtn"
@@ -115,6 +119,7 @@ Partial Class Form1
         '
         'FourthRoundBtn
         '
+        Me.FourthRoundBtn.Enabled = False
         Me.FourthRoundBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.FourthRoundBtn.Location = New System.Drawing.Point(256, 13)
         Me.FourthRoundBtn.Name = "FourthRoundBtn"
@@ -562,6 +567,16 @@ Partial Class Form1
         Me.BigAttractBtn.Text = "БОЛЬШАЯ ИГРА"
         Me.BigAttractBtn.UseVisualStyleBackColor = True
         '
+        'AboutBtn
+        '
+        Me.AboutBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.AboutBtn.Location = New System.Drawing.Point(1081, 628)
+        Me.AboutBtn.Name = "AboutBtn"
+        Me.AboutBtn.Size = New System.Drawing.Size(90, 41)
+        Me.AboutBtn.TabIndex = 0
+        Me.AboutBtn.Text = "Обо мне..."
+        Me.AboutBtn.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -615,6 +630,7 @@ Partial Class Form1
         Me.Controls.Add(Me.SimpleAttractBtn)
         Me.Controls.Add(Me.StoAttractBtn)
         Me.Controls.Add(Me.FirstRoundBtn)
+        Me.Controls.Add(Me.AboutBtn)
         Me.Controls.Add(Me.OpenQuestionsBtn)
         Me.MaximizeBox = False
         Me.MinimizeBox = False
@@ -674,4 +690,5 @@ Partial Class Form1
     Friend WithEvents TripleAttractBtn As Button
     Friend WithEvents UnderAttractBtn As Button
     Friend WithEvents BigAttractBtn As Button
+    Friend WithEvents AboutBtn As Button
 End Class

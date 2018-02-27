@@ -99,6 +99,16 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property download() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("download", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         '''</summary>
         Friend ReadOnly Property duplicate() As System.IO.UnmanagedMemoryStream
@@ -158,6 +168,15 @@ Namespace My.Resources
         Friend ReadOnly Property prosto_wrong() As System.IO.UnmanagedMemoryStream
             Get
                 Return ResourceManager.GetStream("prosto_wrong", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        '''</summary>
+        Friend ReadOnly Property run() As System.IO.UnmanagedMemoryStream
+            Get
+                Return ResourceManager.GetStream("run", resourceCulture)
             End Get
         End Property
         

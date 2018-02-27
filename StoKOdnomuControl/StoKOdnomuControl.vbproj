@@ -69,6 +69,12 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AboutBox1.Designer.vb">
+      <DependentUpon>AboutBox1.vb</DependentUpon>
+    </Compile>
+    <Compile Include="AboutBox1.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="BigGameControl.Designer.vb">
       <DependentUpon>BigGameControl.vb</DependentUpon>
     </Compile>
@@ -103,6 +109,12 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="RunForm.Designer.vb">
+      <DependentUpon>RunForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="RunForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Tablo.Designer.vb">
       <DependentUpon>Tablo.vb</DependentUpon>
     </Compile>
@@ -111,6 +123,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="AboutBox1.resx">
+      <DependentUpon>AboutBox1.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="BigGameControl.resx">
       <DependentUpon>BigGameControl.vb</DependentUpon>
     </EmbeddedResource>
@@ -125,6 +140,9 @@
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RunForm.resx">
+      <DependentUpon>RunForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Tablo.resx">
       <DependentUpon>Tablo.vb</DependentUpon>
@@ -207,6 +225,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\sto_dulpicate.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="base.txt" />
+    <None Include="Resources\run.wav" />
+    <None Include="Resources\download.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>
