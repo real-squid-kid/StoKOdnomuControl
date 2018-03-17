@@ -483,7 +483,7 @@ Partial Class Form1
         Me.TabloPrepareBtn.Name = "TabloPrepareBtn"
         Me.TabloPrepareBtn.Size = New System.Drawing.Size(151, 75)
         Me.TabloPrepareBtn.TabIndex = 13
-        Me.TabloPrepareBtn.Text = "Показать инфу на табло"
+        Me.TabloPrepareBtn.Text = "Подготовить к игре"
         Me.TabloPrepareBtn.UseVisualStyleBackColor = True
         '
         'GrayChk
