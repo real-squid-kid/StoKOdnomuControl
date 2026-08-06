@@ -134,14 +134,23 @@ Public Class Form1
 
     Private Sub Answer1RevealBtn_Click(sender As Object, e As EventArgs) Handles Answer1RevealBtn.Click
         If Answer1RevealBtn.BackColor <> Color.LightGreen Then
+            Dim b As Integer
+            b = Answer1CostTxt.Text
+            If Radio2x.Checked = True Then
+                b = b / 2
+            End If
+            If Radio3x.Checked = True Then
+                b = b / 3
+            End If
             If AddUpChk.Checked = True Then
                 Dim a As Integer
                 a = Int(RoundScoreTxt.Text) + Int(Answer1CostTxt.Text)
                 RoundScoreTxt.Text = a
-                Tablo.Reveal(1, Answer1Txt.Text, Answer1CostTxt.Text, RoundScoreTxt.Text, 2)
+
+                Tablo.Reveal(1, Answer1Txt.Text, b, RoundScoreTxt.Text, 2)
                 Answer1RevealBtn.BackColor = Color.LightGreen
             Else
-                Tablo.Reveal(1, Answer1Txt.Text, Answer1CostTxt.Text, RoundScoreTxt.Text, 1)
+                Tablo.Reveal(1, Answer1Txt.Text, b, RoundScoreTxt.Text, 1)
                 Answer1RevealBtn.BackColor = Color.LightGreen
             End If
         Else
@@ -153,14 +162,22 @@ Public Class Form1
 
     Private Sub Answer2RevealBtn_Click(sender As Object, e As EventArgs) Handles Answer2RevealBtn.Click
         If Answer2RevealBtn.BackColor <> Color.LightGreen Then
+            Dim b As Integer
+            b = Answer2CostTxt.Text
+            If Radio2x.Checked = True Then
+                b = b / 2
+            End If
+            If Radio3x.Checked = True Then
+                b = b / 3
+            End If
             If AddUpChk.Checked = True Then
                 Dim a As Integer
                 a = Int(RoundScoreTxt.Text) + Int(Answer2CostTxt.Text)
                 RoundScoreTxt.Text = a
-                Tablo.Reveal(2, Answer2Txt.Text, Answer2CostTxt.Text, RoundScoreTxt.Text, 2)
+                Tablo.Reveal(2, Answer2Txt.Text, b, RoundScoreTxt.Text, 2)
                 Answer2RevealBtn.BackColor = Color.LightGreen
             Else
-                Tablo.Reveal(2, Answer2Txt.Text, Answer2CostTxt.Text, RoundScoreTxt.Text, 1)
+                Tablo.Reveal(2, Answer2Txt.Text, b, RoundScoreTxt.Text, 1)
                 Answer2RevealBtn.BackColor = Color.LightGreen
             End If
         Else
@@ -171,14 +188,22 @@ Public Class Form1
 
     Private Sub Answer3RevealBtn_Click(sender As Object, e As EventArgs) Handles Answer3RevealBtn.Click
         If Answer3RevealBtn.BackColor <> Color.LightGreen Then
+            Dim b As Integer
+            b = Answer3CostTxt.Text
+            If Radio2x.Checked = True Then
+                b = b / 2
+            End If
+            If Radio3x.Checked = True Then
+                b = b / 3
+            End If
             If AddUpChk.Checked = True Then
                 Dim a As Integer
                 a = Int(RoundScoreTxt.Text) + Int(Answer3CostTxt.Text)
                 RoundScoreTxt.Text = a
-                Tablo.Reveal(3, Answer3Txt.Text, Answer3CostTxt.Text, RoundScoreTxt.Text, 2)
+                Tablo.Reveal(3, Answer3Txt.Text, b, RoundScoreTxt.Text, 2)
                 Answer3RevealBtn.BackColor = Color.LightGreen
             Else
-                Tablo.Reveal(3, Answer3Txt.Text, Answer3CostTxt.Text, RoundScoreTxt.Text, 1)
+                Tablo.Reveal(3, Answer3Txt.Text, b, RoundScoreTxt.Text, 1)
                 Answer3RevealBtn.BackColor = Color.LightGreen
             End If
         Else
@@ -189,14 +214,22 @@ Public Class Form1
 
     Private Sub Answer4RevealBtn_Click(sender As Object, e As EventArgs) Handles Answer4RevealBtn.Click
         If Answer4RevealBtn.BackColor <> Color.LightGreen Then
+            Dim b As Integer
+            b = Answer4CostTxt.Text
+            If Radio2x.Checked = True Then
+                b = b / 2
+            End If
+            If Radio3x.Checked = True Then
+                b = b / 3
+            End If
             If AddUpChk.Checked = True Then
                 Dim a As Integer
                 a = Int(RoundScoreTxt.Text) + Int(Answer4CostTxt.Text)
                 RoundScoreTxt.Text = a
-                Tablo.Reveal(4, Answer4Txt.Text, Answer4CostTxt.Text, RoundScoreTxt.Text, 2)
+                Tablo.Reveal(4, Answer4Txt.Text, b, RoundScoreTxt.Text, 2)
                 Answer4RevealBtn.BackColor = Color.LightGreen
             Else
-                Tablo.Reveal(4, Answer4Txt.Text, Answer4CostTxt.Text, RoundScoreTxt.Text, 1)
+                Tablo.Reveal(4, Answer4Txt.Text, b, RoundScoreTxt.Text, 1)
                 Answer4RevealBtn.BackColor = Color.LightGreen
             End If
         Else
@@ -207,14 +240,22 @@ Public Class Form1
 
     Private Sub Answer5RevealBtn_Click(sender As Object, e As EventArgs) Handles Answer5RevealBtn.Click
         If Answer5RevealBtn.BackColor <> Color.LightGreen Then
+            Dim b As Integer
+            b = Answer5CostTxt.Text
+            If Radio2x.Checked = True Then
+                b = b / 2
+            End If
+            If Radio3x.Checked = True Then
+                b = b / 3
+            End If
             If AddUpChk.Checked = True Then
                 Dim a As Integer
                 a = Int(RoundScoreTxt.Text) + Int(Answer5CostTxt.Text)
                 RoundScoreTxt.Text = a
-                Tablo.Reveal(5, Answer5Txt.Text, Answer5CostTxt.Text, RoundScoreTxt.Text, 2)
+                Tablo.Reveal(5, Answer5Txt.Text, b, RoundScoreTxt.Text, 2)
                 Answer5RevealBtn.BackColor = Color.LightGreen
             Else
-                Tablo.Reveal(5, Answer5Txt.Text, Answer5CostTxt.Text, RoundScoreTxt.Text, 1)
+                Tablo.Reveal(5, Answer5Txt.Text, b, RoundScoreTxt.Text, 1)
                 Answer5RevealBtn.BackColor = Color.LightGreen
             End If
         Else
@@ -225,14 +266,22 @@ Public Class Form1
 
     Private Sub Answer6RevealBtn_Click(sender As Object, e As EventArgs) Handles Answer6RevealBtn.Click
         If Answer6RevealBtn.BackColor <> Color.LightGreen Then
+            Dim b As Integer
+            b = Answer6CostTxt.Text
+            If Radio2x.Checked = True Then
+                b = b / 2
+            End If
+            If Radio3x.Checked = True Then
+                b = b / 3
+            End If
             If AddUpChk.Checked = True Then
                 Dim a As Integer
                 a = Int(RoundScoreTxt.Text) + Int(Answer6CostTxt.Text)
                 RoundScoreTxt.Text = a
-                Tablo.Reveal(6, Answer6Txt.Text, Answer6CostTxt.Text, RoundScoreTxt.Text, 2)
+                Tablo.Reveal(6, Answer6Txt.Text, b, RoundScoreTxt.Text, 2)
                 Answer6RevealBtn.BackColor = Color.LightGreen
             Else
-                Tablo.Reveal(6, Answer6Txt.Text, Answer6CostTxt.Text, RoundScoreTxt.Text, 1)
+                Tablo.Reveal(6, Answer6Txt.Text, b, RoundScoreTxt.Text, 1)
                 Answer6RevealBtn.BackColor = Color.LightGreen
             End If
         Else
@@ -243,6 +292,18 @@ Public Class Form1
 
     Private Sub TabloPrepareBtn_Click(sender As Object, e As EventArgs) Handles TabloPrepareBtn.Click
         Tablo.Prepare()
+        Answer1RevealBtn.BackColor = Color.LightGray
+        Answer2RevealBtn.BackColor = Color.LightGray
+        Answer3RevealBtn.BackColor = Color.LightGray
+        Answer4RevealBtn.BackColor = Color.LightGray
+        Answer5RevealBtn.BackColor = Color.LightGray
+        Answer6RevealBtn.BackColor = Color.LightGray
+        LeftCross3Btn.BackColor = Color.LightGray
+        LeftCross2Btn.BackColor = Color.LightGray
+        LeftCross1Btn.BackColor = Color.LightGray
+        RightCross3Btn.BackColor = Color.LightGray
+        RightCross2Btn.BackColor = Color.LightGray
+        RightCross1Btn.BackColor = Color.LightGray
     End Sub
 
     Private Sub GrayChk_CheckedChanged(sender As Object, e As EventArgs) Handles GrayChk.CheckedChanged
@@ -302,7 +363,6 @@ Public Class Form1
         Answer4CostTxt.Text = Answers4(1)
         Answer5CostTxt.Text = Answers5(1)
         Answer6CostTxt.Text = Answers6(1)
-        Tablo.Prepare()
     End Sub
 
     Private Sub SecondRoundBtn_Click(sender As Object, e As EventArgs) Handles SecondRoundBtn.Click
@@ -325,7 +385,6 @@ Public Class Form1
         Answer4CostTxt.Text = Answers4(1) * 2
         Answer5CostTxt.Text = Answers5(1) * 2
         Answer6CostTxt.Text = Answers6(1) * 2
-        Tablo.Prepare()
     End Sub
 
     Private Sub ThirdRoundBtn_Click(sender As Object, e As EventArgs) Handles ThirdRoundBtn.Click
@@ -348,7 +407,6 @@ Public Class Form1
         Answer4CostTxt.Text = Answers4(1) * 3
         Answer5CostTxt.Text = Answers5(1) * 3
         Answer6CostTxt.Text = Answers6(1) * 3
-        Tablo.Prepare()
     End Sub
 
     Private Sub FourthRoundBtn_Click(sender As Object, e As EventArgs) Handles FourthRoundBtn.Click
@@ -371,7 +429,6 @@ Public Class Form1
         Answer4CostTxt.Text = 60
         Answer5CostTxt.Text = 120
         Answer6CostTxt.Text = 240
-        Tablo.Prepare()
     End Sub
 
     Private Sub StoAttractBtn_Click(sender As Object, e As EventArgs) Handles StoAttractBtn.Click
@@ -400,5 +457,9 @@ Public Class Form1
 
     Private Sub AboutBtn_Click(sender As Object, e As EventArgs) Handles AboutBtn.Click
         AboutBox1.Show()
+    End Sub
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        My.Computer.Audio.Play(My.Resources.wrong_new, AudioPlayMode.Background)
     End Sub
 End Class

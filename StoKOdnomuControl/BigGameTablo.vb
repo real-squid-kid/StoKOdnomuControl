@@ -3,7 +3,7 @@
         'hide all
         TotalTxt.Visible = False
         TotalLbl.Visible = False
-        RoundScoreLbl.Visible = False
+        RoundScoreLbl.Visible = True
         Answer1Lbl.Visible = False
         Answer2Lbl.Visible = False
         Answer3Lbl.Visible = False
@@ -28,8 +28,8 @@
     End Sub
 
     Public Sub Prepare()
-        TotalLbl.Visible = True
-        TotalTxt.Visible = True
+        TotalLbl.Visible = False
+        TotalTxt.Visible = False
         RoundScoreLbl.Visible = True
     End Sub
 
@@ -62,7 +62,7 @@
     Public Sub SetTimer(e As Integer)
         TimerLbl.Text = e
         TimerLbl.Visible = True
-        My.Computer.Audio.Play(My.Resources.prosto_open, AudioPlayMode.Background)
+        My.Computer.Audio.Play(My.Resources.line_new, AudioPlayMode.Background)
     End Sub
 
     Public Sub StartTimer()
@@ -92,132 +92,142 @@
             Case 1
                 Answer1Lbl.Text = param
                 Answer1Lbl.Visible = True
+                My.Computer.Audio.Play(My.Resources.ff_reveal1, AudioPlayMode.Background)
             Case "1A"
                 Answer1ScoreLbl.Text = param
                 Answer1ScoreLbl.Visible = True
                 TotalLbl.Text = BigGameControl.ScoreTxt.Text
                 RoundScoreLbl.Text = TotalLbl.Text
                 If param = 0 Then
-                    My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources._26_bigwrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources._26_open, AudioPlayMode.Background)
                 End If
             Case 2
                 Answer2Lbl.Text = param
                 Answer2Lbl.Visible = True
+                My.Computer.Audio.Play(My.Resources.ff_reveal2, AudioPlayMode.Background)
             Case "2A"
                 Answer2ScoreLbl.Text = param
                 Answer2ScoreLbl.Visible = True
                 TotalLbl.Text = BigGameControl.ScoreTxt.Text
                 RoundScoreLbl.Text = TotalLbl.Text
                 If param = 0 Then
-                    My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources._26_bigwrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources._26_open, AudioPlayMode.Background)
                 End If
             Case 3
                 Answer3Lbl.Text = param
                 Answer3Lbl.Visible = True
+                My.Computer.Audio.Play(My.Resources.ff_reveal3, AudioPlayMode.Background)
             Case "3A"
                 Answer3ScoreLbl.Text = param
                 Answer3ScoreLbl.Visible = True
                 TotalLbl.Text = BigGameControl.ScoreTxt.Text
                 RoundScoreLbl.Text = TotalLbl.Text
                 If param = 0 Then
-                    My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources._26_bigwrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources._26_open, AudioPlayMode.Background)
                 End If
             Case 4
                 Answer4Lbl.Text = param
                 Answer4Lbl.Visible = True
+                My.Computer.Audio.Play(My.Resources.ff_reveal4, AudioPlayMode.Background)
             Case "4A"
                 Answer4ScoreLbl.Text = param
                 Answer4ScoreLbl.Visible = True
                 TotalLbl.Text = BigGameControl.ScoreTxt.Text
                 RoundScoreLbl.Text = TotalLbl.Text
                 If param = 0 Then
-                    My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources._26_bigwrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources._26_open, AudioPlayMode.Background)
                 End If
             Case 5
                 Answer5Lbl.Text = param
                 Answer5Lbl.Visible = True
+                My.Computer.Audio.Play(My.Resources.ff_reveal5, AudioPlayMode.Background)
             Case "5A"
                 Answer5ScoreLbl.Text = param
                 Answer5ScoreLbl.Visible = True
                 TotalLbl.Text = BigGameControl.ScoreTxt.Text
                 RoundScoreLbl.Text = TotalLbl.Text
                 If param = 0 Then
-                    My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources._26_bigwrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources._26_open, AudioPlayMode.Background)
                 End If
             Case 6
                 Answer6Lbl.Text = param
                 Answer6Lbl.Visible = True
+                My.Computer.Audio.Play(My.Resources.ff_reveal1, AudioPlayMode.Background)
             Case "6A"
                 Answer6ScoreLbl.Text = param
                 Answer6ScoreLbl.Visible = True
                 TotalLbl.Text = BigGameControl.ScoreTxt.Text
                 RoundScoreLbl.Text = TotalLbl.Text
                 If param = 0 Then
-                    My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources._26_bigwrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources._26_open, AudioPlayMode.Background)
                 End If
             Case 7
                 Answer7Lbl.Text = param
                 Answer7Lbl.Visible = True
+                My.Computer.Audio.Play(My.Resources.ff_reveal2, AudioPlayMode.Background)
             Case "7A"
                 Answer7ScoreLbl.Text = param
                 Answer7ScoreLbl.Visible = True
                 TotalLbl.Text = BigGameControl.ScoreTxt.Text
                 RoundScoreLbl.Text = TotalLbl.Text
                 If param = 0 Then
-                    My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources._26_bigwrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources._26_open, AudioPlayMode.Background)
                 End If
             Case 8
                 Answer8Lbl.Text = param
                 Answer8Lbl.Visible = True
+                My.Computer.Audio.Play(My.Resources.ff_reveal3, AudioPlayMode.Background)
             Case "8A"
                 Answer8ScoreLbl.Text = param
                 Answer8ScoreLbl.Visible = True
                 TotalLbl.Text = BigGameControl.ScoreTxt.Text
                 RoundScoreLbl.Text = TotalLbl.Text
                 If param = 0 Then
-                    My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources._26_bigwrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources._26_open, AudioPlayMode.Background)
                 End If
             Case 9
                 Answer9Lbl.Text = param
                 Answer9Lbl.Visible = True
+                My.Computer.Audio.Play(My.Resources.ff_reveal4, AudioPlayMode.Background)
             Case "9A"
                 Answer9ScoreLbl.Text = param
                 Answer9ScoreLbl.Visible = True
                 TotalLbl.Text = BigGameControl.ScoreTxt.Text
                 RoundScoreLbl.Text = TotalLbl.Text
                 If param = 0 Then
-                    My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources._26_bigwrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources._26_open, AudioPlayMode.Background)
                 End If
             Case 10
                 Answer10Lbl.Text = param
                 Answer10Lbl.Visible = True
+                My.Computer.Audio.Play(My.Resources.ff_reveal5, AudioPlayMode.Background)
             Case "10A"
                 Answer10ScoreLbl.Text = param
                 Answer10ScoreLbl.Visible = True
                 TotalLbl.Text = BigGameControl.ScoreTxt.Text
                 RoundScoreLbl.Text = TotalLbl.Text
                 If param = 0 Then
-                    My.Computer.Audio.Play(My.Resources.wrong, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources._26_bigwrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources.line_open, AudioPlayMode.Background)
+                    My.Computer.Audio.Play(My.Resources._26_open, AudioPlayMode.Background)
                 End If
         End Select
     End Sub

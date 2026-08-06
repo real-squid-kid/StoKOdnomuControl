@@ -11,7 +11,8 @@
     <AssemblyName>StoKOdnomuControl</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>WindowsForms</MyType>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -22,6 +23,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DocumentationFile>StoKOdnomuControl.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,6 +34,7 @@
     <OutputPath>bin\Release\</OutputPath>
     <DocumentationFile>StoKOdnomuControl.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <OptionExplicit>On</OptionExplicit>
@@ -228,6 +231,37 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="base.txt" />
+    <None Include="Resources\2026\26_buzzer.wav" />
+    <None Include="Resources\2026\26_bigwrong.wav" />
+    <None Include="Resources\2026\26_big.jpg" />
+    <None Include="Resources\2026\26_wrong_r.png" />
+    <None Include="Resources\2026\26_wrong_l.png" />
+    <None Include="Resources\2026\26_wrong.wav" />
+    <None Include="Resources\2026\26_win.wav" />
+    <None Include="Resources\2026\26_same.wav" />
+    <None Include="Resources\2026\26_open.wav" />
+    <None Include="Resources\2026\26_noscore.wav" />
+    <None Include="Resources\2026\26_main.jpg" />
+    <None Include="Resources\2026\26_chance_r.png" />
+    <None Include="Resources\2026\26_chance_l.png" />
+    <None Include="Новый дизигн\strike_left.png" />
+    <None Include="Новый дизигн\life_right.png" />
+    <None Include="Новый дизигн\life_left.png" />
+    <None Include="Новый дизигн\Осн игра new.jpg" />
+    <None Include="Новый дизигн\Блиц new.jpg" />
+    <None Include="Новый дизигн\strike_right.png" />
+    <None Include="Новые звуки\wrong_new.wav" />
+    <None Include="Новые звуки\same_new.wav" />
+    <None Include="Новые звуки\no_score_new.wav" />
+    <None Include="Новые звуки\line_new.wav" />
+    <None Include="Новые звуки\line_first_new.wav" />
+    <None Include="Новые звуки\ff_reveal5.wav" />
+    <None Include="Новые звуки\ff_reveal4.wav" />
+    <None Include="Новые звуки\ff_reveal3.wav" />
+    <None Include="Новые звуки\ff_reveal2.wav" />
+    <None Include="Новые звуки\ff_reveal1.wav" />
+    <None Include="Resources\Осн игра.png" />
+    <None Include="Resources\Большая игра.png" />
     <None Include="Resources\run.wav" />
     <None Include="Resources\download.png" />
   </ItemGroup>

@@ -169,4 +169,97 @@
   <data name="run" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\run.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="ff_reveal1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Новые звуки\ff_reveal1.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="ff_reveal2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Новые звуки\ff_reveal2.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="ff_reveal3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Новые звуки\ff_reveal3.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="ff_reveal4" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Новые звуки\ff_reveal4.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="ff_reveal5" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Новые звуки\ff_reveal5.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="line_first_new" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Новые звуки\line_first_new.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="line_new" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Новые звуки\line_new.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="no_score_new" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Новые звуки\no_score_new.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="same_new" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Новые звуки\same_new.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="wrong_new" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Новые звуки\wrong_new.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="Большая_игра" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Большая игра.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Осн_игра" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Осн игра.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="life_left" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Новый дизигн\life_left.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="life_right" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Новый дизигн\life_right.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="strike_left" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Новый дизигн\strike_left.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="strike_right" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Новый дизигн\strike_right.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Блиц_new" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Новый дизигн\Блиц new.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Осн_игра_new" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Новый дизигн\Осн игра new.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="_26_big" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\2026\26_big.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="_26_bigwrong" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\2026\26_bigwrong.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="_26_buzzer" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\2026\26_buzzer.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="_26_chance_l" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\2026\26_chance_l.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="_26_chance_r" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\2026\26_chance_r.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="_26_main" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\2026\26_main.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="_26_noscore" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\2026\26_noscore.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="_26_open" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\2026\26_open.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="_26_same" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\2026\26_same.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="_26_win" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\2026\26_win.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="_26_wrong" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\2026\26_wrong.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="_26_wrong_l" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\2026\26_wrong_l.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="_26_wrong_r" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\2026\26_wrong_r.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

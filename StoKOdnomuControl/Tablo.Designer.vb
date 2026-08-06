@@ -22,6 +22,7 @@ Partial Class Tablo
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Tablo))
         Me.RoundScoreLbl = New System.Windows.Forms.Label()
         Me.ScoreLeftLbl = New System.Windows.Forms.Label()
         Me.ScoreRightLbl = New System.Windows.Forms.Label()
@@ -50,11 +51,11 @@ Partial Class Tablo
         'RoundScoreLbl
         '
         Me.RoundScoreLbl.BackColor = System.Drawing.Color.Transparent
-        Me.RoundScoreLbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.RoundScoreLbl.ForeColor = System.Drawing.Color.White
-        Me.RoundScoreLbl.Location = New System.Drawing.Point(538, 9)
+        Me.RoundScoreLbl.Font = New System.Drawing.Font("JetBrains Mono", 47.99999!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.RoundScoreLbl.ForeColor = System.Drawing.Color.Black
+        Me.RoundScoreLbl.Location = New System.Drawing.Point(522, 22)
         Me.RoundScoreLbl.Name = "RoundScoreLbl"
-        Me.RoundScoreLbl.Size = New System.Drawing.Size(187, 99)
+        Me.RoundScoreLbl.Size = New System.Drawing.Size(229, 86)
         Me.RoundScoreLbl.TabIndex = 0
         Me.RoundScoreLbl.Text = "000"
         Me.RoundScoreLbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
@@ -62,32 +63,32 @@ Partial Class Tablo
         'ScoreLeftLbl
         '
         Me.ScoreLeftLbl.BackColor = System.Drawing.Color.Transparent
-        Me.ScoreLeftLbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.ScoreLeftLbl.ForeColor = System.Drawing.Color.White
-        Me.ScoreLeftLbl.Location = New System.Drawing.Point(12, 9)
+        Me.ScoreLeftLbl.Font = New System.Drawing.Font("JetBrains Mono", 47.99999!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.ScoreLeftLbl.ForeColor = System.Drawing.Color.Black
+        Me.ScoreLeftLbl.Location = New System.Drawing.Point(21, 22)
         Me.ScoreLeftLbl.Name = "ScoreLeftLbl"
-        Me.ScoreLeftLbl.Size = New System.Drawing.Size(187, 99)
+        Me.ScoreLeftLbl.Size = New System.Drawing.Size(149, 86)
         Me.ScoreLeftLbl.TabIndex = 0
         Me.ScoreLeftLbl.Text = "000"
-        Me.ScoreLeftLbl.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.ScoreLeftLbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
         'ScoreRightLbl
         '
         Me.ScoreRightLbl.BackColor = System.Drawing.Color.Transparent
-        Me.ScoreRightLbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.ScoreRightLbl.ForeColor = System.Drawing.Color.White
-        Me.ScoreRightLbl.Location = New System.Drawing.Point(1065, 9)
+        Me.ScoreRightLbl.Font = New System.Drawing.Font("JetBrains Mono", 47.99999!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.ScoreRightLbl.ForeColor = System.Drawing.Color.Black
+        Me.ScoreRightLbl.Location = New System.Drawing.Point(1103, 22)
         Me.ScoreRightLbl.Name = "ScoreRightLbl"
-        Me.ScoreRightLbl.Size = New System.Drawing.Size(187, 99)
+        Me.ScoreRightLbl.Size = New System.Drawing.Size(149, 86)
         Me.ScoreRightLbl.TabIndex = 0
         Me.ScoreRightLbl.Text = "000"
-        Me.ScoreRightLbl.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.ScoreRightLbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
         'Answer1Lbl
         '
         Me.Answer1Lbl.BackColor = System.Drawing.Color.Transparent
-        Me.Answer1Lbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer1Lbl.ForeColor = System.Drawing.Color.White
+        Me.Answer1Lbl.Font = New System.Drawing.Font("JetBrains Mono", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Answer1Lbl.ForeColor = System.Drawing.Color.Black
         Me.Answer1Lbl.Location = New System.Drawing.Point(275, 154)
         Me.Answer1Lbl.Name = "Answer1Lbl"
         Me.Answer1Lbl.Size = New System.Drawing.Size(581, 76)
@@ -98,8 +99,8 @@ Partial Class Tablo
         'Answer2Lbl
         '
         Me.Answer2Lbl.BackColor = System.Drawing.Color.Transparent
-        Me.Answer2Lbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer2Lbl.ForeColor = System.Drawing.Color.White
+        Me.Answer2Lbl.Font = New System.Drawing.Font("JetBrains Mono", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Answer2Lbl.ForeColor = System.Drawing.Color.Black
         Me.Answer2Lbl.Location = New System.Drawing.Point(275, 230)
         Me.Answer2Lbl.Name = "Answer2Lbl"
         Me.Answer2Lbl.Size = New System.Drawing.Size(581, 76)
@@ -110,8 +111,8 @@ Partial Class Tablo
         'Answer3Lbl
         '
         Me.Answer3Lbl.BackColor = System.Drawing.Color.Transparent
-        Me.Answer3Lbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer3Lbl.ForeColor = System.Drawing.Color.White
+        Me.Answer3Lbl.Font = New System.Drawing.Font("JetBrains Mono", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Answer3Lbl.ForeColor = System.Drawing.Color.Black
         Me.Answer3Lbl.Location = New System.Drawing.Point(275, 306)
         Me.Answer3Lbl.Name = "Answer3Lbl"
         Me.Answer3Lbl.Size = New System.Drawing.Size(694, 76)
@@ -122,8 +123,8 @@ Partial Class Tablo
         'Answer4Lbl
         '
         Me.Answer4Lbl.BackColor = System.Drawing.Color.Transparent
-        Me.Answer4Lbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer4Lbl.ForeColor = System.Drawing.Color.White
+        Me.Answer4Lbl.Font = New System.Drawing.Font("JetBrains Mono", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Answer4Lbl.ForeColor = System.Drawing.Color.Black
         Me.Answer4Lbl.Location = New System.Drawing.Point(275, 382)
         Me.Answer4Lbl.Name = "Answer4Lbl"
         Me.Answer4Lbl.Size = New System.Drawing.Size(694, 76)
@@ -134,8 +135,8 @@ Partial Class Tablo
         'Answer5Lbl
         '
         Me.Answer5Lbl.BackColor = System.Drawing.Color.Transparent
-        Me.Answer5Lbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer5Lbl.ForeColor = System.Drawing.Color.White
+        Me.Answer5Lbl.Font = New System.Drawing.Font("JetBrains Mono", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Answer5Lbl.ForeColor = System.Drawing.Color.Black
         Me.Answer5Lbl.Location = New System.Drawing.Point(275, 458)
         Me.Answer5Lbl.Name = "Answer5Lbl"
         Me.Answer5Lbl.Size = New System.Drawing.Size(581, 76)
@@ -146,8 +147,8 @@ Partial Class Tablo
         'Answer6Lbl
         '
         Me.Answer6Lbl.BackColor = System.Drawing.Color.Transparent
-        Me.Answer6Lbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer6Lbl.ForeColor = System.Drawing.Color.White
+        Me.Answer6Lbl.Font = New System.Drawing.Font("JetBrains Mono", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Answer6Lbl.ForeColor = System.Drawing.Color.Black
         Me.Answer6Lbl.Location = New System.Drawing.Point(275, 534)
         Me.Answer6Lbl.Name = "Answer6Lbl"
         Me.Answer6Lbl.Size = New System.Drawing.Size(581, 76)
@@ -158,8 +159,8 @@ Partial Class Tablo
         'Answer1ScoreLbl
         '
         Me.Answer1ScoreLbl.BackColor = System.Drawing.Color.Transparent
-        Me.Answer1ScoreLbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer1ScoreLbl.ForeColor = System.Drawing.Color.White
+        Me.Answer1ScoreLbl.Font = New System.Drawing.Font("JetBrains Mono", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Answer1ScoreLbl.ForeColor = System.Drawing.Color.Black
         Me.Answer1ScoreLbl.Location = New System.Drawing.Point(862, 154)
         Me.Answer1ScoreLbl.Name = "Answer1ScoreLbl"
         Me.Answer1ScoreLbl.Size = New System.Drawing.Size(107, 76)
@@ -170,8 +171,8 @@ Partial Class Tablo
         'Answer2ScoreLbl
         '
         Me.Answer2ScoreLbl.BackColor = System.Drawing.Color.Transparent
-        Me.Answer2ScoreLbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer2ScoreLbl.ForeColor = System.Drawing.Color.White
+        Me.Answer2ScoreLbl.Font = New System.Drawing.Font("JetBrains Mono", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Answer2ScoreLbl.ForeColor = System.Drawing.Color.Black
         Me.Answer2ScoreLbl.Location = New System.Drawing.Point(862, 230)
         Me.Answer2ScoreLbl.Name = "Answer2ScoreLbl"
         Me.Answer2ScoreLbl.Size = New System.Drawing.Size(107, 76)
@@ -182,8 +183,8 @@ Partial Class Tablo
         'Answer3ScoreLbl
         '
         Me.Answer3ScoreLbl.BackColor = System.Drawing.Color.Transparent
-        Me.Answer3ScoreLbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer3ScoreLbl.ForeColor = System.Drawing.Color.White
+        Me.Answer3ScoreLbl.Font = New System.Drawing.Font("JetBrains Mono", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Answer3ScoreLbl.ForeColor = System.Drawing.Color.Black
         Me.Answer3ScoreLbl.Location = New System.Drawing.Point(862, 306)
         Me.Answer3ScoreLbl.Name = "Answer3ScoreLbl"
         Me.Answer3ScoreLbl.Size = New System.Drawing.Size(107, 76)
@@ -194,8 +195,8 @@ Partial Class Tablo
         'Answer4ScoreLbl
         '
         Me.Answer4ScoreLbl.BackColor = System.Drawing.Color.Transparent
-        Me.Answer4ScoreLbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer4ScoreLbl.ForeColor = System.Drawing.Color.White
+        Me.Answer4ScoreLbl.Font = New System.Drawing.Font("JetBrains Mono", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Answer4ScoreLbl.ForeColor = System.Drawing.Color.Black
         Me.Answer4ScoreLbl.Location = New System.Drawing.Point(862, 382)
         Me.Answer4ScoreLbl.Name = "Answer4ScoreLbl"
         Me.Answer4ScoreLbl.Size = New System.Drawing.Size(107, 76)
@@ -206,8 +207,8 @@ Partial Class Tablo
         'Answer5ScoreLbl
         '
         Me.Answer5ScoreLbl.BackColor = System.Drawing.Color.Transparent
-        Me.Answer5ScoreLbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer5ScoreLbl.ForeColor = System.Drawing.Color.White
+        Me.Answer5ScoreLbl.Font = New System.Drawing.Font("JetBrains Mono", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Answer5ScoreLbl.ForeColor = System.Drawing.Color.Black
         Me.Answer5ScoreLbl.Location = New System.Drawing.Point(862, 458)
         Me.Answer5ScoreLbl.Name = "Answer5ScoreLbl"
         Me.Answer5ScoreLbl.Size = New System.Drawing.Size(107, 76)
@@ -218,8 +219,8 @@ Partial Class Tablo
         'Answer6ScoreLbl
         '
         Me.Answer6ScoreLbl.BackColor = System.Drawing.Color.Transparent
-        Me.Answer6ScoreLbl.Font = New System.Drawing.Font("Calibri", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer6ScoreLbl.ForeColor = System.Drawing.Color.White
+        Me.Answer6ScoreLbl.Font = New System.Drawing.Font("JetBrains Mono", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.Answer6ScoreLbl.ForeColor = System.Drawing.Color.Black
         Me.Answer6ScoreLbl.Location = New System.Drawing.Point(862, 534)
         Me.Answer6ScoreLbl.Name = "Answer6ScoreLbl"
         Me.Answer6ScoreLbl.Size = New System.Drawing.Size(107, 76)
@@ -232,11 +233,11 @@ Partial Class Tablo
         Me.RightStrike3Lbl.BackColor = System.Drawing.Color.Transparent
         Me.RightStrike3Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.RightStrike3Lbl.ForeColor = System.Drawing.Color.Red
-        Me.RightStrike3Lbl.Location = New System.Drawing.Point(1065, 306)
+        Me.RightStrike3Lbl.Image = CType(resources.GetObject("RightStrike3Lbl.Image"), System.Drawing.Image)
+        Me.RightStrike3Lbl.Location = New System.Drawing.Point(1099, 266)
         Me.RightStrike3Lbl.Name = "RightStrike3Lbl"
-        Me.RightStrike3Lbl.Size = New System.Drawing.Size(187, 99)
+        Me.RightStrike3Lbl.Size = New System.Drawing.Size(156, 134)
         Me.RightStrike3Lbl.TabIndex = 0
-        Me.RightStrike3Lbl.Text = "X"
         Me.RightStrike3Lbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
         'RightStrike2Lbl
@@ -244,11 +245,11 @@ Partial Class Tablo
         Me.RightStrike2Lbl.BackColor = System.Drawing.Color.Transparent
         Me.RightStrike2Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.RightStrike2Lbl.ForeColor = System.Drawing.Color.Red
-        Me.RightStrike2Lbl.Location = New System.Drawing.Point(1065, 405)
+        Me.RightStrike2Lbl.Image = CType(resources.GetObject("RightStrike2Lbl.Image"), System.Drawing.Image)
+        Me.RightStrike2Lbl.Location = New System.Drawing.Point(1099, 400)
         Me.RightStrike2Lbl.Name = "RightStrike2Lbl"
-        Me.RightStrike2Lbl.Size = New System.Drawing.Size(187, 99)
+        Me.RightStrike2Lbl.Size = New System.Drawing.Size(156, 134)
         Me.RightStrike2Lbl.TabIndex = 0
-        Me.RightStrike2Lbl.Text = "X"
         Me.RightStrike2Lbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
         'RightStrike1Lbl
@@ -256,11 +257,11 @@ Partial Class Tablo
         Me.RightStrike1Lbl.BackColor = System.Drawing.Color.Transparent
         Me.RightStrike1Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.RightStrike1Lbl.ForeColor = System.Drawing.Color.Red
-        Me.RightStrike1Lbl.Location = New System.Drawing.Point(1065, 504)
+        Me.RightStrike1Lbl.Image = CType(resources.GetObject("RightStrike1Lbl.Image"), System.Drawing.Image)
+        Me.RightStrike1Lbl.Location = New System.Drawing.Point(1099, 534)
         Me.RightStrike1Lbl.Name = "RightStrike1Lbl"
-        Me.RightStrike1Lbl.Size = New System.Drawing.Size(187, 99)
+        Me.RightStrike1Lbl.Size = New System.Drawing.Size(156, 134)
         Me.RightStrike1Lbl.TabIndex = 0
-        Me.RightStrike1Lbl.Text = "X"
         Me.RightStrike1Lbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
         'LeftStrike3Lbl
@@ -268,11 +269,11 @@ Partial Class Tablo
         Me.LeftStrike3Lbl.BackColor = System.Drawing.Color.Transparent
         Me.LeftStrike3Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.LeftStrike3Lbl.ForeColor = System.Drawing.Color.Red
-        Me.LeftStrike3Lbl.Location = New System.Drawing.Point(12, 306)
+        Me.LeftStrike3Lbl.Image = CType(resources.GetObject("LeftStrike3Lbl.Image"), System.Drawing.Image)
+        Me.LeftStrike3Lbl.Location = New System.Drawing.Point(14, 266)
         Me.LeftStrike3Lbl.Name = "LeftStrike3Lbl"
-        Me.LeftStrike3Lbl.Size = New System.Drawing.Size(187, 99)
+        Me.LeftStrike3Lbl.Size = New System.Drawing.Size(156, 134)
         Me.LeftStrike3Lbl.TabIndex = 1
-        Me.LeftStrike3Lbl.Text = "X"
         Me.LeftStrike3Lbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
         'LeftStrike2Lbl
@@ -280,11 +281,11 @@ Partial Class Tablo
         Me.LeftStrike2Lbl.BackColor = System.Drawing.Color.Transparent
         Me.LeftStrike2Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.LeftStrike2Lbl.ForeColor = System.Drawing.Color.Red
-        Me.LeftStrike2Lbl.Location = New System.Drawing.Point(12, 405)
+        Me.LeftStrike2Lbl.Image = CType(resources.GetObject("LeftStrike2Lbl.Image"), System.Drawing.Image)
+        Me.LeftStrike2Lbl.Location = New System.Drawing.Point(14, 400)
         Me.LeftStrike2Lbl.Name = "LeftStrike2Lbl"
-        Me.LeftStrike2Lbl.Size = New System.Drawing.Size(187, 99)
+        Me.LeftStrike2Lbl.Size = New System.Drawing.Size(156, 134)
         Me.LeftStrike2Lbl.TabIndex = 2
-        Me.LeftStrike2Lbl.Text = "X"
         Me.LeftStrike2Lbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
         'LeftStrike1Lbl
@@ -292,21 +293,21 @@ Partial Class Tablo
         Me.LeftStrike1Lbl.BackColor = System.Drawing.Color.Transparent
         Me.LeftStrike1Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.LeftStrike1Lbl.ForeColor = System.Drawing.Color.Red
-        Me.LeftStrike1Lbl.Location = New System.Drawing.Point(12, 504)
+        Me.LeftStrike1Lbl.Image = CType(resources.GetObject("LeftStrike1Lbl.Image"), System.Drawing.Image)
+        Me.LeftStrike1Lbl.Location = New System.Drawing.Point(14, 534)
         Me.LeftStrike1Lbl.Name = "LeftStrike1Lbl"
-        Me.LeftStrike1Lbl.Size = New System.Drawing.Size(187, 99)
+        Me.LeftStrike1Lbl.Size = New System.Drawing.Size(156, 134)
         Me.LeftStrike1Lbl.TabIndex = 3
-        Me.LeftStrike1Lbl.Text = "X"
         Me.LeftStrike1Lbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
         'LeftRoundLbl
         '
         Me.LeftRoundLbl.BackColor = System.Drawing.Color.Transparent
-        Me.LeftRoundLbl.Font = New System.Drawing.Font("Calibri", 48.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.LeftRoundLbl.ForeColor = System.Drawing.Color.Red
-        Me.LeftRoundLbl.Location = New System.Drawing.Point(49, 144)
+        Me.LeftRoundLbl.Font = New System.Drawing.Font("JetBrains Mono", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.LeftRoundLbl.ForeColor = System.Drawing.Color.Black
+        Me.LeftRoundLbl.Location = New System.Drawing.Point(35, 134)
         Me.LeftRoundLbl.Name = "LeftRoundLbl"
-        Me.LeftRoundLbl.Size = New System.Drawing.Size(105, 162)
+        Me.LeftRoundLbl.Size = New System.Drawing.Size(119, 107)
         Me.LeftRoundLbl.TabIndex = 1
         Me.LeftRoundLbl.Text = "1"
         Me.LeftRoundLbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
@@ -314,11 +315,11 @@ Partial Class Tablo
         'RightRoundLbl
         '
         Me.RightRoundLbl.BackColor = System.Drawing.Color.Transparent
-        Me.RightRoundLbl.Font = New System.Drawing.Font("Calibri", 48.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.RightRoundLbl.ForeColor = System.Drawing.Color.Red
-        Me.RightRoundLbl.Location = New System.Drawing.Point(1104, 144)
+        Me.RightRoundLbl.Font = New System.Drawing.Font("JetBrains Mono", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me.RightRoundLbl.ForeColor = System.Drawing.Color.Black
+        Me.RightRoundLbl.Location = New System.Drawing.Point(1116, 134)
         Me.RightRoundLbl.Name = "RightRoundLbl"
-        Me.RightRoundLbl.Size = New System.Drawing.Size(105, 162)
+        Me.RightRoundLbl.Size = New System.Drawing.Size(119, 107)
         Me.RightRoundLbl.TabIndex = 1
         Me.RightRoundLbl.Text = "1"
         Me.RightRoundLbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
@@ -328,7 +329,8 @@ Partial Class Tablo
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.Green
-        Me.BackgroundImage = Global.StoKOdnomuControl.My.Resources.Resources._1995_sto_main
+        Me.BackgroundImage = Global.StoKOdnomuControl.My.Resources.Resources._26_main
+        Me.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
         Me.ClientSize = New System.Drawing.Size(1264, 681)
         Me.Controls.Add(Me.RightRoundLbl)
         Me.Controls.Add(Me.LeftRoundLbl)
