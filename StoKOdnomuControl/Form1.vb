@@ -455,34 +455,25 @@ Public Class Form1
         Tablo.AttractMode(5)
     End Sub
 
-    Private Sub AboutBtn_Click(sender As Object, e As EventArgs) Handles AboutBtn.Click
+    Private Sub AboutBtn_Click(sender As Object, e As EventArgs)
         AboutBox1.Show()
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         My.Computer.Audio.Play(My.Resources._26_wrong, AudioPlayMode.Background)
     End Sub
-
+    Private WithEvents _buzz As New BuzzManager()
     Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs) _
     Handles MyBase.FormClosing
-        _buzz.Dispose()
+        _buzz.Shutdown()
+
         AudioService.Instance.Shutdown()
     End Sub
-    Private WithEvents _buzz As New BuzzManager()
+
 
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        If Not _buzz.Initialize() Then
-            MessageBox.Show("Приёмник Buzz не найден")
-            MessageBox.Show(_buzz.ListJoysticks())
-            MessageBox.Show(_buzz.Diagnose())
-        End If
+        If Not _buzz.Initialize() Then MessageBox.Show("Приёмник не найден")
     End Sub
 
-    Private Sub OnBuzzer(pad As Integer) Handles _buzz.BuzzerPressed
-        ' Событие приходит из фонового потока!
-        If InvokeRequired Then
-            Invoke(Sub() OnBuzzer(pad))
-            Return
-        End If
-    End Sub
+
 End Class

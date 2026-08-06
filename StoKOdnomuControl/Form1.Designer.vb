@@ -71,11 +71,10 @@ Partial Class Form1
         Me.TripleAttractBtn = New System.Windows.Forms.Button()
         Me.UnderAttractBtn = New System.Windows.Forms.Button()
         Me.BigAttractBtn = New System.Windows.Forms.Button()
-        Me.AboutBtn = New System.Windows.Forms.Button()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
-        Me.Radio1x = New System.Windows.Forms.RadioButton()
-        Me.Radio2x = New System.Windows.Forms.RadioButton()
         Me.Radio3x = New System.Windows.Forms.RadioButton()
+        Me.Radio2x = New System.Windows.Forms.RadioButton()
+        Me.Radio1x = New System.Windows.Forms.RadioButton()
         Me.Button1 = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
@@ -83,10 +82,9 @@ Partial Class Form1
         'OpenQuestionsBtn
         '
         Me.OpenQuestionsBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.OpenQuestionsBtn.Location = New System.Drawing.Point(1569, 731)
-        Me.OpenQuestionsBtn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.OpenQuestionsBtn.Location = New System.Drawing.Point(1177, 594)
         Me.OpenQuestionsBtn.Name = "OpenQuestionsBtn"
-        Me.OpenQuestionsBtn.Size = New System.Drawing.Size(100, 92)
+        Me.OpenQuestionsBtn.Size = New System.Drawing.Size(75, 75)
         Me.OpenQuestionsBtn.TabIndex = 0
         Me.OpenQuestionsBtn.Text = "📂"
         Me.OpenQuestionsBtn.UseVisualStyleBackColor = True
@@ -95,10 +93,9 @@ Partial Class Form1
         '
         Me.FirstRoundBtn.Enabled = False
         Me.FirstRoundBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.FirstRoundBtn.Location = New System.Drawing.Point(17, 16)
-        Me.FirstRoundBtn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.FirstRoundBtn.Location = New System.Drawing.Point(13, 13)
         Me.FirstRoundBtn.Name = "FirstRoundBtn"
-        Me.FirstRoundBtn.Size = New System.Drawing.Size(100, 92)
+        Me.FirstRoundBtn.Size = New System.Drawing.Size(75, 75)
         Me.FirstRoundBtn.TabIndex = 1
         Me.FirstRoundBtn.Text = "x1"
         Me.FirstRoundBtn.UseVisualStyleBackColor = True
@@ -107,10 +104,9 @@ Partial Class Form1
         '
         Me.SecondRoundBtn.Enabled = False
         Me.SecondRoundBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.SecondRoundBtn.Location = New System.Drawing.Point(125, 16)
-        Me.SecondRoundBtn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.SecondRoundBtn.Location = New System.Drawing.Point(94, 13)
         Me.SecondRoundBtn.Name = "SecondRoundBtn"
-        Me.SecondRoundBtn.Size = New System.Drawing.Size(100, 92)
+        Me.SecondRoundBtn.Size = New System.Drawing.Size(75, 75)
         Me.SecondRoundBtn.TabIndex = 2
         Me.SecondRoundBtn.Text = "x2"
         Me.SecondRoundBtn.UseVisualStyleBackColor = True
@@ -119,10 +115,9 @@ Partial Class Form1
         '
         Me.ThirdRoundBtn.Enabled = False
         Me.ThirdRoundBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.ThirdRoundBtn.Location = New System.Drawing.Point(233, 16)
-        Me.ThirdRoundBtn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.ThirdRoundBtn.Location = New System.Drawing.Point(175, 13)
         Me.ThirdRoundBtn.Name = "ThirdRoundBtn"
-        Me.ThirdRoundBtn.Size = New System.Drawing.Size(100, 92)
+        Me.ThirdRoundBtn.Size = New System.Drawing.Size(75, 75)
         Me.ThirdRoundBtn.TabIndex = 3
         Me.ThirdRoundBtn.Text = "x3"
         Me.ThirdRoundBtn.UseVisualStyleBackColor = True
@@ -131,10 +126,9 @@ Partial Class Form1
         '
         Me.FourthRoundBtn.Enabled = False
         Me.FourthRoundBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.FourthRoundBtn.Location = New System.Drawing.Point(341, 16)
-        Me.FourthRoundBtn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.FourthRoundBtn.Location = New System.Drawing.Point(256, 13)
         Me.FourthRoundBtn.Name = "FourthRoundBtn"
-        Me.FourthRoundBtn.Size = New System.Drawing.Size(100, 92)
+        Me.FourthRoundBtn.Size = New System.Drawing.Size(75, 75)
         Me.FourthRoundBtn.TabIndex = 4
         Me.FourthRoundBtn.Text = "?"
         Me.FourthRoundBtn.UseVisualStyleBackColor = True
@@ -142,10 +136,9 @@ Partial Class Form1
         'BigRoundBtn
         '
         Me.BigRoundBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.BigRoundBtn.Location = New System.Drawing.Point(449, 16)
-        Me.BigRoundBtn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.BigRoundBtn.Location = New System.Drawing.Point(337, 13)
         Me.BigRoundBtn.Name = "BigRoundBtn"
-        Me.BigRoundBtn.Size = New System.Drawing.Size(100, 92)
+        Me.BigRoundBtn.Size = New System.Drawing.Size(75, 75)
         Me.BigRoundBtn.TabIndex = 5
         Me.BigRoundBtn.Text = "БИ"
         Me.BigRoundBtn.UseVisualStyleBackColor = True
@@ -154,10 +147,9 @@ Partial Class Form1
         '
         Me.RoundScoreTxt.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.RoundScoreTxt.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.RoundScoreTxt.Location = New System.Drawing.Point(747, 133)
-        Me.RoundScoreTxt.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.RoundScoreTxt.Location = New System.Drawing.Point(560, 108)
         Me.RoundScoreTxt.Name = "RoundScoreTxt"
-        Me.RoundScoreTxt.Size = New System.Drawing.Size(133, 46)
+        Me.RoundScoreTxt.Size = New System.Drawing.Size(100, 38)
         Me.RoundScoreTxt.TabIndex = 6
         Me.RoundScoreTxt.Text = "000"
         Me.RoundScoreTxt.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
@@ -165,120 +157,108 @@ Partial Class Form1
         'Answer1Txt
         '
         Me.Answer1Txt.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer1Txt.Location = New System.Drawing.Point(529, 331)
-        Me.Answer1Txt.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Answer1Txt.Location = New System.Drawing.Point(397, 269)
         Me.Answer1Txt.Name = "Answer1Txt"
-        Me.Answer1Txt.Size = New System.Drawing.Size(457, 46)
+        Me.Answer1Txt.Size = New System.Drawing.Size(344, 38)
         Me.Answer1Txt.TabIndex = 7
         Me.Answer1Txt.Text = "ОТВЕТ"
         '
         'Answer2Txt
         '
         Me.Answer2Txt.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer2Txt.Location = New System.Drawing.Point(529, 385)
-        Me.Answer2Txt.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Answer2Txt.Location = New System.Drawing.Point(397, 313)
         Me.Answer2Txt.Name = "Answer2Txt"
-        Me.Answer2Txt.Size = New System.Drawing.Size(457, 46)
+        Me.Answer2Txt.Size = New System.Drawing.Size(344, 38)
         Me.Answer2Txt.TabIndex = 7
         Me.Answer2Txt.Text = "ОТВЕТ"
         '
         'Answer3Txt
         '
         Me.Answer3Txt.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer3Txt.Location = New System.Drawing.Point(529, 439)
-        Me.Answer3Txt.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Answer3Txt.Location = New System.Drawing.Point(397, 357)
         Me.Answer3Txt.Name = "Answer3Txt"
-        Me.Answer3Txt.Size = New System.Drawing.Size(457, 46)
+        Me.Answer3Txt.Size = New System.Drawing.Size(344, 38)
         Me.Answer3Txt.TabIndex = 7
         Me.Answer3Txt.Text = "ОТВЕТ"
         '
         'Answer4Txt
         '
         Me.Answer4Txt.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer4Txt.Location = New System.Drawing.Point(529, 494)
-        Me.Answer4Txt.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Answer4Txt.Location = New System.Drawing.Point(397, 401)
         Me.Answer4Txt.Name = "Answer4Txt"
-        Me.Answer4Txt.Size = New System.Drawing.Size(457, 46)
+        Me.Answer4Txt.Size = New System.Drawing.Size(344, 38)
         Me.Answer4Txt.TabIndex = 7
         Me.Answer4Txt.Text = "ОТВЕТ"
         '
         'Answer5Txt
         '
         Me.Answer5Txt.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer5Txt.Location = New System.Drawing.Point(529, 548)
-        Me.Answer5Txt.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Answer5Txt.Location = New System.Drawing.Point(397, 445)
         Me.Answer5Txt.Name = "Answer5Txt"
-        Me.Answer5Txt.Size = New System.Drawing.Size(457, 46)
+        Me.Answer5Txt.Size = New System.Drawing.Size(344, 38)
         Me.Answer5Txt.TabIndex = 7
         Me.Answer5Txt.Text = "ОТВЕТ"
         '
         'Answer6Txt
         '
         Me.Answer6Txt.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer6Txt.Location = New System.Drawing.Point(529, 602)
-        Me.Answer6Txt.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Answer6Txt.Location = New System.Drawing.Point(397, 489)
         Me.Answer6Txt.Name = "Answer6Txt"
-        Me.Answer6Txt.Size = New System.Drawing.Size(457, 46)
+        Me.Answer6Txt.Size = New System.Drawing.Size(344, 38)
         Me.Answer6Txt.TabIndex = 7
         Me.Answer6Txt.Text = "ОТВЕТ"
         '
         'Answer1CostTxt
         '
         Me.Answer1CostTxt.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer1CostTxt.Location = New System.Drawing.Point(996, 331)
-        Me.Answer1CostTxt.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Answer1CostTxt.Location = New System.Drawing.Point(747, 269)
         Me.Answer1CostTxt.Name = "Answer1CostTxt"
-        Me.Answer1CostTxt.Size = New System.Drawing.Size(107, 46)
+        Me.Answer1CostTxt.Size = New System.Drawing.Size(81, 38)
         Me.Answer1CostTxt.TabIndex = 7
         Me.Answer1CostTxt.Text = "00"
         '
         'Answer2CostTxt
         '
         Me.Answer2CostTxt.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer2CostTxt.Location = New System.Drawing.Point(996, 385)
-        Me.Answer2CostTxt.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Answer2CostTxt.Location = New System.Drawing.Point(747, 313)
         Me.Answer2CostTxt.Name = "Answer2CostTxt"
-        Me.Answer2CostTxt.Size = New System.Drawing.Size(107, 46)
+        Me.Answer2CostTxt.Size = New System.Drawing.Size(81, 38)
         Me.Answer2CostTxt.TabIndex = 7
         Me.Answer2CostTxt.Text = "00"
         '
         'Answer3CostTxt
         '
         Me.Answer3CostTxt.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer3CostTxt.Location = New System.Drawing.Point(996, 439)
-        Me.Answer3CostTxt.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Answer3CostTxt.Location = New System.Drawing.Point(747, 357)
         Me.Answer3CostTxt.Name = "Answer3CostTxt"
-        Me.Answer3CostTxt.Size = New System.Drawing.Size(107, 46)
+        Me.Answer3CostTxt.Size = New System.Drawing.Size(81, 38)
         Me.Answer3CostTxt.TabIndex = 7
         Me.Answer3CostTxt.Text = "00"
         '
         'Answer4CostTxt
         '
         Me.Answer4CostTxt.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer4CostTxt.Location = New System.Drawing.Point(996, 494)
-        Me.Answer4CostTxt.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Answer4CostTxt.Location = New System.Drawing.Point(747, 401)
         Me.Answer4CostTxt.Name = "Answer4CostTxt"
-        Me.Answer4CostTxt.Size = New System.Drawing.Size(107, 46)
+        Me.Answer4CostTxt.Size = New System.Drawing.Size(81, 38)
         Me.Answer4CostTxt.TabIndex = 7
         Me.Answer4CostTxt.Text = "00"
         '
         'Answer5CostTxt
         '
         Me.Answer5CostTxt.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer5CostTxt.Location = New System.Drawing.Point(996, 548)
-        Me.Answer5CostTxt.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Answer5CostTxt.Location = New System.Drawing.Point(747, 445)
         Me.Answer5CostTxt.Name = "Answer5CostTxt"
-        Me.Answer5CostTxt.Size = New System.Drawing.Size(107, 46)
+        Me.Answer5CostTxt.Size = New System.Drawing.Size(81, 38)
         Me.Answer5CostTxt.TabIndex = 7
         Me.Answer5CostTxt.Text = "00"
         '
         'Answer6CostTxt
         '
         Me.Answer6CostTxt.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer6CostTxt.Location = New System.Drawing.Point(996, 602)
-        Me.Answer6CostTxt.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Answer6CostTxt.Location = New System.Drawing.Point(747, 489)
         Me.Answer6CostTxt.Name = "Answer6CostTxt"
-        Me.Answer6CostTxt.Size = New System.Drawing.Size(107, 46)
+        Me.Answer6CostTxt.Size = New System.Drawing.Size(81, 38)
         Me.Answer6CostTxt.TabIndex = 7
         Me.Answer6CostTxt.Text = "00"
         '
@@ -286,10 +266,9 @@ Partial Class Form1
         '
         Me.ScoreRightTxt.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.ScoreRightTxt.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.ScoreRightTxt.Location = New System.Drawing.Point(1104, 133)
-        Me.ScoreRightTxt.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.ScoreRightTxt.Location = New System.Drawing.Point(828, 108)
         Me.ScoreRightTxt.Name = "ScoreRightTxt"
-        Me.ScoreRightTxt.Size = New System.Drawing.Size(133, 46)
+        Me.ScoreRightTxt.Size = New System.Drawing.Size(100, 38)
         Me.ScoreRightTxt.TabIndex = 6
         Me.ScoreRightTxt.Text = "000"
         Me.ScoreRightTxt.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
@@ -298,10 +277,9 @@ Partial Class Form1
         '
         Me.ScoreLeftTxt.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.ScoreLeftTxt.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.ScoreLeftTxt.Location = New System.Drawing.Point(389, 133)
-        Me.ScoreLeftTxt.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.ScoreLeftTxt.Location = New System.Drawing.Point(292, 108)
         Me.ScoreLeftTxt.Name = "ScoreLeftTxt"
-        Me.ScoreLeftTxt.Size = New System.Drawing.Size(133, 46)
+        Me.ScoreLeftTxt.Size = New System.Drawing.Size(100, 38)
         Me.ScoreLeftTxt.TabIndex = 6
         Me.ScoreLeftTxt.Text = "000"
         Me.ScoreLeftTxt.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
@@ -309,10 +287,9 @@ Partial Class Form1
         'RoundScoreRefreshBtn
         '
         Me.RoundScoreRefreshBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.RoundScoreRefreshBtn.Location = New System.Drawing.Point(747, 187)
-        Me.RoundScoreRefreshBtn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.RoundScoreRefreshBtn.Location = New System.Drawing.Point(560, 152)
         Me.RoundScoreRefreshBtn.Name = "RoundScoreRefreshBtn"
-        Me.RoundScoreRefreshBtn.Size = New System.Drawing.Size(133, 37)
+        Me.RoundScoreRefreshBtn.Size = New System.Drawing.Size(100, 30)
         Me.RoundScoreRefreshBtn.TabIndex = 8
         Me.RoundScoreRefreshBtn.Text = "Обновить"
         Me.RoundScoreRefreshBtn.UseVisualStyleBackColor = True
@@ -320,10 +297,9 @@ Partial Class Form1
         'ScoreLeftRefreshTxt
         '
         Me.ScoreLeftRefreshTxt.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.ScoreLeftRefreshTxt.Location = New System.Drawing.Point(389, 187)
-        Me.ScoreLeftRefreshTxt.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.ScoreLeftRefreshTxt.Location = New System.Drawing.Point(292, 152)
         Me.ScoreLeftRefreshTxt.Name = "ScoreLeftRefreshTxt"
-        Me.ScoreLeftRefreshTxt.Size = New System.Drawing.Size(133, 37)
+        Me.ScoreLeftRefreshTxt.Size = New System.Drawing.Size(100, 30)
         Me.ScoreLeftRefreshTxt.TabIndex = 8
         Me.ScoreLeftRefreshTxt.Text = "Обновить"
         Me.ScoreLeftRefreshTxt.UseVisualStyleBackColor = True
@@ -331,10 +307,9 @@ Partial Class Form1
         'ScoreRightRefreshTxt
         '
         Me.ScoreRightRefreshTxt.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.ScoreRightRefreshTxt.Location = New System.Drawing.Point(1104, 187)
-        Me.ScoreRightRefreshTxt.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.ScoreRightRefreshTxt.Location = New System.Drawing.Point(828, 152)
         Me.ScoreRightRefreshTxt.Name = "ScoreRightRefreshTxt"
-        Me.ScoreRightRefreshTxt.Size = New System.Drawing.Size(133, 37)
+        Me.ScoreRightRefreshTxt.Size = New System.Drawing.Size(100, 30)
         Me.ScoreRightRefreshTxt.TabIndex = 8
         Me.ScoreRightRefreshTxt.Text = "Обновить"
         Me.ScoreRightRefreshTxt.UseVisualStyleBackColor = True
@@ -342,10 +317,9 @@ Partial Class Form1
         'TransferLeftBtn
         '
         Me.TransferLeftBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.TransferLeftBtn.Location = New System.Drawing.Point(580, 133)
-        Me.TransferLeftBtn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.TransferLeftBtn.Location = New System.Drawing.Point(435, 108)
         Me.TransferLeftBtn.Name = "TransferLeftBtn"
-        Me.TransferLeftBtn.Size = New System.Drawing.Size(100, 91)
+        Me.TransferLeftBtn.Size = New System.Drawing.Size(75, 74)
         Me.TransferLeftBtn.TabIndex = 9
         Me.TransferLeftBtn.Text = "<"
         Me.TransferLeftBtn.UseVisualStyleBackColor = True
@@ -353,10 +327,9 @@ Partial Class Form1
         'TransferRightBtn
         '
         Me.TransferRightBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.TransferRightBtn.Location = New System.Drawing.Point(947, 133)
-        Me.TransferRightBtn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.TransferRightBtn.Location = New System.Drawing.Point(710, 108)
         Me.TransferRightBtn.Name = "TransferRightBtn"
-        Me.TransferRightBtn.Size = New System.Drawing.Size(100, 91)
+        Me.TransferRightBtn.Size = New System.Drawing.Size(75, 74)
         Me.TransferRightBtn.TabIndex = 9
         Me.TransferRightBtn.Text = ">"
         Me.TransferRightBtn.UseVisualStyleBackColor = True
@@ -365,10 +338,9 @@ Partial Class Form1
         '
         Me.AddUpChk.AutoSize = True
         Me.AddUpChk.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.AddUpChk.Location = New System.Drawing.Point(728, 263)
-        Me.AddUpChk.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.AddUpChk.Location = New System.Drawing.Point(546, 214)
         Me.AddUpChk.Name = "AddUpChk"
-        Me.AddUpChk.Size = New System.Drawing.Size(167, 35)
+        Me.AddUpChk.Size = New System.Drawing.Size(134, 29)
         Me.AddUpChk.TabIndex = 10
         Me.AddUpChk.Text = "Зачислять"
         Me.AddUpChk.UseVisualStyleBackColor = True
@@ -377,10 +349,9 @@ Partial Class Form1
         '
         Me.LeftCross3Btn.BackColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
         Me.LeftCross3Btn.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.LeftCross3Btn.Location = New System.Drawing.Point(341, 325)
-        Me.LeftCross3Btn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.LeftCross3Btn.Location = New System.Drawing.Point(256, 264)
         Me.LeftCross3Btn.Name = "LeftCross3Btn"
-        Me.LeftCross3Btn.Size = New System.Drawing.Size(100, 92)
+        Me.LeftCross3Btn.Size = New System.Drawing.Size(75, 75)
         Me.LeftCross3Btn.TabIndex = 11
         Me.LeftCross3Btn.Text = "X"
         Me.LeftCross3Btn.UseVisualStyleBackColor = False
@@ -389,10 +360,9 @@ Partial Class Form1
         '
         Me.LeftCross2Btn.BackColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
         Me.LeftCross2Btn.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.LeftCross2Btn.Location = New System.Drawing.Point(341, 425)
-        Me.LeftCross2Btn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.LeftCross2Btn.Location = New System.Drawing.Point(256, 345)
         Me.LeftCross2Btn.Name = "LeftCross2Btn"
-        Me.LeftCross2Btn.Size = New System.Drawing.Size(100, 92)
+        Me.LeftCross2Btn.Size = New System.Drawing.Size(75, 75)
         Me.LeftCross2Btn.TabIndex = 11
         Me.LeftCross2Btn.Text = "X"
         Me.LeftCross2Btn.UseVisualStyleBackColor = False
@@ -401,10 +371,9 @@ Partial Class Form1
         '
         Me.LeftCross1Btn.BackColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
         Me.LeftCross1Btn.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.LeftCross1Btn.Location = New System.Drawing.Point(341, 524)
-        Me.LeftCross1Btn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.LeftCross1Btn.Location = New System.Drawing.Point(256, 426)
         Me.LeftCross1Btn.Name = "LeftCross1Btn"
-        Me.LeftCross1Btn.Size = New System.Drawing.Size(100, 92)
+        Me.LeftCross1Btn.Size = New System.Drawing.Size(75, 75)
         Me.LeftCross1Btn.TabIndex = 11
         Me.LeftCross1Btn.Text = "X"
         Me.LeftCross1Btn.UseVisualStyleBackColor = False
@@ -413,10 +382,9 @@ Partial Class Form1
         '
         Me.RightCross3Btn.BackColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
         Me.RightCross3Btn.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.RightCross3Btn.Location = New System.Drawing.Point(1303, 325)
-        Me.RightCross3Btn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.RightCross3Btn.Location = New System.Drawing.Point(977, 264)
         Me.RightCross3Btn.Name = "RightCross3Btn"
-        Me.RightCross3Btn.Size = New System.Drawing.Size(100, 92)
+        Me.RightCross3Btn.Size = New System.Drawing.Size(75, 75)
         Me.RightCross3Btn.TabIndex = 11
         Me.RightCross3Btn.Text = "X"
         Me.RightCross3Btn.UseVisualStyleBackColor = False
@@ -425,10 +393,9 @@ Partial Class Form1
         '
         Me.RightCross2Btn.BackColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
         Me.RightCross2Btn.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.RightCross2Btn.Location = New System.Drawing.Point(1303, 425)
-        Me.RightCross2Btn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.RightCross2Btn.Location = New System.Drawing.Point(977, 345)
         Me.RightCross2Btn.Name = "RightCross2Btn"
-        Me.RightCross2Btn.Size = New System.Drawing.Size(100, 92)
+        Me.RightCross2Btn.Size = New System.Drawing.Size(75, 75)
         Me.RightCross2Btn.TabIndex = 11
         Me.RightCross2Btn.Text = "X"
         Me.RightCross2Btn.UseVisualStyleBackColor = False
@@ -437,10 +404,9 @@ Partial Class Form1
         '
         Me.RightCross1Btn.BackColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
         Me.RightCross1Btn.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.RightCross1Btn.Location = New System.Drawing.Point(1303, 524)
-        Me.RightCross1Btn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.RightCross1Btn.Location = New System.Drawing.Point(977, 426)
         Me.RightCross1Btn.Name = "RightCross1Btn"
-        Me.RightCross1Btn.Size = New System.Drawing.Size(100, 92)
+        Me.RightCross1Btn.Size = New System.Drawing.Size(75, 75)
         Me.RightCross1Btn.TabIndex = 11
         Me.RightCross1Btn.Text = "X"
         Me.RightCross1Btn.UseVisualStyleBackColor = False
@@ -448,10 +414,9 @@ Partial Class Form1
         'Answer1RevealBtn
         '
         Me.Answer1RevealBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer1RevealBtn.Location = New System.Drawing.Point(1112, 331)
-        Me.Answer1RevealBtn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Answer1RevealBtn.Location = New System.Drawing.Point(834, 269)
         Me.Answer1RevealBtn.Name = "Answer1RevealBtn"
-        Me.Answer1RevealBtn.Size = New System.Drawing.Size(100, 47)
+        Me.Answer1RevealBtn.Size = New System.Drawing.Size(75, 38)
         Me.Answer1RevealBtn.TabIndex = 12
         Me.Answer1RevealBtn.Text = "ОТКР"
         Me.Answer1RevealBtn.UseVisualStyleBackColor = True
@@ -459,10 +424,9 @@ Partial Class Form1
         'Answer2RevealBtn
         '
         Me.Answer2RevealBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer2RevealBtn.Location = New System.Drawing.Point(1112, 385)
-        Me.Answer2RevealBtn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Answer2RevealBtn.Location = New System.Drawing.Point(834, 313)
         Me.Answer2RevealBtn.Name = "Answer2RevealBtn"
-        Me.Answer2RevealBtn.Size = New System.Drawing.Size(100, 47)
+        Me.Answer2RevealBtn.Size = New System.Drawing.Size(75, 38)
         Me.Answer2RevealBtn.TabIndex = 12
         Me.Answer2RevealBtn.Text = "ОТКР"
         Me.Answer2RevealBtn.UseVisualStyleBackColor = True
@@ -470,10 +434,9 @@ Partial Class Form1
         'Answer3RevealBtn
         '
         Me.Answer3RevealBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer3RevealBtn.Location = New System.Drawing.Point(1112, 439)
-        Me.Answer3RevealBtn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Answer3RevealBtn.Location = New System.Drawing.Point(834, 357)
         Me.Answer3RevealBtn.Name = "Answer3RevealBtn"
-        Me.Answer3RevealBtn.Size = New System.Drawing.Size(100, 47)
+        Me.Answer3RevealBtn.Size = New System.Drawing.Size(75, 38)
         Me.Answer3RevealBtn.TabIndex = 12
         Me.Answer3RevealBtn.Text = "ОТКР"
         Me.Answer3RevealBtn.UseVisualStyleBackColor = True
@@ -481,10 +444,9 @@ Partial Class Form1
         'Answer4RevealBtn
         '
         Me.Answer4RevealBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer4RevealBtn.Location = New System.Drawing.Point(1112, 494)
-        Me.Answer4RevealBtn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Answer4RevealBtn.Location = New System.Drawing.Point(834, 401)
         Me.Answer4RevealBtn.Name = "Answer4RevealBtn"
-        Me.Answer4RevealBtn.Size = New System.Drawing.Size(100, 47)
+        Me.Answer4RevealBtn.Size = New System.Drawing.Size(75, 38)
         Me.Answer4RevealBtn.TabIndex = 12
         Me.Answer4RevealBtn.Text = "ОТКР"
         Me.Answer4RevealBtn.UseVisualStyleBackColor = True
@@ -492,10 +454,9 @@ Partial Class Form1
         'Answer5RevealBtn
         '
         Me.Answer5RevealBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer5RevealBtn.Location = New System.Drawing.Point(1112, 548)
-        Me.Answer5RevealBtn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Answer5RevealBtn.Location = New System.Drawing.Point(834, 445)
         Me.Answer5RevealBtn.Name = "Answer5RevealBtn"
-        Me.Answer5RevealBtn.Size = New System.Drawing.Size(100, 47)
+        Me.Answer5RevealBtn.Size = New System.Drawing.Size(75, 38)
         Me.Answer5RevealBtn.TabIndex = 12
         Me.Answer5RevealBtn.Text = "ОТКР"
         Me.Answer5RevealBtn.UseVisualStyleBackColor = True
@@ -503,10 +464,9 @@ Partial Class Form1
         'Answer6RevealBtn
         '
         Me.Answer6RevealBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer6RevealBtn.Location = New System.Drawing.Point(1112, 602)
-        Me.Answer6RevealBtn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Answer6RevealBtn.Location = New System.Drawing.Point(834, 489)
         Me.Answer6RevealBtn.Name = "Answer6RevealBtn"
-        Me.Answer6RevealBtn.Size = New System.Drawing.Size(100, 47)
+        Me.Answer6RevealBtn.Size = New System.Drawing.Size(75, 38)
         Me.Answer6RevealBtn.TabIndex = 12
         Me.Answer6RevealBtn.Text = "ОТКР"
         Me.Answer6RevealBtn.UseVisualStyleBackColor = True
@@ -514,10 +474,9 @@ Partial Class Form1
         'ShowTabloBtn
         '
         Me.ShowTabloBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.ShowTabloBtn.Location = New System.Drawing.Point(1468, 15)
-        Me.ShowTabloBtn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.ShowTabloBtn.Location = New System.Drawing.Point(1101, 12)
         Me.ShowTabloBtn.Name = "ShowTabloBtn"
-        Me.ShowTabloBtn.Size = New System.Drawing.Size(201, 92)
+        Me.ShowTabloBtn.Size = New System.Drawing.Size(151, 75)
         Me.ShowTabloBtn.TabIndex = 5
         Me.ShowTabloBtn.Text = "Показать табло"
         Me.ShowTabloBtn.UseVisualStyleBackColor = True
@@ -525,10 +484,9 @@ Partial Class Form1
         'TabloPrepareBtn
         '
         Me.TabloPrepareBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.TabloPrepareBtn.Location = New System.Drawing.Point(1468, 113)
-        Me.TabloPrepareBtn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.TabloPrepareBtn.Location = New System.Drawing.Point(1101, 92)
         Me.TabloPrepareBtn.Name = "TabloPrepareBtn"
-        Me.TabloPrepareBtn.Size = New System.Drawing.Size(201, 92)
+        Me.TabloPrepareBtn.Size = New System.Drawing.Size(151, 75)
         Me.TabloPrepareBtn.TabIndex = 13
         Me.TabloPrepareBtn.Text = "Подготовить к игре"
         Me.TabloPrepareBtn.UseVisualStyleBackColor = True
@@ -537,10 +495,9 @@ Partial Class Form1
         '
         Me.GrayChk.AutoSize = True
         Me.GrayChk.Font = New System.Drawing.Font("Microsoft Sans Serif", 27.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.GrayChk.Location = New System.Drawing.Point(1163, 26)
-        Me.GrayChk.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.GrayChk.Location = New System.Drawing.Point(872, 21)
         Me.GrayChk.Name = "GrayChk"
-        Me.GrayChk.Size = New System.Drawing.Size(282, 58)
+        Me.GrayChk.Size = New System.Drawing.Size(223, 46)
         Me.GrayChk.TabIndex = 20
         Me.GrayChk.Text = "Затемнить"
         Me.GrayChk.UseVisualStyleBackColor = True
@@ -548,10 +505,9 @@ Partial Class Form1
         'StoAttractBtn
         '
         Me.StoAttractBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.StoAttractBtn.Location = New System.Drawing.Point(17, 194)
-        Me.StoAttractBtn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.StoAttractBtn.Location = New System.Drawing.Point(13, 158)
         Me.StoAttractBtn.Name = "StoAttractBtn"
-        Me.StoAttractBtn.Size = New System.Drawing.Size(208, 92)
+        Me.StoAttractBtn.Size = New System.Drawing.Size(156, 75)
         Me.StoAttractBtn.TabIndex = 1
         Me.StoAttractBtn.Text = "СТО К ОДНОМУ"
         Me.StoAttractBtn.UseVisualStyleBackColor = True
@@ -560,20 +516,18 @@ Partial Class Form1
         '
         Me.Label1.AutoSize = True
         Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Label1.Location = New System.Drawing.Point(40, 144)
-        Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.Label1.Location = New System.Drawing.Point(30, 117)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(143, 36)
+        Me.Label1.Size = New System.Drawing.Size(114, 29)
         Me.Label1.TabIndex = 21
         Me.Label1.Text = "Надписи"
         '
         'SimpleAttractBtn
         '
         Me.SimpleAttractBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.SimpleAttractBtn.Location = New System.Drawing.Point(17, 294)
-        Me.SimpleAttractBtn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.SimpleAttractBtn.Location = New System.Drawing.Point(13, 239)
         Me.SimpleAttractBtn.Name = "SimpleAttractBtn"
-        Me.SimpleAttractBtn.Size = New System.Drawing.Size(208, 92)
+        Me.SimpleAttractBtn.Size = New System.Drawing.Size(156, 75)
         Me.SimpleAttractBtn.TabIndex = 1
         Me.SimpleAttractBtn.Text = "ПРОСТАЯ ИГРА"
         Me.SimpleAttractBtn.UseVisualStyleBackColor = True
@@ -581,10 +535,9 @@ Partial Class Form1
         'DoubleAttractBtn
         '
         Me.DoubleAttractBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.DoubleAttractBtn.Location = New System.Drawing.Point(16, 394)
-        Me.DoubleAttractBtn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.DoubleAttractBtn.Location = New System.Drawing.Point(12, 320)
         Me.DoubleAttractBtn.Name = "DoubleAttractBtn"
-        Me.DoubleAttractBtn.Size = New System.Drawing.Size(208, 92)
+        Me.DoubleAttractBtn.Size = New System.Drawing.Size(156, 75)
         Me.DoubleAttractBtn.TabIndex = 1
         Me.DoubleAttractBtn.Text = "ДВОЙНАЯ ИГРА"
         Me.DoubleAttractBtn.UseVisualStyleBackColor = True
@@ -592,10 +545,9 @@ Partial Class Form1
         'TripleAttractBtn
         '
         Me.TripleAttractBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.TripleAttractBtn.Location = New System.Drawing.Point(17, 494)
-        Me.TripleAttractBtn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.TripleAttractBtn.Location = New System.Drawing.Point(13, 401)
         Me.TripleAttractBtn.Name = "TripleAttractBtn"
-        Me.TripleAttractBtn.Size = New System.Drawing.Size(208, 92)
+        Me.TripleAttractBtn.Size = New System.Drawing.Size(156, 75)
         Me.TripleAttractBtn.TabIndex = 1
         Me.TripleAttractBtn.Text = "ТРОЙНАЯ ИГРА"
         Me.TripleAttractBtn.UseVisualStyleBackColor = True
@@ -603,10 +555,9 @@ Partial Class Form1
         'UnderAttractBtn
         '
         Me.UnderAttractBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.UnderAttractBtn.Location = New System.Drawing.Point(16, 593)
-        Me.UnderAttractBtn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.UnderAttractBtn.Location = New System.Drawing.Point(12, 482)
         Me.UnderAttractBtn.Name = "UnderAttractBtn"
-        Me.UnderAttractBtn.Size = New System.Drawing.Size(208, 92)
+        Me.UnderAttractBtn.Size = New System.Drawing.Size(156, 75)
         Me.UnderAttractBtn.TabIndex = 1
         Me.UnderAttractBtn.Text = "ИГРА НАОБОРОТ"
         Me.UnderAttractBtn.UseVisualStyleBackColor = True
@@ -614,83 +565,77 @@ Partial Class Form1
         'BigAttractBtn
         '
         Me.BigAttractBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.BigAttractBtn.Location = New System.Drawing.Point(16, 693)
-        Me.BigAttractBtn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.BigAttractBtn.Location = New System.Drawing.Point(12, 563)
         Me.BigAttractBtn.Name = "BigAttractBtn"
-        Me.BigAttractBtn.Size = New System.Drawing.Size(208, 92)
+        Me.BigAttractBtn.Size = New System.Drawing.Size(156, 75)
         Me.BigAttractBtn.TabIndex = 1
         Me.BigAttractBtn.Text = "БОЛЬШАЯ ИГРА"
         Me.BigAttractBtn.UseVisualStyleBackColor = True
-        '
-        'AboutBtn
-        '
-        Me.AboutBtn.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.AboutBtn.Location = New System.Drawing.Point(1441, 773)
-        Me.AboutBtn.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
-        Me.AboutBtn.Name = "AboutBtn"
-        Me.AboutBtn.Size = New System.Drawing.Size(120, 50)
-        Me.AboutBtn.TabIndex = 0
-        Me.AboutBtn.Text = "Обо мне..."
-        Me.AboutBtn.UseVisualStyleBackColor = True
         '
         'GroupBox1
         '
         Me.GroupBox1.Controls.Add(Me.Radio3x)
         Me.GroupBox1.Controls.Add(Me.Radio2x)
         Me.GroupBox1.Controls.Add(Me.Radio1x)
-        Me.GroupBox1.Location = New System.Drawing.Point(556, 15)
+        Me.GroupBox1.Location = New System.Drawing.Point(417, 12)
+        Me.GroupBox1.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(451, 100)
+        Me.GroupBox1.Padding = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.GroupBox1.Size = New System.Drawing.Size(338, 81)
         Me.GroupBox1.TabIndex = 22
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Чтобы очки на табло правильно отображались"
+        '
+        'Radio3x
+        '
+        Me.Radio3x.AutoSize = True
+        Me.Radio3x.Location = New System.Drawing.Point(143, 39)
+        Me.Radio3x.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Radio3x.Name = "Radio3x"
+        Me.Radio3x.Size = New System.Drawing.Size(105, 17)
+        Me.Radio3x.TabIndex = 2
+        Me.Radio3x.Text = "Сейчас тройная"
+        Me.Radio3x.UseVisualStyleBackColor = True
+        '
+        'Radio2x
+        '
+        Me.Radio2x.AutoSize = True
+        Me.Radio2x.Location = New System.Drawing.Point(7, 39)
+        Me.Radio2x.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Radio2x.Name = "Radio2x"
+        Me.Radio2x.Size = New System.Drawing.Size(106, 17)
+        Me.Radio2x.TabIndex = 1
+        Me.Radio2x.Text = "Сейчас двойная"
+        Me.Radio2x.UseVisualStyleBackColor = True
         '
         'Radio1x
         '
         Me.Radio1x.AutoSize = True
         Me.Radio1x.Checked = True
-        Me.Radio1x.Location = New System.Drawing.Point(9, 21)
+        Me.Radio1x.Location = New System.Drawing.Point(7, 17)
+        Me.Radio1x.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.Radio1x.Name = "Radio1x"
-        Me.Radio1x.Size = New System.Drawing.Size(248, 21)
+        Me.Radio1x.Size = New System.Drawing.Size(189, 17)
         Me.Radio1x.TabIndex = 0
         Me.Radio1x.TabStop = True
         Me.Radio1x.Text = "Сейчас одинарная или наоборот"
         Me.Radio1x.UseVisualStyleBackColor = True
         '
-        'Radio2x
-        '
-        Me.Radio2x.AutoSize = True
-        Me.Radio2x.Location = New System.Drawing.Point(9, 48)
-        Me.Radio2x.Name = "Radio2x"
-        Me.Radio2x.Size = New System.Drawing.Size(136, 21)
-        Me.Radio2x.TabIndex = 1
-        Me.Radio2x.Text = "Сейчас двойная"
-        Me.Radio2x.UseVisualStyleBackColor = True
-        '
-        'Radio3x
-        '
-        Me.Radio3x.AutoSize = True
-        Me.Radio3x.Location = New System.Drawing.Point(191, 48)
-        Me.Radio3x.Name = "Radio3x"
-        Me.Radio3x.Size = New System.Drawing.Size(136, 21)
-        Me.Radio3x.TabIndex = 2
-        Me.Radio3x.Text = "Сейчас тройная"
-        Me.Radio3x.UseVisualStyleBackColor = True
-        '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(947, 260)
+        Me.Button1.Location = New System.Drawing.Point(710, 211)
+        Me.Button1.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(131, 49)
+        Me.Button1.Size = New System.Drawing.Size(98, 40)
         Me.Button1.TabIndex = 23
-        Me.Button1.Text = "Button1"
+        Me.Button1.Text = "Биииип"
         Me.Button1.UseVisualStyleBackColor = True
         '
         'Form1
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1685, 838)
+        Me.ClientSize = New System.Drawing.Size(1264, 681)
         Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.Label1)
@@ -741,9 +686,7 @@ Partial Class Form1
         Me.Controls.Add(Me.SimpleAttractBtn)
         Me.Controls.Add(Me.StoAttractBtn)
         Me.Controls.Add(Me.FirstRoundBtn)
-        Me.Controls.Add(Me.AboutBtn)
         Me.Controls.Add(Me.OpenQuestionsBtn)
-        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "Form1"
@@ -804,7 +747,6 @@ Partial Class Form1
     Friend WithEvents TripleAttractBtn As Button
     Friend WithEvents UnderAttractBtn As Button
     Friend WithEvents BigAttractBtn As Button
-    Friend WithEvents AboutBtn As Button
     Friend WithEvents GroupBox1 As GroupBox
     Friend WithEvents Radio3x As RadioButton
     Friend WithEvents Radio2x As RadioButton
