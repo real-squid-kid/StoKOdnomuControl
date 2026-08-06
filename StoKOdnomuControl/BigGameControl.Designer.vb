@@ -88,6 +88,7 @@ Partial Class BigGameControl
         '
         Me.Answer5Txt.Font = New System.Drawing.Font("Microsoft Sans Serif", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer5Txt.Location = New System.Drawing.Point(98, 481)
+        Me.Answer5Txt.MaxLength = 13
         Me.Answer5Txt.Name = "Answer5Txt"
         Me.Answer5Txt.Size = New System.Drawing.Size(344, 62)
         Me.Answer5Txt.TabIndex = 24
@@ -106,6 +107,7 @@ Partial Class BigGameControl
         '
         Me.Answer4Txt.Font = New System.Drawing.Font("Microsoft Sans Serif", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer4Txt.Location = New System.Drawing.Point(98, 413)
+        Me.Answer4Txt.MaxLength = 13
         Me.Answer4Txt.Name = "Answer4Txt"
         Me.Answer4Txt.Size = New System.Drawing.Size(344, 62)
         Me.Answer4Txt.TabIndex = 23
@@ -124,6 +126,7 @@ Partial Class BigGameControl
         '
         Me.Answer3Txt.Font = New System.Drawing.Font("Microsoft Sans Serif", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer3Txt.Location = New System.Drawing.Point(98, 345)
+        Me.Answer3Txt.MaxLength = 13
         Me.Answer3Txt.Name = "Answer3Txt"
         Me.Answer3Txt.Size = New System.Drawing.Size(344, 62)
         Me.Answer3Txt.TabIndex = 22
@@ -142,6 +145,7 @@ Partial Class BigGameControl
         '
         Me.Answer2Txt.Font = New System.Drawing.Font("Microsoft Sans Serif", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer2Txt.Location = New System.Drawing.Point(98, 277)
+        Me.Answer2Txt.MaxLength = 13
         Me.Answer2Txt.Name = "Answer2Txt"
         Me.Answer2Txt.Size = New System.Drawing.Size(344, 62)
         Me.Answer2Txt.TabIndex = 21
@@ -160,6 +164,7 @@ Partial Class BigGameControl
         '
         Me.Answer1Txt.Font = New System.Drawing.Font("Microsoft Sans Serif", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer1Txt.Location = New System.Drawing.Point(98, 209)
+        Me.Answer1Txt.MaxLength = 13
         Me.Answer1Txt.Name = "Answer1Txt"
         Me.Answer1Txt.Size = New System.Drawing.Size(344, 62)
         Me.Answer1Txt.TabIndex = 20
@@ -169,6 +174,7 @@ Partial Class BigGameControl
         '
         Me.Answer6Txt.Font = New System.Drawing.Font("Microsoft Sans Serif", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer6Txt.Location = New System.Drawing.Point(713, 209)
+        Me.Answer6Txt.MaxLength = 13
         Me.Answer6Txt.Name = "Answer6Txt"
         Me.Answer6Txt.Size = New System.Drawing.Size(344, 62)
         Me.Answer6Txt.TabIndex = 30
@@ -187,6 +193,7 @@ Partial Class BigGameControl
         '
         Me.Answer7Txt.Font = New System.Drawing.Font("Microsoft Sans Serif", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer7Txt.Location = New System.Drawing.Point(713, 277)
+        Me.Answer7Txt.MaxLength = 13
         Me.Answer7Txt.Name = "Answer7Txt"
         Me.Answer7Txt.Size = New System.Drawing.Size(344, 62)
         Me.Answer7Txt.TabIndex = 31
@@ -205,6 +212,7 @@ Partial Class BigGameControl
         '
         Me.Answer8Txt.Font = New System.Drawing.Font("Microsoft Sans Serif", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer8Txt.Location = New System.Drawing.Point(713, 345)
+        Me.Answer8Txt.MaxLength = 13
         Me.Answer8Txt.Name = "Answer8Txt"
         Me.Answer8Txt.Size = New System.Drawing.Size(344, 62)
         Me.Answer8Txt.TabIndex = 32
@@ -223,6 +231,7 @@ Partial Class BigGameControl
         '
         Me.Answer9Txt.Font = New System.Drawing.Font("Microsoft Sans Serif", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer9Txt.Location = New System.Drawing.Point(713, 413)
+        Me.Answer9Txt.MaxLength = 13
         Me.Answer9Txt.Name = "Answer9Txt"
         Me.Answer9Txt.Size = New System.Drawing.Size(344, 62)
         Me.Answer9Txt.TabIndex = 33
@@ -241,6 +250,7 @@ Partial Class BigGameControl
         '
         Me.Answer10Txt.Font = New System.Drawing.Font("Microsoft Sans Serif", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.Answer10Txt.Location = New System.Drawing.Point(713, 481)
+        Me.Answer10Txt.MaxLength = 13
         Me.Answer10Txt.Name = "Answer10Txt"
         Me.Answer10Txt.Size = New System.Drawing.Size(344, 62)
         Me.Answer10Txt.TabIndex = 34
@@ -262,7 +272,7 @@ Partial Class BigGameControl
         Me.Timer15Btn.Name = "Timer15Btn"
         Me.Timer15Btn.Size = New System.Drawing.Size(125, 75)
         Me.Timer15Btn.TabIndex = 18
-        Me.Timer15Btn.Text = "15 секунд"
+        Me.Timer15Btn.Text = "20 секунд"
         Me.Timer15Btn.UseVisualStyleBackColor = True
         '
         'Timer20Btn
@@ -272,7 +282,7 @@ Partial Class BigGameControl
         Me.Timer20Btn.Name = "Timer20Btn"
         Me.Timer20Btn.Size = New System.Drawing.Size(125, 75)
         Me.Timer20Btn.TabIndex = 18
-        Me.Timer20Btn.Text = "20 секунд"
+        Me.Timer20Btn.Text = "25 секунд"
         Me.Timer20Btn.UseVisualStyleBackColor = True
         '
         'StartStopBtn
@@ -282,7 +292,7 @@ Partial Class BigGameControl
         Me.StartStopBtn.Name = "StartStopBtn"
         Me.StartStopBtn.Size = New System.Drawing.Size(125, 75)
         Me.StartStopBtn.TabIndex = 18
-        Me.StartStopBtn.Text = "Старт"
+        Me.StartStopBtn.Text = "Стоп"
         Me.StartStopBtn.UseVisualStyleBackColor = True
         '
         'HideAnswersChk

@@ -54,19 +54,19 @@
     End Sub
 
     Private Sub SameAnswerBtn_Click(sender As Object, e As EventArgs) Handles SameAnswerBtn.Click
-        My.Computer.Audio.Play(My.Resources.sto_dulpicate, AudioPlayMode.Background)
+        My.Computer.Audio.Play(My.Resources._26_same, AudioPlayMode.Background)
     End Sub
 
     Private Sub Timer15Btn_Click(sender As Object, e As EventArgs) Handles Timer15Btn.Click
-        BigGameTablo.SetTimer(15)
-    End Sub
-
-    Private Sub Timer20Btn_Click(sender As Object, e As EventArgs) Handles Timer20Btn.Click
         BigGameTablo.SetTimer(20)
     End Sub
 
+    Private Sub Timer20Btn_Click(sender As Object, e As EventArgs) Handles Timer20Btn.Click
+        BigGameTablo.SetTimer(25)
+    End Sub
+
     Private Sub StartStopBtn_Click(sender As Object, e As EventArgs) Handles StartStopBtn.Click
-        BigGameTablo.StartTimer()
+        BigGameTablo.StopTimer()
     End Sub
 
     Private Sub HideAnswersChk_CheckedChanged(sender As Object, e As EventArgs) Handles HideAnswersChk.CheckedChanged

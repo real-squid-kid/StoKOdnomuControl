@@ -1,8 +1,8 @@
 ﻿Public Class BigGameTablo
     Private Sub BigGameTablo_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         'hide all
-        TotalTxt.Visible = False
-        TotalLbl.Visible = False
+        TotalTxt.Visible = True
+        TotalLbl.Visible = True
         RoundScoreLbl.Visible = True
         Answer1Lbl.Visible = False
         Answer2Lbl.Visible = False
@@ -28,8 +28,8 @@
     End Sub
 
     Public Sub Prepare()
-        TotalLbl.Visible = False
-        TotalTxt.Visible = False
+        TotalLbl.Visible = True
+        TotalTxt.Visible = True
         RoundScoreLbl.Visible = True
     End Sub
 
@@ -62,7 +62,14 @@
     Public Sub SetTimer(e As Integer)
         TimerLbl.Text = e
         TimerLbl.Visible = True
-        My.Computer.Audio.Play(My.Resources.line_new, AudioPlayMode.Background)
+        'My.Computer.Audio.Play(My.Resources.line_new, AudioPlayMode.Background)
+        StartTimer()
+        Select Case e
+            Case 20
+                AudioService.Instance.Play(My.Resources._20sec)
+            Case 25
+                AudioService.Instance.Play(My.Resources._25sec)
+        End Select
     End Sub
 
     Public Sub StartTimer()
@@ -77,13 +84,15 @@
     Public Sub StopTimer()
         TimerLbl.Visible = False
         Timer1.Enabled = False
+        AudioService.Instance.StopAll()
     End Sub
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
         TimerLbl.Text -= 1
-        If TimerLbl.Text < 0 Then
+        If TimerLbl.Text = -1 Then TimerLbl.Visible = False
+        If TimerLbl.Text < -1 Then
             StopTimer()
-            My.Computer.Audio.Play(My.Resources.alarm, AudioPlayMode.Background)
+            'My.Computer.Audio.Play(My.Resources.alarm, AudioPlayMode.Background)
         End If
     End Sub
 

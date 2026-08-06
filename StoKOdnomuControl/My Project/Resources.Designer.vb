@@ -81,6 +81,24 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Поиск локализованного ресурса типа System.IO.UnmanagedMemoryStream, аналогичного System.IO.MemoryStream.
+        '''</summary>
+        Friend ReadOnly Property _20sec() As System.IO.UnmanagedMemoryStream
+            Get
+                Return ResourceManager.GetStream("_20sec", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Поиск локализованного ресурса типа System.IO.UnmanagedMemoryStream, аналогичного System.IO.MemoryStream.
+        '''</summary>
+        Friend ReadOnly Property _25sec() As System.IO.UnmanagedMemoryStream
+            Get
+                Return ResourceManager.GetStream("_25sec", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Поиск локализованного ресурса типа System.Drawing.Bitmap.
         '''</summary>
         Friend ReadOnly Property _26_big() As System.Drawing.Bitmap
