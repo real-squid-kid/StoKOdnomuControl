@@ -1,4 +1,5 @@
 ﻿Public Class BigGameTablo
+    Dim threshold As Boolean
     Private Sub BigGameTablo_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         'hide all
         TotalTxt.Visible = True
@@ -25,6 +26,7 @@
         Answer9ScoreLbl.Visible = False
         Answer10ScoreLbl.Visible = False
         TimerLbl.Visible = False
+        threshold = False
     End Sub
 
     Public Sub Prepare()
@@ -95,7 +97,18 @@
             'My.Computer.Audio.Play(My.Resources.alarm, AudioPlayMode.Background)
         End If
     End Sub
-
+    Private Sub RightAnswer()
+        If threshold = False Then
+            If TotalLbl.Text > 149 Then
+                threshold = True
+                My.Computer.Audio.Play(My.Resources._26_win, AudioPlayMode.Background)
+            Else
+                My.Computer.Audio.Play(My.Resources._26_open, AudioPlayMode.Background)
+            End If
+        Else
+            My.Computer.Audio.Play(My.Resources._26_open, AudioPlayMode.Background)
+        End If
+    End Sub
     Public Sub Reveal(e As String, param As String)
         Select Case e
             Case 1
@@ -110,7 +123,7 @@
                 If param = 0 Then
                     My.Computer.Audio.Play(My.Resources._26_bigwrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources._26_open, AudioPlayMode.Background)
+                    RightAnswer()
                 End If
             Case 2
                 Answer2Lbl.Text = param
@@ -124,7 +137,7 @@
                 If param = 0 Then
                     My.Computer.Audio.Play(My.Resources._26_bigwrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources._26_open, AudioPlayMode.Background)
+                    RightAnswer()
                 End If
             Case 3
                 Answer3Lbl.Text = param
@@ -138,7 +151,7 @@
                 If param = 0 Then
                     My.Computer.Audio.Play(My.Resources._26_bigwrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources._26_open, AudioPlayMode.Background)
+                    RightAnswer()
                 End If
             Case 4
                 Answer4Lbl.Text = param
@@ -152,7 +165,7 @@
                 If param = 0 Then
                     My.Computer.Audio.Play(My.Resources._26_bigwrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources._26_open, AudioPlayMode.Background)
+                    RightAnswer()
                 End If
             Case 5
                 Answer5Lbl.Text = param
@@ -166,7 +179,7 @@
                 If param = 0 Then
                     My.Computer.Audio.Play(My.Resources._26_bigwrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources._26_open, AudioPlayMode.Background)
+                    RightAnswer()
                 End If
             Case 6
                 Answer6Lbl.Text = param
@@ -180,7 +193,7 @@
                 If param = 0 Then
                     My.Computer.Audio.Play(My.Resources._26_bigwrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources._26_open, AudioPlayMode.Background)
+                    RightAnswer()
                 End If
             Case 7
                 Answer7Lbl.Text = param
@@ -194,7 +207,7 @@
                 If param = 0 Then
                     My.Computer.Audio.Play(My.Resources._26_bigwrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources._26_open, AudioPlayMode.Background)
+                    RightAnswer()
                 End If
             Case 8
                 Answer8Lbl.Text = param
@@ -208,7 +221,7 @@
                 If param = 0 Then
                     My.Computer.Audio.Play(My.Resources._26_bigwrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources._26_open, AudioPlayMode.Background)
+                    RightAnswer()
                 End If
             Case 9
                 Answer9Lbl.Text = param
@@ -222,7 +235,7 @@
                 If param = 0 Then
                     My.Computer.Audio.Play(My.Resources._26_bigwrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources._26_open, AudioPlayMode.Background)
+                    RightAnswer()
                 End If
             Case 10
                 Answer10Lbl.Text = param
@@ -236,7 +249,7 @@
                 If param = 0 Then
                     My.Computer.Audio.Play(My.Resources._26_bigwrong, AudioPlayMode.Background)
                 Else
-                    My.Computer.Audio.Play(My.Resources._26_open, AudioPlayMode.Background)
+                    RightAnswer()
                 End If
         End Select
     End Sub

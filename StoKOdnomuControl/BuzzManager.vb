@@ -17,7 +17,7 @@ Public Class BuzzManager
     Private _blinkTicks As Integer
 
     Private WithEvents _pollTimer As New Timer With {.Interval = 25}
-    Private WithEvents _blinkTimer As New Timer With {.Interval = 250}
+    Private WithEvents _blinkTimer As New Timer With {.Interval = 125}
 
     ' ---------- Инициализация ----------
 
@@ -94,7 +94,7 @@ Public Class BuzzManager
     Private Sub OnPress(ByVal pad As Integer)
         If _activePad >= 0 Then Exit Sub          ' остальные заблокированы
         _activePad = pad
-        _blinkTicks = 30                           ' 30 * 500 мс = 15 секунд
+        _blinkTicks = 60                           ' 30 * 500 мс = 15 секунд
 
         AudioService.Instance.Play(My.Resources._26_buzzer)
         SetPadLed(pad, True)
