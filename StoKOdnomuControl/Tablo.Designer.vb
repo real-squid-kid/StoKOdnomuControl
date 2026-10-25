@@ -163,7 +163,7 @@ Partial Class Tablo
         Me.Answer1ScoreLbl.ForeColor = System.Drawing.Color.Black
         Me.Answer1ScoreLbl.Location = New System.Drawing.Point(862, 154)
         Me.Answer1ScoreLbl.Name = "Answer1ScoreLbl"
-        Me.Answer1ScoreLbl.Size = New System.Drawing.Size(107, 76)
+        Me.Answer1ScoreLbl.Size = New System.Drawing.Size(117, 76)
         Me.Answer1ScoreLbl.TabIndex = 0
         Me.Answer1ScoreLbl.Text = "000"
         Me.Answer1ScoreLbl.TextAlign = System.Drawing.ContentAlignment.MiddleRight
@@ -175,7 +175,7 @@ Partial Class Tablo
         Me.Answer2ScoreLbl.ForeColor = System.Drawing.Color.Black
         Me.Answer2ScoreLbl.Location = New System.Drawing.Point(862, 230)
         Me.Answer2ScoreLbl.Name = "Answer2ScoreLbl"
-        Me.Answer2ScoreLbl.Size = New System.Drawing.Size(107, 76)
+        Me.Answer2ScoreLbl.Size = New System.Drawing.Size(117, 76)
         Me.Answer2ScoreLbl.TabIndex = 0
         Me.Answer2ScoreLbl.Text = "000"
         Me.Answer2ScoreLbl.TextAlign = System.Drawing.ContentAlignment.MiddleRight
@@ -187,7 +187,7 @@ Partial Class Tablo
         Me.Answer3ScoreLbl.ForeColor = System.Drawing.Color.Black
         Me.Answer3ScoreLbl.Location = New System.Drawing.Point(862, 306)
         Me.Answer3ScoreLbl.Name = "Answer3ScoreLbl"
-        Me.Answer3ScoreLbl.Size = New System.Drawing.Size(107, 76)
+        Me.Answer3ScoreLbl.Size = New System.Drawing.Size(117, 76)
         Me.Answer3ScoreLbl.TabIndex = 0
         Me.Answer3ScoreLbl.Text = "000"
         Me.Answer3ScoreLbl.TextAlign = System.Drawing.ContentAlignment.MiddleRight
@@ -199,7 +199,7 @@ Partial Class Tablo
         Me.Answer4ScoreLbl.ForeColor = System.Drawing.Color.Black
         Me.Answer4ScoreLbl.Location = New System.Drawing.Point(862, 382)
         Me.Answer4ScoreLbl.Name = "Answer4ScoreLbl"
-        Me.Answer4ScoreLbl.Size = New System.Drawing.Size(107, 76)
+        Me.Answer4ScoreLbl.Size = New System.Drawing.Size(117, 76)
         Me.Answer4ScoreLbl.TabIndex = 0
         Me.Answer4ScoreLbl.Text = "000"
         Me.Answer4ScoreLbl.TextAlign = System.Drawing.ContentAlignment.MiddleRight
@@ -211,7 +211,7 @@ Partial Class Tablo
         Me.Answer5ScoreLbl.ForeColor = System.Drawing.Color.Black
         Me.Answer5ScoreLbl.Location = New System.Drawing.Point(862, 458)
         Me.Answer5ScoreLbl.Name = "Answer5ScoreLbl"
-        Me.Answer5ScoreLbl.Size = New System.Drawing.Size(107, 76)
+        Me.Answer5ScoreLbl.Size = New System.Drawing.Size(117, 76)
         Me.Answer5ScoreLbl.TabIndex = 0
         Me.Answer5ScoreLbl.Text = "000"
         Me.Answer5ScoreLbl.TextAlign = System.Drawing.ContentAlignment.MiddleRight
@@ -223,7 +223,7 @@ Partial Class Tablo
         Me.Answer6ScoreLbl.ForeColor = System.Drawing.Color.Black
         Me.Answer6ScoreLbl.Location = New System.Drawing.Point(862, 534)
         Me.Answer6ScoreLbl.Name = "Answer6ScoreLbl"
-        Me.Answer6ScoreLbl.Size = New System.Drawing.Size(107, 76)
+        Me.Answer6ScoreLbl.Size = New System.Drawing.Size(117, 76)
         Me.Answer6ScoreLbl.TabIndex = 0
         Me.Answer6ScoreLbl.Text = "000"
         Me.Answer6ScoreLbl.TextAlign = System.Drawing.ContentAlignment.MiddleRight
