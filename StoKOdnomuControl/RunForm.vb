@@ -1,10 +1,14 @@
 ﻿Public Class RunForm
     Private Sub PictureBox1_Click(sender As Object, e As EventArgs) Handles PictureBox1.Click
-        My.Computer.Audio.Stop()
+        AudioService.Instance.StopChannel(AudioChannel.EasterEgg)
         Me.Close()
     End Sub
 
     Private Sub RunForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        My.Computer.Audio.Play(My.Resources.run, AudioPlayMode.Background)
+        AudioService.Instance.Play(SoundCue.EasterEgg, AudioChannel.EasterEgg)
+    End Sub
+
+    Private Sub RunForm_FormClosed(sender As Object, e As FormClosedEventArgs) Handles MyBase.FormClosed
+        AudioService.Instance.StopChannel(AudioChannel.EasterEgg)
     End Sub
 End Class

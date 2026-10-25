@@ -1,479 +1,375 @@
-﻿Imports System.IO
+Option Strict On
+Imports System.IO
+Imports System.Windows.Forms
+
 Public Class Form1
-    Dim Answers As New List(Of String)
-    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        LeftCross1Btn.BackColor = Color.LightGray
-        LeftCross2Btn.BackColor = Color.LightGray
-        LeftCross3Btn.BackColor = Color.LightGray
-        RightCross1Btn.BackColor = Color.LightGray
-        RightCross2Btn.BackColor = Color.LightGray
-        RightCross3Btn.BackColor = Color.LightGray
+    Inherits Form
+    Private ReadOnly _session As GameSession
+    Private ReadOnly _buzz As New BuzzManager()
+    Private _bank As QuestionBank
+    Private _last As MainGameState
+    Private _board As Tablo
+    Private _bigControl As BigGameControl
+    Private _bigBoard As BigGameTablo
+    Private ReadOnly _countdown As New Countdown()
+    Private ReadOnly _answers(5) As TextBox
+    Private ReadOnly _points(5) As NumericUpDown
+    Private ReadOnly _show(5) As Button
+    Private ReadOnly _answerStatus(5) As Label
+    Private ReadOnly _strikes(1, 2) As Button
+    Private ReadOnly _scores(2) As NumericUpDown
+    Private ReadOnly _roundButtons As New List(Of Button)()
+    Private ReadOnly _screens As New ComboBox With {.DropDownStyle = ComboBoxStyle.DropDownList, .Width = 290}
+    Private ReadOnly _fullscreen As New CheckBox With {.Text = "На весь экран", .Checked = True, .AutoSize = True, .Margin = New Padding(6, 12, 4, 4)}
+    Private ReadOnly _award As New CheckBox With {.Text = "При открытии начислять очки в банк", .Checked = True, .AutoSize = True, .Margin = New Padding(6, 12, 4, 4)}
+    Private ReadOnly _round As Label = OperatorUi.Label("", 350)
+    Private ReadOnly _status As Label = OperatorUi.Label("Загрузите базу или введите ответы вручную.", 1200)
+    Private ReadOnly _buzzStatus As Label = OperatorUi.Label("Buzz!: не подключён", 500)
+    Private _undo As Button
+    Private _restore As Button
+
+    Public Sub New()
+        Dim dataDirectory = Environment.GetEnvironmentVariable("STOKODNOMU_DATA_DIR")
+        If String.IsNullOrWhiteSpace(dataDirectory) Then dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "StoKOdnomuControl")
+        _session = New GameSession(dataDirectory)
+        BuildUi()
+        AddHandler _session.Changed, AddressOf SessionChanged
+        AddHandler _session.StorageError, Sub(message) SetStatus(message)
+        AddHandler AudioService.Instance.AudioError, AddressOf SetStatus
+        AddHandler _countdown.Changed, Sub() RenderCountdown()
+        AddHandler _buzz.StatusChanged, Sub(message) OperatorUi.OnUi(Me, Sub() _buzzStatus.Text = message)
+        AddHandler _buzz.BuzzerPressed, Sub(pad)
+                                           OperatorUi.OnUi(Me, Sub()
+                                                                  _buzzStatus.Text = "Первым нажал пульт " & (pad + 1) & ". Для нового розыгрыша нажмите «Разрешить Buzz!» ."
+                                                                  AudioService.Instance.Play(SoundCue.Buzzer, AudioChannel.Buzzer)
+                                                              End Sub)
+                                       End Sub
+        AddHandler _buzz.SimultaneousPress, Sub() OperatorUi.OnUi(Me, Sub() _buzzStatus.Text = "Buzz!: несколько нажатий в одном отчёте. Переиграйте розыгрыш.")
+        AddHandler Shown, Sub()
+                              _buzz.Initialize()
+                              _restore.Enabled = _session.HasSavedGame
+                          End Sub
+        AddHandler FormClosed, AddressOf CloseServices
+        KeyPreview = True
+        AddHandler KeyDown, Sub(sender, e)
+                                If e.Control AndAlso e.KeyCode = Keys.Z Then
+                                    UndoAction()
+                                    e.SuppressKeyPress = True
+                                End If
+                            End Sub
+        SessionChanged(Me, EventArgs.Empty)
     End Sub
 
-    Private Sub OpenQuestionsBtn_Click(sender As Object, e As EventArgs) Handles OpenQuestionsBtn.Click
-        Try
-            Answers.Clear()
-            Dim Openfile As New OpenFileDialog
-            Dim Result As String
-            If Openfile.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
-                Result = File.ReadAllText(Openfile.FileName)
-                Dim a() As String
-                a = Result.Split(ControlChars.CrLf.ToCharArray, StringSplitOptions.RemoveEmptyEntries)
-                For Each b In a
-                    Answers.Add(b)
-                Next
-                If Answers.Count <> 24 Then
-                    Throw New Exception("Incompatible base format.")
-                End If
-                FirstRoundBtn.Enabled = True
-                SecondRoundBtn.Enabled = True
-                ThirdRoundBtn.Enabled = True
-                FourthRoundBtn.Enabled = True
-            Else
-            End If
-        Catch exc As Exception
-            MessageBox.Show("Ошибка: " & exc.Message & " Данные не были внесены.", "Невозможно открыть файл", MessageBoxButtons.OK, MessageBoxIcon.Stop)
-            Answers.Clear()
-        End Try
+    Private Sub BuildUi()
+        Dim page = OperatorUi.Page(Me, "Сто к одному — пульт оператора")
+        OperatorUi.Heading(page, "Основная игра")
+        Dim actions = OperatorUi.Row(page)
+        OperatorUi.Button(actions, "Загрузить базу TXT…", AddressOf LoadBank)
+        _undo = OperatorUi.Button(actions, "Отменить действие", AddressOf UndoAction)
+        _undo.Name = "UndoLastAction"
+        OperatorUi.Button(actions, "Открыть большую игру", AddressOf OpenBigGame)
+        _restore = OperatorUi.Button(actions, "Восстановить игру…", AddressOf RestoreGame)
+        OperatorUi.Button(actions, "Новый матч…", AddressOf NewMatch, 145)
+        OperatorUi.Button(actions, "О программе", Sub()
+                                                         Using about As New AboutBox1()
+                                                             about.ShowDialog(Me)
+                                                         End Using
+                                                     End Sub, 140)
+        Dim display = OperatorUi.Row(page)
+        For i = 0 To Screen.AllScreens.Length - 1
+            Dim displayScreen = Screen.AllScreens(i)
+            _screens.Items.Add("Экран " & (i + 1) & " · " & displayScreen.Bounds.Width & "×" & displayScreen.Bounds.Height & If(displayScreen.Primary, " · основной", ""))
+        Next
+        _screens.SelectedIndex = If(Screen.AllScreens.Length > 1, 1, 0)
+        display.Controls.Add(_screens)
+        display.Controls.Add(_fullscreen)
+        OperatorUi.Button(display, "Показать основное табло", AddressOf ShowMainBoard, 235)
+        OperatorUi.Button(display, "Скрыть оба табло", AddressOf HideBoards)
+        OperatorUi.Button(display, "Остановить все звуки", Sub()
+                                                                 _countdown.Stop()
+                                                                 AudioService.Instance.StopAll()
+                                                             End Sub, 210)
+        Dim soundEnabled As New CheckBox With {.Text = "Звук включён", .Checked = True, .AutoSize = True, .Margin = New Padding(6, 12, 4, 4)}
+        display.Controls.Add(soundEnabled)
+        AddHandler soundEnabled.CheckedChanged, Sub()
+                                                    AudioService.Instance.Enabled = soundEnabled.Checked
+                                                    If Not soundEnabled.Checked Then AudioService.Instance.StopAll()
+                                                End Sub
+        Dim rounds = OperatorUi.Row(page)
+        For i = 1 To 4
+            Dim number = i
+            _roundButtons.Add(OperatorUi.Button(rounds, {"", "Простая · ×1", "Двойная · ×2", "Тройная · ×3", "Игра наоборот"}(i), Sub() StartRound(number), 138))
+        Next
+        OperatorUi.Button(rounds, "Сбросить раунд…", AddressOf ResetCurrentRound, 220)
+        rounds.Controls.Add(_round)
+        Dim scores = OperatorUi.Row(page)
+        Dim scoreNames = {"Левая команда", "Банк раунда", "Правая команда"}
+        For i = 0 To 2
+            Dim index = i
+            scores.Controls.Add(OperatorUi.Label(scoreNames(i), 130))
+            _scores(i) = OperatorUi.Number()
+            _scores(i).Name = {"LeftScore", "RoundBank", "RightScore"}(i)
+            scores.Controls.Add(_scores(i))
+            Dim apply = OperatorUi.Button(scores, "Применить", Sub() ApplyScore(index), 110)
+            apply.Name = "ApplyScore" & index
+        Next
+        Dim transfers = OperatorUi.Row(page)
+        OperatorUi.Button(transfers, "Отдать банк левой команде", Sub() Transfer(TeamSide.Left), 265)
+        OperatorUi.Button(transfers, "Отдать банк правой команде", Sub() Transfer(TeamSide.Right), 265)
+        transfers.Controls.Add(_award)
+        Dim dimFields As New CheckBox With {.Text = "Приглушить поля пульта", .AutoSize = True, .Margin = New Padding(6, 12, 4, 4)}
+        transfers.Controls.Add(dimFields)
+        AddHandler dimFields.CheckedChanged, Sub()
+                                                 For i = 0 To 5
+                                                     _answers(i).ForeColor = If(dimFields.Checked, Color.LightGray, SystemColors.WindowText)
+                                                     _points(i).ForeColor = If(dimFields.Checked, Color.LightGray, SystemColors.WindowText)
+                                                 Next
+                                             End Sub
+        Dim table = OperatorUi.Grid(page, 42, 0, 95, 170, 180, 190)
+        Dim headings = {"№", "Ответ (изменение поля — черновик)", "Очки ×1", "Показ / скрытие", "Правка текста и цены", "Состояние"}
+        For column = 0 To headings.Length - 1
+            OperatorUi.Cell(table, OperatorUi.Label(headings(column), CInt(If(column = 1, 360, Math.Max(40, table.ColumnStyles(column).Width - 8)))), column, 0)
+        Next
+        For i = 0 To 5
+            Dim index = i
+            _answers(i) = New TextBox With {.Name = "MainAnswer" & i, .MaxLength = 120, .Margin = New Padding(4, 10, 4, 4)}
+            _points(i) = OperatorUi.Number(GameRules.MaximumAnswerPoints)
+            _points(i).Width = 80
+            _points(i).Name = "MainPoints" & i
+            OperatorUi.Cell(table, OperatorUi.Label((i + 1).ToString(), 34), 0, i + 1)
+            OperatorUi.Cell(table, _answers(i), 1, i + 1)
+            OperatorUi.Cell(table, _points(i), 2, i + 1)
+            _show(i) = OperatorUi.Button(table, "Открыть ответ", Sub() ToggleAnswer(index), 158)
+            _show(i).Name = "ToggleMainAnswer" & i
+            table.SetCellPosition(_show(i), New TableLayoutPanelCellPosition(3, i + 1))
+            Dim edit = OperatorUi.Button(table, "Применить правку", Sub() EditAnswer(index), 168)
+            edit.Name = "EditMainAnswer" & i
+            table.SetCellPosition(edit, New TableLayoutPanelCellPosition(4, i + 1))
+            _answerStatus(i) = OperatorUi.Label("", 180)
+            OperatorUi.Cell(table, _answerStatus(i), 5, i + 1)
+        Next
+        Dim note = OperatorUi.Label("Скрытие не отменяет очки. Повторный показ не начисляет их снова. Для отмены начисления используйте «Отменить» (Ctrl+Z).", 1200)
+        note.Height = 34
+        page.Controls.Add(note)
+        Dim strikes = OperatorUi.Row(page)
+        For side = 0 To 1
+            strikes.Controls.Add(OperatorUi.Label(If(side = 0, "Ошибки слева:", "Ошибки справа:"), 145))
+            For i = 0 To 2
+                Dim team = CType(side, TeamSide)
+                Dim index = i
+                _strikes(side, i) = OperatorUi.Button(strikes, "Ошибка " & (i + 1), Sub() ToggleStrike(team, index), 130)
+            Next
+        Next
+        Dim splashes = OperatorUi.Row(page)
+        splashes.Controls.Add(OperatorUi.Label("Заставка:", 100))
+        Dim names = {"Сто к одному", "Простая", "Двойная", "Тройная", "Наоборот", "Большая"}
+        For i = 0 To 5
+            Dim splash = i
+            OperatorUi.Button(splashes, names(i), Sub() _session.Execute("Заставка «" & names(splash) & "»", Sub(state) state.Main.Splash = splash), 140)
+        Next
+        OperatorUi.Button(splashes, "Вернуть игру", Sub() _session.Execute("Вернуть игру с заставки", Sub(state) state.Main.Splash = -1), 155)
+        Dim buzz = OperatorUi.Row(page)
+        OperatorUi.Button(buzz, "Подключить Buzz!", Sub() _buzz.Initialize(), 170)
+        OperatorUi.Button(buzz, "Разрешить Buzz!", Sub() _buzz.Arm(), 170)
+        OperatorUi.Button(buzz, "Заблокировать Buzz!", Sub() _buzz.Disarm(), 200)
+        OperatorUi.Button(buzz, "Звук ошибки", Sub() AudioService.Instance.Play(SoundCue.WrongAnswer), 150)
+        buzz.Controls.Add(_buzzStatus)
+        _buzzStatus.Height = 50
+        _status.Height = 42
+        _status.ForeColor = Color.FromArgb(25, 64, 110)
+        Dim scroll = page.Parent
+        Controls.Remove(scroll)
+        Dim frame As New TableLayoutPanel With {.Dock = DockStyle.Fill, .RowCount = 2, .ColumnCount = 1, .Margin = New Padding(0), .Padding = New Padding(0)}
+        frame.RowStyles.Add(New RowStyle(SizeType.Percent, 100))
+        frame.RowStyles.Add(New RowStyle(SizeType.Absolute, 42))
+        frame.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100))
+        frame.Controls.Add(scroll, 0, 0)
+        _status.Dock = DockStyle.Fill
+        frame.Controls.Add(_status, 0, 1)
+        Controls.Add(frame)
     End Sub
 
-    Private Sub ShowTabloBtn_Click(sender As Object, e As EventArgs) Handles ShowTabloBtn.Click
-        Tablo.Show()
-
+    Private Sub LoadBank()
+        Using dialog As New OpenFileDialog With {.Title = "Выберите базу из 24 ответов", .Filter = "Базы ответов (*.txt)|*.txt|Все файлы (*.*)|*.*"}
+            If dialog.ShowDialog(Me) <> DialogResult.OK Then Return
+            Dim loaded = QuestionBankReader.ReadFile(dialog.FileName)
+            _bank = loaded
+            SetStatus("Загружена база «" & Path.GetFileName(dialog.FileName) & "». Выберите раунд. Текущая игра сохранена.")
+        End Using
     End Sub
 
-    Private Sub LeftCross3Btn_Click(sender As Object, e As EventArgs) Handles LeftCross3Btn.Click
-        If LeftCross3Btn.BackColor = Color.LightGray Then
-            LeftCross3Btn.BackColor = Color.Red
-            Tablo.Strike("L", 3, True)
+    Private Sub StartRound(number As Integer)
+        If Not OperatorUi.Confirm(Me, "Начать раунд «" & _roundButtons(number - 1).Text & "»? Банк, открытия и ошибки текущего раунда будут сброшены; счета команд сохранятся.") Then Return
+        _last = Nothing
+        _session.Execute("Начать раунд " & number, Sub(state)
+                                                             state.Main.Round = number
+                                                             If _bank IsNot Nothing Then
+                                                                 state.Main.Answers = _bank.Rounds(number - 1).Select(Function(a) New AnswerState With {.Text = a.Text, .Points = a.Points}).ToArray()
+                                                             ElseIf number = 4 Then
+                                                                 Dim values = {15, 30, 45, 60, 120, 240}
+                                                                 For i = 0 To 5
+                                                                     state.Main.Answers(i).Points = values(i)
+                                                                 Next
+                                                             End If
+                                                             GameRules.ResetRound(state.Main)
+                                                         End Sub)
+        _buzz.Disarm()
+    End Sub
+
+    Private Sub ResetCurrentRound()
+        If Not OperatorUi.Confirm(Me, "Сбросить банк, открытия и ошибки? Тексты ответов и счета команд сохранятся.") Then Return
+        _session.Execute("Сбросить текущий раунд", Sub(state) GameRules.ResetRound(state.Main))
+        _buzz.Disarm()
+    End Sub
+
+    Private Sub ApplyScore(index As Integer)
+        Dim value = CInt(_scores(index).Value)
+        _session.Execute("Исправить " & {"счёт левой команды", "банк раунда", "счёт правой команды"}(index) & " → " & value, Sub(state)
+                                                                                                                                  Select Case index
+                                                                                                                                      Case 0 : state.Main.LeftScore = value
+                                                                                                                                      Case 1 : state.Main.Bank = value
+                                                                                                                                      Case 2 : state.Main.RightScore = value
+                                                                                                                                  End Select
+                                                                                                                              End Sub)
+    End Sub
+
+    Private Sub Transfer(side As TeamSide)
+        _session.Execute("Передать банк " & If(side = TeamSide.Left, "левой", "правой") & " команде", Sub(state) GameRules.TransferBank(state.Main, side))
+        AudioService.Instance.Play(SoundCue.Transfer)
+    End Sub
+
+    Private Sub ToggleAnswer(index As Integer)
+        Dim answer = _session.State.Main.Answers(index)
+        If answer.TextVisible Then
+            _session.Execute("Скрыть ответ " & (index + 1) & " без отмены очков", Sub(state)
+                                                                                     state.Main.Answers(index).TextVisible = False
+                                                                                     state.Main.Answers(index).ScoreVisible = False
+                                                                                 End Sub)
         Else
-            LeftCross3Btn.BackColor = Color.LightGray
-            Tablo.Strike("L", 3, False)
+            Dim award = _award.Checked
+            _session.Execute("Открыть ответ " & (index + 1), Sub(state) GameRules.ShowMainAnswer(state.Main, index, _answers(index).Text, CInt(_points(index).Value), award))
+            AudioService.Instance.Play(If(award AndAlso answer.AwardedBank = -1, SoundCue.OpenAnswer, SoundCue.NoScore))
         End If
     End Sub
 
-    Private Sub LeftCross2Btn_Click(sender As Object, e As EventArgs) Handles LeftCross2Btn.Click
-        If LeftCross2Btn.BackColor = Color.LightGray Then
-            LeftCross2Btn.BackColor = Color.Red
-            Tablo.Strike("L", 2, True)
-        Else
-            LeftCross2Btn.BackColor = Color.LightGray
-            Tablo.Strike("L", 2, False)
-        End If
+    Private Sub EditAnswer(index As Integer)
+        _session.Execute("Исправить ответ " & (index + 1), Sub(state) GameRules.EditMainAnswer(state.Main, index, _answers(index).Text, CInt(_points(index).Value)))
     End Sub
 
-    Private Sub LeftCross1Btn_Click(sender As Object, e As EventArgs) Handles LeftCross1Btn.Click
-        If LeftCross1Btn.BackColor = Color.LightGray Then
-            LeftCross1Btn.BackColor = Color.Red
-            Tablo.Strike("L", 1, True)
-        Else
-            LeftCross1Btn.BackColor = Color.LightGray
-            Tablo.Strike("L", 1, False)
-        End If
+    Private Sub ToggleStrike(side As TeamSide, index As Integer)
+        Dim wasOn = If(side = TeamSide.Left, _session.State.Main.LeftStrikes(index), _session.State.Main.RightStrikes(index))
+        _session.Execute(If(wasOn, "Убрать", "Поставить") & " ошибку " & (index + 1) & If(side = TeamSide.Left, " слева", " справа"), Sub(state)
+                                                                                                                                     Dim strikes = If(side = TeamSide.Left, state.Main.LeftStrikes, state.Main.RightStrikes)
+                                                                                                                                     strikes(index) = Not wasOn
+                                                                                                                                 End Sub)
+        If Not wasOn Then AudioService.Instance.Play(SoundCue.WrongAnswer)
     End Sub
 
-    Private Sub RightCross3Btn_Click(sender As Object, e As EventArgs) Handles RightCross3Btn.Click
-        If RightCross3Btn.BackColor = Color.LightGray Then
-            RightCross3Btn.BackColor = Color.Red
-            Tablo.Strike("R", 3, True)
-        Else
-            RightCross3Btn.BackColor = Color.LightGray
-            Tablo.Strike("R", 3, False)
-        End If
+    Friend Sub UndoAction()
+        _session.Undo()
     End Sub
 
-    Private Sub RightCross2Btn_Click(sender As Object, e As EventArgs) Handles RightCross2Btn.Click
-        If RightCross2Btn.BackColor = Color.LightGray Then
-            RightCross2Btn.BackColor = Color.Red
-            Tablo.Strike("R", 2, True)
-        Else
-            RightCross2Btn.BackColor = Color.LightGray
-            Tablo.Strike("R", 2, False)
-        End If
+    Private Sub RestoreGame()
+        If MessageBox.Show(Me, "Восстановить последнее автосохранение вместе с историей отмены? Текущие несохранённые черновики будут заменены.", "Восстановление", MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then Return
+        _last = Nothing
+        If _bigControl IsNot Nothing Then _bigControl.ReloadDrafts()
+        _session.Restore()
+        _countdown.Stop()
+        _buzz.Disarm()
+        SetStatus("Игра восстановлена. Таймер и Buzz! запускаются отдельно. Для следующих раундов при необходимости загрузите базу.")
     End Sub
 
-    Private Sub RightCross1Btn_Click(sender As Object, e As EventArgs) Handles RightCross1Btn.Click
-        If RightCross1Btn.BackColor = Color.LightGray Then
-            RightCross1Btn.BackColor = Color.Red
-            Tablo.Strike("R", 1, True)
-        Else
-            RightCross1Btn.BackColor = Color.LightGray
-            Tablo.Strike("R", 1, False)
-        End If
+    Private Sub NewMatch()
+        If Not OperatorUi.Confirm(Me, "Начать новый матч? Все счета, ответы и большая игра будут сброшены.") Then Return
+        _last = Nothing
+        If _bigControl IsNot Nothing Then _bigControl.ReloadDrafts()
+        _session.Execute("Новый матч", Sub(state)
+                                          state.Main = New MainGameState()
+                                          state.Big = New BigGameState()
+                                      End Sub)
+        _countdown.Stop()
+        _buzz.Disarm()
     End Sub
 
-    Private Sub ScoreLeftRefreshTxt_Click(sender As Object, e As EventArgs) Handles ScoreLeftRefreshTxt.Click
-        Tablo.UpdateScore("R", ScoreLeftTxt.Text, False)
+    Private Sub SessionChanged(sender As Object, e As EventArgs)
+        Dim state = _session.State.Main
+        For i = 0 To 5
+            Dim answer = state.Answers(i)
+            If _last Is Nothing OrElse _last.Answers(i).Text <> answer.Text Then _answers(i).Text = answer.Text
+            If _last Is Nothing OrElse _last.Answers(i).Points <> answer.Points Then _points(i).Value = answer.Points
+            _show(i).Text = If(answer.TextVisible, "Скрыть ответ", "Открыть ответ")
+            _answerStatus(i).Text = If(answer.AwardedBank >= 0, If(answer.AwardedBank = state.BankId, "+" & answer.AwardedPoints & " в банке", "Очки уже переданы"), "Без начисления")
+            _answerStatus(i).ForeColor = If(answer.TextVisible, Color.DarkGreen, Color.DimGray)
+        Next
+        Dim values = {state.LeftScore, state.Bank, state.RightScore}
+        Dim previous = If(_last Is Nothing, Nothing, New Integer() {_last.LeftScore, _last.Bank, _last.RightScore})
+        For i = 0 To 2
+            If previous Is Nothing OrElse values(i) <> previous(i) Then _scores(i).Value = values(i)
+            For side = 0 To 1
+                Dim enabled = If(side = 0, state.LeftStrikes(i), state.RightStrikes(i))
+                _strikes(side, i).Text = If(enabled, "Убрать ошибку ", "Ошибка ") & (i + 1)
+                _strikes(side, i).BackColor = If(enabled, Color.MistyRose, SystemColors.Control)
+            Next
+        Next
+        _round.Text = "Раунд " & state.Round & " · в банк ×" & state.Multiplier & If(_bank Is Nothing, " · ручной ввод", " · база загружена")
+        _undo.Enabled = _session.UndoDescription <> ""
+        If _undo.Enabled Then _restore.Enabled = True
+        _undo.Text = "Отменить (Ctrl+Z)"
+        Dim description = _session.UndoDescription
+        _status.Text = If(description = "", "Готово. Загрузите базу или введите ответы вручную.", "Последнее действие: " & description & ". Отмена доступна из обоих пультов.")
+        If _board IsNot Nothing Then _board.Render(state)
+        If _bigBoard IsNot Nothing Then _bigBoard.Render(_session.State.Big)
+        _last = state
     End Sub
 
-    Private Sub ScoreRightRefreshTxt_Click(sender As Object, e As EventArgs) Handles ScoreRightRefreshTxt.Click
-        Tablo.UpdateScore("L", ScoreRightTxt.Text, False)
+    Private Function SelectedScreen() As Screen
+        Dim screens = Screen.AllScreens
+        Return screens(Math.Max(0, Math.Min(_screens.SelectedIndex, screens.Length - 1)))
+    End Function
+
+    Private Sub ShowMainBoard()
+        If _bigBoard IsNot Nothing Then _bigBoard.Hide()
+        If _board Is Nothing OrElse _board.IsDisposed Then _board = New Tablo()
+        _board.Render(_session.State.Main)
+        _board.ShowOn(SelectedScreen(), _fullscreen.Checked)
     End Sub
 
-    Private Sub RoundScoreRefreshBtn_Click(sender As Object, e As EventArgs) Handles RoundScoreRefreshBtn.Click
-        Tablo.UpdateScore("C", RoundScoreTxt.Text, False)
+    Private Sub ShowBigBoard()
+        If _board IsNot Nothing Then _board.Hide()
+        If _bigBoard Is Nothing OrElse _bigBoard.IsDisposed Then _bigBoard = New BigGameTablo()
+        _bigBoard.Render(_session.State.Big)
+        RenderCountdown()
+        _bigBoard.ShowOn(SelectedScreen(), _fullscreen.Checked)
     End Sub
 
-    Private Sub TransferLeftBtn_Click(sender As Object, e As EventArgs) Handles TransferLeftBtn.Click
-        Dim a As Integer
-        a = Int(ScoreLeftTxt.Text) + Int(RoundScoreTxt.Text)
-        ScoreLeftTxt.Text = a
-        RoundScoreTxt.Text = 0
-        Tablo.UpdateScore("L", ScoreLeftTxt.Text, True)
-        Tablo.UpdateScore("C", RoundScoreTxt.Text, False)
+    Private Sub HideBoards()
+        If _board IsNot Nothing Then _board.Hide()
+        If _bigBoard IsNot Nothing Then _bigBoard.Hide()
     End Sub
 
-    Private Sub TransferRightBtn_Click(sender As Object, e As EventArgs) Handles TransferRightBtn.Click
-        Dim a As Integer
-        a = Int(ScoreRightTxt.Text) + Int(RoundScoreTxt.Text)
-        ScoreRightTxt.Text = a
-        RoundScoreTxt.Text = 0
-        Tablo.UpdateScore("R", ScoreRightTxt.Text, True)
-        Tablo.UpdateScore("C", RoundScoreTxt.Text, False)
+    Private Sub OpenBigGame()
+        _buzz.Disarm()
+        If _bigControl Is Nothing OrElse _bigControl.IsDisposed Then _bigControl = New BigGameControl(_session, _countdown, AddressOf ShowBigBoard, AddressOf UndoAction)
+        _bigControl.Show(Me)
+        _bigControl.BringToFront()
+        ShowBigBoard()
     End Sub
 
-    Private Sub Answer1RevealBtn_Click(sender As Object, e As EventArgs) Handles Answer1RevealBtn.Click
-        If Answer1RevealBtn.BackColor <> Color.LightGreen Then
-            Dim b As Integer
-            b = Answer1CostTxt.Text
-            If Radio2x.Checked = True Then
-                b = b / 2
-            End If
-            If Radio3x.Checked = True Then
-                b = b / 3
-            End If
-            If AddUpChk.Checked = True Then
-                Dim a As Integer
-                a = Int(RoundScoreTxt.Text) + Int(Answer1CostTxt.Text)
-                RoundScoreTxt.Text = a
-
-                Tablo.Reveal(1, Answer1Txt.Text, b, RoundScoreTxt.Text, 2)
-                Answer1RevealBtn.BackColor = Color.LightGreen
-            Else
-                Tablo.Reveal(1, Answer1Txt.Text, b, RoundScoreTxt.Text, 1)
-                Answer1RevealBtn.BackColor = Color.LightGreen
-            End If
-        Else
-            Tablo.RollBack(1, RoundScoreTxt.Text)
-            Answer1RevealBtn.BackColor = Color.LightGray
-        End If
-
+    Private Sub RenderCountdown()
+        If _bigBoard IsNot Nothing Then _bigBoard.RenderTimer(_countdown.SecondsRemaining, _countdown.Visible)
     End Sub
 
-    Private Sub Answer2RevealBtn_Click(sender As Object, e As EventArgs) Handles Answer2RevealBtn.Click
-        If Answer2RevealBtn.BackColor <> Color.LightGreen Then
-            Dim b As Integer
-            b = Answer2CostTxt.Text
-            If Radio2x.Checked = True Then
-                b = b / 2
-            End If
-            If Radio3x.Checked = True Then
-                b = b / 3
-            End If
-            If AddUpChk.Checked = True Then
-                Dim a As Integer
-                a = Int(RoundScoreTxt.Text) + Int(Answer2CostTxt.Text)
-                RoundScoreTxt.Text = a
-                Tablo.Reveal(2, Answer2Txt.Text, b, RoundScoreTxt.Text, 2)
-                Answer2RevealBtn.BackColor = Color.LightGreen
-            Else
-                Tablo.Reveal(2, Answer2Txt.Text, b, RoundScoreTxt.Text, 1)
-                Answer2RevealBtn.BackColor = Color.LightGreen
-            End If
-        Else
-            Tablo.RollBack(2, RoundScoreTxt.Text)
-            Answer2RevealBtn.BackColor = Color.LightGray
-        End If
+    Private Sub SetStatus(message As String)
+        OperatorUi.OnUi(Me, Sub() _status.Text = message)
     End Sub
 
-    Private Sub Answer3RevealBtn_Click(sender As Object, e As EventArgs) Handles Answer3RevealBtn.Click
-        If Answer3RevealBtn.BackColor <> Color.LightGreen Then
-            Dim b As Integer
-            b = Answer3CostTxt.Text
-            If Radio2x.Checked = True Then
-                b = b / 2
-            End If
-            If Radio3x.Checked = True Then
-                b = b / 3
-            End If
-            If AddUpChk.Checked = True Then
-                Dim a As Integer
-                a = Int(RoundScoreTxt.Text) + Int(Answer3CostTxt.Text)
-                RoundScoreTxt.Text = a
-                Tablo.Reveal(3, Answer3Txt.Text, b, RoundScoreTxt.Text, 2)
-                Answer3RevealBtn.BackColor = Color.LightGreen
-            Else
-                Tablo.Reveal(3, Answer3Txt.Text, b, RoundScoreTxt.Text, 1)
-                Answer3RevealBtn.BackColor = Color.LightGreen
-            End If
-        Else
-            Tablo.RollBack(3, RoundScoreTxt.Text)
-            Answer3RevealBtn.BackColor = Color.LightGray
-        End If
+    Private Sub CloseServices(sender As Object, e As FormClosedEventArgs)
+        _buzz.Dispose()
+        _countdown.Dispose()
+        RemoveHandler AudioService.Instance.AudioError, AddressOf SetStatus
+        AudioService.Instance.Dispose()
+        If _bigControl IsNot Nothing Then _bigControl.Dispose()
+        If _board IsNot Nothing Then _board.Dispose()
+        If _bigBoard IsNot Nothing Then _bigBoard.Dispose()
     End Sub
-
-    Private Sub Answer4RevealBtn_Click(sender As Object, e As EventArgs) Handles Answer4RevealBtn.Click
-        If Answer4RevealBtn.BackColor <> Color.LightGreen Then
-            Dim b As Integer
-            b = Answer4CostTxt.Text
-            If Radio2x.Checked = True Then
-                b = b / 2
-            End If
-            If Radio3x.Checked = True Then
-                b = b / 3
-            End If
-            If AddUpChk.Checked = True Then
-                Dim a As Integer
-                a = Int(RoundScoreTxt.Text) + Int(Answer4CostTxt.Text)
-                RoundScoreTxt.Text = a
-                Tablo.Reveal(4, Answer4Txt.Text, b, RoundScoreTxt.Text, 2)
-                Answer4RevealBtn.BackColor = Color.LightGreen
-            Else
-                Tablo.Reveal(4, Answer4Txt.Text, b, RoundScoreTxt.Text, 1)
-                Answer4RevealBtn.BackColor = Color.LightGreen
-            End If
-        Else
-            Tablo.RollBack(4, RoundScoreTxt.Text)
-            Answer4RevealBtn.BackColor = Color.LightGray
-        End If
-    End Sub
-
-    Private Sub Answer5RevealBtn_Click(sender As Object, e As EventArgs) Handles Answer5RevealBtn.Click
-        If Answer5RevealBtn.BackColor <> Color.LightGreen Then
-            Dim b As Integer
-            b = Answer5CostTxt.Text
-            If Radio2x.Checked = True Then
-                b = b / 2
-            End If
-            If Radio3x.Checked = True Then
-                b = b / 3
-            End If
-            If AddUpChk.Checked = True Then
-                Dim a As Integer
-                a = Int(RoundScoreTxt.Text) + Int(Answer5CostTxt.Text)
-                RoundScoreTxt.Text = a
-                Tablo.Reveal(5, Answer5Txt.Text, b, RoundScoreTxt.Text, 2)
-                Answer5RevealBtn.BackColor = Color.LightGreen
-            Else
-                Tablo.Reveal(5, Answer5Txt.Text, b, RoundScoreTxt.Text, 1)
-                Answer5RevealBtn.BackColor = Color.LightGreen
-            End If
-        Else
-            Tablo.RollBack(5, RoundScoreTxt.Text)
-            Answer5RevealBtn.BackColor = Color.LightGray
-        End If
-    End Sub
-
-    Private Sub Answer6RevealBtn_Click(sender As Object, e As EventArgs) Handles Answer6RevealBtn.Click
-        If Answer6RevealBtn.BackColor <> Color.LightGreen Then
-            Dim b As Integer
-            b = Answer6CostTxt.Text
-            If Radio2x.Checked = True Then
-                b = b / 2
-            End If
-            If Radio3x.Checked = True Then
-                b = b / 3
-            End If
-            If AddUpChk.Checked = True Then
-                Dim a As Integer
-                a = Int(RoundScoreTxt.Text) + Int(Answer6CostTxt.Text)
-                RoundScoreTxt.Text = a
-                Tablo.Reveal(6, Answer6Txt.Text, b, RoundScoreTxt.Text, 2)
-                Answer6RevealBtn.BackColor = Color.LightGreen
-            Else
-                Tablo.Reveal(6, Answer6Txt.Text, b, RoundScoreTxt.Text, 1)
-                Answer6RevealBtn.BackColor = Color.LightGreen
-            End If
-        Else
-            Tablo.RollBack(6, RoundScoreTxt.Text)
-            Answer6RevealBtn.BackColor = Color.LightGray
-        End If
-    End Sub
-
-    Private Sub TabloPrepareBtn_Click(sender As Object, e As EventArgs) Handles TabloPrepareBtn.Click
-        Tablo.Prepare()
-        Answer1RevealBtn.BackColor = Color.LightGray
-        Answer2RevealBtn.BackColor = Color.LightGray
-        Answer3RevealBtn.BackColor = Color.LightGray
-        Answer4RevealBtn.BackColor = Color.LightGray
-        Answer5RevealBtn.BackColor = Color.LightGray
-        Answer6RevealBtn.BackColor = Color.LightGray
-        LeftCross3Btn.BackColor = Color.LightGray
-        LeftCross2Btn.BackColor = Color.LightGray
-        LeftCross1Btn.BackColor = Color.LightGray
-        RightCross3Btn.BackColor = Color.LightGray
-        RightCross2Btn.BackColor = Color.LightGray
-        RightCross1Btn.BackColor = Color.LightGray
-    End Sub
-
-    Private Sub GrayChk_CheckedChanged(sender As Object, e As EventArgs) Handles GrayChk.CheckedChanged
-        If GrayChk.Checked = True Then
-            RoundScoreTxt.ForeColor = Color.LightGray
-            Answer1Txt.ForeColor = Color.LightGray
-            Answer1CostTxt.ForeColor = Color.LightGray
-            Answer2Txt.ForeColor = Color.LightGray
-            Answer2CostTxt.ForeColor = Color.LightGray
-            Answer3Txt.ForeColor = Color.LightGray
-            Answer3CostTxt.ForeColor = Color.LightGray
-            Answer4Txt.ForeColor = Color.LightGray
-            Answer4CostTxt.ForeColor = Color.LightGray
-            Answer5Txt.ForeColor = Color.LightGray
-            Answer5CostTxt.ForeColor = Color.LightGray
-            Answer6Txt.ForeColor = Color.LightGray
-            Answer6CostTxt.ForeColor = Color.LightGray
-        Else
-            RoundScoreTxt.ForeColor = Color.Black
-            Answer1Txt.ForeColor = Color.Black
-            Answer1CostTxt.ForeColor = Color.Black
-            Answer2Txt.ForeColor = Color.Black
-            Answer2CostTxt.ForeColor = Color.Black
-            Answer3Txt.ForeColor = Color.Black
-            Answer3CostTxt.ForeColor = Color.Black
-            Answer4Txt.ForeColor = Color.Black
-            Answer4CostTxt.ForeColor = Color.Black
-            Answer5Txt.ForeColor = Color.Black
-            Answer5CostTxt.ForeColor = Color.Black
-            Answer6Txt.ForeColor = Color.Black
-            Answer6CostTxt.ForeColor = Color.Black
-        End If
-    End Sub
-
-    Private Sub BigRoundBtn_Click(sender As Object, e As EventArgs) Handles BigRoundBtn.Click
-        BigGameControl.Show()
-        BigGameTablo.Show()
-    End Sub
-
-    Private Sub FirstRoundBtn_Click(sender As Object, e As EventArgs) Handles FirstRoundBtn.Click
-        Tablo.SetRound(1)
-        Dim Answers1() As String = Answers(0).Split("&")
-        Dim Answers2() As String = Answers(1).Split("&")
-        Dim Answers3() As String = Answers(2).Split("&")
-        Dim Answers4() As String = Answers(3).Split("&")
-        Dim Answers5() As String = Answers(4).Split("&")
-        Dim Answers6() As String = Answers(5).Split("&")
-        Answer1Txt.Text = Answers1(0)
-        Answer2Txt.Text = Answers2(0)
-        Answer3Txt.Text = Answers3(0)
-        Answer4Txt.Text = Answers4(0)
-        Answer5Txt.Text = Answers5(0)
-        Answer6Txt.Text = Answers6(0)
-        Answer1CostTxt.Text = Answers1(1)
-        Answer2CostTxt.Text = Answers2(1)
-        Answer3CostTxt.Text = Answers3(1)
-        Answer4CostTxt.Text = Answers4(1)
-        Answer5CostTxt.Text = Answers5(1)
-        Answer6CostTxt.Text = Answers6(1)
-    End Sub
-
-    Private Sub SecondRoundBtn_Click(sender As Object, e As EventArgs) Handles SecondRoundBtn.Click
-        Tablo.SetRound(2)
-        Dim Answers1() As String = Answers(6).Split("&")
-        Dim Answers2() As String = Answers(7).Split("&")
-        Dim Answers3() As String = Answers(8).Split("&")
-        Dim Answers4() As String = Answers(9).Split("&")
-        Dim Answers5() As String = Answers(10).Split("&")
-        Dim Answers6() As String = Answers(11).Split("&")
-        Answer1Txt.Text = Answers1(0)
-        Answer2Txt.Text = Answers2(0)
-        Answer3Txt.Text = Answers3(0)
-        Answer4Txt.Text = Answers4(0)
-        Answer5Txt.Text = Answers5(0)
-        Answer6Txt.Text = Answers6(0)
-        Answer1CostTxt.Text = Answers1(1) * 2
-        Answer2CostTxt.Text = Answers2(1) * 2
-        Answer3CostTxt.Text = Answers3(1) * 2
-        Answer4CostTxt.Text = Answers4(1) * 2
-        Answer5CostTxt.Text = Answers5(1) * 2
-        Answer6CostTxt.Text = Answers6(1) * 2
-    End Sub
-
-    Private Sub ThirdRoundBtn_Click(sender As Object, e As EventArgs) Handles ThirdRoundBtn.Click
-        Tablo.SetRound(3)
-        Dim Answers1() As String = Answers(12).Split("&")
-        Dim Answers2() As String = Answers(13).Split("&")
-        Dim Answers3() As String = Answers(14).Split("&")
-        Dim Answers4() As String = Answers(15).Split("&")
-        Dim Answers5() As String = Answers(16).Split("&")
-        Dim Answers6() As String = Answers(17).Split("&")
-        Answer1Txt.Text = Answers1(0)
-        Answer2Txt.Text = Answers2(0)
-        Answer3Txt.Text = Answers3(0)
-        Answer4Txt.Text = Answers4(0)
-        Answer5Txt.Text = Answers5(0)
-        Answer6Txt.Text = Answers6(0)
-        Answer1CostTxt.Text = Answers1(1) * 3
-        Answer2CostTxt.Text = Answers2(1) * 3
-        Answer3CostTxt.Text = Answers3(1) * 3
-        Answer4CostTxt.Text = Answers4(1) * 3
-        Answer5CostTxt.Text = Answers5(1) * 3
-        Answer6CostTxt.Text = Answers6(1) * 3
-    End Sub
-
-    Private Sub FourthRoundBtn_Click(sender As Object, e As EventArgs) Handles FourthRoundBtn.Click
-        Tablo.SetRound(4)
-        Dim Answers1 As String = Answers(18)
-        Dim Answers2 As String = Answers(19)
-        Dim Answers3 As String = Answers(20)
-        Dim Answers4 As String = Answers(21)
-        Dim Answers5 As String = Answers(22)
-        Dim Answers6 As String = Answers(23)
-        Answer1Txt.Text = Answers1
-        Answer2Txt.Text = Answers2
-        Answer3Txt.Text = Answers3
-        Answer4Txt.Text = Answers4
-        Answer5Txt.Text = Answers5
-        Answer6Txt.Text = Answers6
-        Answer1CostTxt.Text = 15
-        Answer2CostTxt.Text = 30
-        Answer3CostTxt.Text = 45
-        Answer4CostTxt.Text = 60
-        Answer5CostTxt.Text = 120
-        Answer6CostTxt.Text = 240
-    End Sub
-
-    Private Sub StoAttractBtn_Click(sender As Object, e As EventArgs) Handles StoAttractBtn.Click
-        Tablo.AttractMode(0)
-    End Sub
-
-    Private Sub SimpleAttractBtn_Click(sender As Object, e As EventArgs) Handles SimpleAttractBtn.Click
-        Tablo.AttractMode(1)
-    End Sub
-
-    Private Sub DoubleAttractBtn_Click(sender As Object, e As EventArgs) Handles DoubleAttractBtn.Click
-        Tablo.AttractMode(2)
-    End Sub
-
-    Private Sub TripleAttractBtn_Click(sender As Object, e As EventArgs) Handles TripleAttractBtn.Click
-        Tablo.AttractMode(3)
-    End Sub
-
-    Private Sub UnderAttractBtn_Click(sender As Object, e As EventArgs) Handles UnderAttractBtn.Click
-        Tablo.AttractMode(4)
-    End Sub
-
-    Private Sub BigAttractBtn_Click(sender As Object, e As EventArgs) Handles BigAttractBtn.Click
-        Tablo.AttractMode(5)
-    End Sub
-
-    Private Sub AboutBtn_Click(sender As Object, e As EventArgs)
-        AboutBox1.Show()
-    End Sub
-
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        My.Computer.Audio.Play(My.Resources._26_wrong, AudioPlayMode.Background)
-    End Sub
-    Private WithEvents _buzz As New BuzzManager()
-    Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs) _
-    Handles MyBase.FormClosing
-        _buzz.Shutdown()
-
-        AudioService.Instance.Shutdown()
-    End Sub
-
-
-    Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        If Not _buzz.Initialize() Then MessageBox.Show("Приёмник не найден")
-    End Sub
-
-
 End Class

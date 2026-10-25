@@ -22,7 +22,6 @@ Partial Class Tablo
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Tablo))
         Me.RoundScoreLbl = New System.Windows.Forms.Label()
         Me.ScoreLeftLbl = New System.Windows.Forms.Label()
         Me.ScoreRightLbl = New System.Windows.Forms.Label()
@@ -233,7 +232,7 @@ Partial Class Tablo
         Me.RightStrike3Lbl.BackColor = System.Drawing.Color.Transparent
         Me.RightStrike3Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.RightStrike3Lbl.ForeColor = System.Drawing.Color.Red
-        Me.RightStrike3Lbl.Image = CType(resources.GetObject("RightStrike3Lbl.Image"), System.Drawing.Image)
+        Me.RightStrike3Lbl.Image = Global.StoKOdnomuControl.My.Resources.Resources._26_chance_r
         Me.RightStrike3Lbl.Location = New System.Drawing.Point(1099, 266)
         Me.RightStrike3Lbl.Name = "RightStrike3Lbl"
         Me.RightStrike3Lbl.Size = New System.Drawing.Size(156, 134)
@@ -245,7 +244,7 @@ Partial Class Tablo
         Me.RightStrike2Lbl.BackColor = System.Drawing.Color.Transparent
         Me.RightStrike2Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.RightStrike2Lbl.ForeColor = System.Drawing.Color.Red
-        Me.RightStrike2Lbl.Image = CType(resources.GetObject("RightStrike2Lbl.Image"), System.Drawing.Image)
+        Me.RightStrike2Lbl.Image = Global.StoKOdnomuControl.My.Resources.Resources._26_chance_r
         Me.RightStrike2Lbl.Location = New System.Drawing.Point(1099, 400)
         Me.RightStrike2Lbl.Name = "RightStrike2Lbl"
         Me.RightStrike2Lbl.Size = New System.Drawing.Size(156, 134)
@@ -257,7 +256,7 @@ Partial Class Tablo
         Me.RightStrike1Lbl.BackColor = System.Drawing.Color.Transparent
         Me.RightStrike1Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.RightStrike1Lbl.ForeColor = System.Drawing.Color.Red
-        Me.RightStrike1Lbl.Image = CType(resources.GetObject("RightStrike1Lbl.Image"), System.Drawing.Image)
+        Me.RightStrike1Lbl.Image = Global.StoKOdnomuControl.My.Resources.Resources._26_chance_r
         Me.RightStrike1Lbl.Location = New System.Drawing.Point(1099, 534)
         Me.RightStrike1Lbl.Name = "RightStrike1Lbl"
         Me.RightStrike1Lbl.Size = New System.Drawing.Size(156, 134)
@@ -269,7 +268,7 @@ Partial Class Tablo
         Me.LeftStrike3Lbl.BackColor = System.Drawing.Color.Transparent
         Me.LeftStrike3Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.LeftStrike3Lbl.ForeColor = System.Drawing.Color.Red
-        Me.LeftStrike3Lbl.Image = CType(resources.GetObject("LeftStrike3Lbl.Image"), System.Drawing.Image)
+        Me.LeftStrike3Lbl.Image = Global.StoKOdnomuControl.My.Resources.Resources._26_chance_l
         Me.LeftStrike3Lbl.Location = New System.Drawing.Point(14, 266)
         Me.LeftStrike3Lbl.Name = "LeftStrike3Lbl"
         Me.LeftStrike3Lbl.Size = New System.Drawing.Size(156, 134)
@@ -281,7 +280,7 @@ Partial Class Tablo
         Me.LeftStrike2Lbl.BackColor = System.Drawing.Color.Transparent
         Me.LeftStrike2Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.LeftStrike2Lbl.ForeColor = System.Drawing.Color.Red
-        Me.LeftStrike2Lbl.Image = CType(resources.GetObject("LeftStrike2Lbl.Image"), System.Drawing.Image)
+        Me.LeftStrike2Lbl.Image = Global.StoKOdnomuControl.My.Resources.Resources._26_chance_l
         Me.LeftStrike2Lbl.Location = New System.Drawing.Point(14, 400)
         Me.LeftStrike2Lbl.Name = "LeftStrike2Lbl"
         Me.LeftStrike2Lbl.Size = New System.Drawing.Size(156, 134)
@@ -293,7 +292,7 @@ Partial Class Tablo
         Me.LeftStrike1Lbl.BackColor = System.Drawing.Color.Transparent
         Me.LeftStrike1Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
         Me.LeftStrike1Lbl.ForeColor = System.Drawing.Color.Red
-        Me.LeftStrike1Lbl.Image = CType(resources.GetObject("LeftStrike1Lbl.Image"), System.Drawing.Image)
+        Me.LeftStrike1Lbl.Image = Global.StoKOdnomuControl.My.Resources.Resources._26_chance_l
         Me.LeftStrike1Lbl.Location = New System.Drawing.Point(14, 534)
         Me.LeftStrike1Lbl.Name = "LeftStrike1Lbl"
         Me.LeftStrike1Lbl.Size = New System.Drawing.Size(156, 134)

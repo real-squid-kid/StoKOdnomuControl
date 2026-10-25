@@ -1,226 +1,212 @@
-﻿Public Class BigGameControl
-    Dim State As Integer = 0
+Option Strict On
+Imports System.Windows.Forms
 
-    Private Sub GrayChk_CheckedChanged(sender As Object, e As EventArgs) Handles GrayChk.CheckedChanged
-        If GrayChk.Checked = True Then
-            ScoreTxt.ForeColor = Color.LightGray
-            Answer1Txt.ForeColor = Color.LightGray
-            Answer1CostTxt.ForeColor = Color.LightGray
-            Answer2Txt.ForeColor = Color.LightGray
-            Answer2CostTxt.ForeColor = Color.LightGray
-            Answer3Txt.ForeColor = Color.LightGray
-            Answer3CostTxt.ForeColor = Color.LightGray
-            Answer4Txt.ForeColor = Color.LightGray
-            Answer4CostTxt.ForeColor = Color.LightGray
-            Answer5Txt.ForeColor = Color.LightGray
-            Answer5CostTxt.ForeColor = Color.LightGray
-            Answer6Txt.ForeColor = Color.LightGray
-            Answer6CostTxt.ForeColor = Color.LightGray
-            Answer7Txt.ForeColor = Color.LightGray
-            Answer7CostTxt.ForeColor = Color.LightGray
-            Answer8Txt.ForeColor = Color.LightGray
-            Answer8CostTxt.ForeColor = Color.LightGray
-            Answer9Txt.ForeColor = Color.LightGray
-            Answer9CostTxt.ForeColor = Color.LightGray
-            Answer10Txt.ForeColor = Color.LightGray
-            Answer10CostTxt.ForeColor = Color.LightGray
+Public Class BigGameControl
+    Inherits Form
+    Private ReadOnly _session As GameSession
+    Private ReadOnly _countdown As Countdown
+    Private ReadOnly _undoAction As Action
+    Private ReadOnly _texts(9) As TextBox
+    Private ReadOnly _points(9) As NumericUpDown
+    Private ReadOnly _textButtons(9) As Button
+    Private ReadOnly _pointButtons(9) As Button
+    Private ReadOnly _hide As New CheckBox With {.Text = "Скрыть ответы первого участника на табло", .AutoSize = True, .Margin = New Padding(6, 12, 4, 4)}
+    Private ReadOnly _total As NumericUpDown = OperatorUi.Number()
+    Private ReadOnly _target As NumericUpDown = OperatorUi.Number()
+    Private ReadOnly _timerStatus As Label = OperatorUi.Label("Таймер остановлен", 260)
+    Private ReadOnly _actionStatus As Label = OperatorUi.Label("", 1200)
+    Private _next As Button
+    Private _undo As Button
+    Private _last As BigGameState
+    Private _updating As Boolean
+
+    Public Sub New(session As GameSession, countdown As Countdown, showBoard As Action, undoAction As Action)
+        _session = session
+        _countdown = countdown
+        _undoAction = undoAction
+        BuildUi(showBoard)
+        AddHandler _session.Changed, AddressOf SessionChanged
+        AddHandler countdown.Changed, AddressOf CountdownChanged
+        AddHandler FormClosing, Sub(sender, e)
+                                    If e.CloseReason = CloseReason.UserClosing Then
+                                        e.Cancel = True
+                                        Hide()
+                                    End If
+                                End Sub
+        AddHandler Disposed, Sub()
+                                 RemoveHandler _session.Changed, AddressOf SessionChanged
+                                 RemoveHandler countdown.Changed, AddressOf CountdownChanged
+                             End Sub
+        KeyPreview = True
+        AddHandler KeyDown, Sub(sender, e)
+                                If e.Control AndAlso e.KeyCode = Keys.Z Then
+                                    _undoAction()
+                                    e.SuppressKeyPress = True
+                                End If
+                            End Sub
+        SessionChanged(Me, EventArgs.Empty)
+    End Sub
+
+    Private Sub BuildUi(showBoard As Action)
+        Dim page = OperatorUi.Page(Me, "Сто к одному — большая игра")
+        OperatorUi.Heading(page, "Большая игра · два участника, пять вопросов")
+        Dim actions = OperatorUi.Row(page)
+        _next = OperatorUi.Button(actions, "", AddressOf NextStep, 360)
+        _next.Name = "RevealNext"
+        _undo = OperatorUi.Button(actions, "Отменить (Ctrl+Z)", Sub() _undoAction(), 200)
+        OperatorUi.Button(actions, "Показать табло", showBoard, 180)
+        OperatorUi.Button(actions, "Новая большая игра…", AddressOf ResetGame, 230)
+        Dim timer = OperatorUi.Row(page)
+        OperatorUi.Button(timer, "Начать / заново · 20 с", Sub() _countdown.Start(20), 220)
+        OperatorUi.Button(timer, "Начать / заново · 25 с", Sub() _countdown.Start(25), 220)
+        OperatorUi.Button(timer, "Остановить таймер и трек", Sub() _countdown.Stop(), 250)
+        OperatorUi.Button(timer, "Звук повтора ответа", Sub() AudioService.Instance.Play(SoundCue.SameAnswer), 210)
+        timer.Controls.Add(_timerStatus)
+        Dim scores = OperatorUi.Row(page)
+        scores.Controls.Add(OperatorUi.Label("Общий итог:", 115))
+        _total.Name = "BigTotal"
+        scores.Controls.Add(_total)
+        OperatorUi.Button(scores, "Исправить общий итог", Sub() Run("Исправить итог большой игры", Sub(state) GameRules.SetBigTotal(state.Big, CInt(_total.Value))), 215)
+        scores.Controls.Add(OperatorUi.Label("Цель для победы:", 155))
+        _target.Minimum = 1
+        scores.Controls.Add(_target)
+        OperatorUi.Button(scores, "Применить цель", Sub() Run("Изменить цель большой игры", Sub(state) state.Big.TargetScore = CInt(_target.Value)), 165)
+        scores.Controls.Add(_hide)
+        AddHandler _hide.CheckedChanged, Sub()
+                                            If Not _updating Then _session.Execute(If(_hide.Checked, "Скрыть", "Вернуть") & " ответы первого участника", Sub(state) state.Big.HideFirstPlayer = _hide.Checked)
+                                        End Sub
+        Dim players = OperatorUi.Grid(page, 0, 0)
+        For player = 0 To 1
+            Dim columnPage As New FlowLayoutPanel With {.AutoSize = True, .FlowDirection = FlowDirection.TopDown, .WrapContents = False, .Dock = DockStyle.Fill, .Margin = New Padding(2)}
+            OperatorUi.Cell(players, columnPage, player, 0)
+            Dim title = OperatorUi.Label("Участник " & (player + 1), 550)
+            title.Font = New Font("Segoe UI", 12, FontStyle.Bold)
+            columnPage.Controls.Add(title)
+            Dim table = OperatorUi.Grid(columnPage, 40, 0, 65, 130, 145)
+            table.Width = 575
+            table.Dock = DockStyle.Top
+            Dim headings = {"№", "Ответ (черновик)", "Очки", "Текст на табло", "Очки в общий итог"}
+            For column = 0 To headings.Length - 1
+                OperatorUi.Cell(table, OperatorUi.Label(headings(column), If(column = 1, 165, CInt(Math.Max(30, table.ColumnStyles(column).Width - 8)))), column, 0)
+            Next
+            For question = 0 To 4
+                Dim index = player * 5 + question
+                _texts(index) = New TextBox With {.Name = "BigAnswer" & index, .MaxLength = 120, .Margin = New Padding(4, 10, 4, 4)}
+                _points(index) = OperatorUi.Number(GameRules.MaximumAnswerPoints)
+                _points(index).Width = 58
+                _points(index).Name = "BigPoints" & index
+                OperatorUi.Cell(table, OperatorUi.Label((question + 1).ToString(), 30), 0, question + 1)
+                OperatorUi.Cell(table, _texts(index), 1, question + 1)
+                OperatorUi.Cell(table, _points(index), 2, question + 1)
+                _textButtons(index) = OperatorUi.Button(table, "Показать текст", Sub() ShowText(index), 122)
+                _textButtons(index).Name = "ShowBigText" & index
+                table.SetCellPosition(_textButtons(index), New TableLayoutPanelCellPosition(3, question + 1))
+                _pointButtons(index) = OperatorUi.Button(table, "Начислить", Sub() ShowPoints(index), 137)
+                _pointButtons(index).Name = "ShowBigPoints" & index
+                table.SetCellPosition(_pointButtons(index), New TableLayoutPanelCellPosition(4, question + 1))
+            Next
+        Next
+        Dim note = OperatorUi.Label("Правка очков уже открытого ответа меняет итог на разницу. «Отменить» возвращает последнее игровое действие в любом пульте. Таймер останавливается отдельно.", 1200)
+        note.Height = 48
+        page.Controls.Add(note)
+        Dim dimFields As New CheckBox With {.Text = "Приглушить ответы и цены в пульте", .AutoSize = True, .Margin = New Padding(6)}
+        page.Controls.Add(dimFields)
+        AddHandler dimFields.CheckedChanged, Sub()
+                                                 For i = 0 To 9
+                                                     _texts(i).ForeColor = If(dimFields.Checked, Color.LightGray, SystemColors.WindowText)
+                                                     _points(i).ForeColor = If(dimFields.Checked, Color.LightGray, SystemColors.WindowText)
+                                                 Next
+                                             End Sub
+        Dim drafts = OperatorUi.Row(page)
+        OperatorUi.Button(drafts, "Сохранить черновики ответов", AddressOf SaveDrafts, 285)
+        drafts.Controls.Add(OperatorUi.Label("Черновики сохраняются без раскрытия и начисления очков.", 650))
+        _actionStatus.Height = 48
+        page.Controls.Add(_actionStatus)
+    End Sub
+
+    Private Sub NextStep()
+        Dim stepNumber = _session.State.Big.NextStep
+        If stepNumber >= 20 Then Return
+        Dim index = stepNumber \ 2
+        If stepNumber Mod 2 = 0 Then
+            ShowText(index)
         Else
-            ScoreTxt.ForeColor = Color.Black
-            Answer1Txt.ForeColor = Color.Black
-            Answer1CostTxt.ForeColor = Color.Black
-            Answer2Txt.ForeColor = Color.Black
-            Answer2CostTxt.ForeColor = Color.Black
-            Answer3Txt.ForeColor = Color.Black
-            Answer3CostTxt.ForeColor = Color.Black
-            Answer4Txt.ForeColor = Color.Black
-            Answer4CostTxt.ForeColor = Color.Black
-            Answer5Txt.ForeColor = Color.Black
-            Answer5CostTxt.ForeColor = Color.Black
-            Answer6Txt.ForeColor = Color.Black
-            Answer6CostTxt.ForeColor = Color.Black
-            Answer7Txt.ForeColor = Color.Black
-            Answer7CostTxt.ForeColor = Color.Black
-            Answer8Txt.ForeColor = Color.Black
-            Answer8CostTxt.ForeColor = Color.Black
-            Answer9Txt.ForeColor = Color.Black
-            Answer9CostTxt.ForeColor = Color.Black
-            Answer10Txt.ForeColor = Color.Black
-            Answer10CostTxt.ForeColor = Color.Black
+            ShowPoints(index)
         End If
     End Sub
 
-    Private Sub ShowInfoBtn_Click(sender As Object, e As EventArgs) Handles ShowInfoBtn.Click
-        BigGameTablo.Prepare()
+    Private Sub ShowText(index As Integer)
+        Dim wasVisible = _session.State.Big.Answers(index).TextVisible
+        Run(If(wasVisible, "Исправить", "Показать") & " текст: " & AnswerName(index), Sub(state) GameRules.ShowBigText(state.Big, index, _texts(index).Text))
+        If Not wasVisible Then AudioService.Instance.Play(CType(CInt(SoundCue.Reveal1) + index Mod 5, SoundCue))
     End Sub
 
-    Private Sub SameAnswerBtn_Click(sender As Object, e As EventArgs) Handles SameAnswerBtn.Click
-        My.Computer.Audio.Play(My.Resources._26_same, AudioPlayMode.Background)
-    End Sub
-
-    Private Sub Timer15Btn_Click(sender As Object, e As EventArgs) Handles Timer15Btn.Click
-        BigGameTablo.SetTimer(20)
-    End Sub
-
-    Private Sub Timer20Btn_Click(sender As Object, e As EventArgs) Handles Timer20Btn.Click
-        BigGameTablo.SetTimer(25)
-    End Sub
-
-    Private Sub StartStopBtn_Click(sender As Object, e As EventArgs) Handles StartStopBtn.Click
-        BigGameTablo.StopTimer()
-    End Sub
-
-    Private Sub HideAnswersChk_CheckedChanged(sender As Object, e As EventArgs) Handles HideAnswersChk.CheckedChanged
-        If HideAnswersChk.Checked = True Then
-            BigGameTablo.HideAnswers()
+    Private Sub ShowPoints(index As Integer)
+        Dim before = _session.State.Big
+        Run(If(before.Answers(index).ScoreVisible, "Исправить", "Начислить") & " очки: " & AnswerName(index), Sub(state) GameRules.ShowBigPoints(state.Big, index, CInt(_points(index).Value)))
+        Dim after = _session.State.Big
+        If before.Total < after.TargetScore AndAlso after.Total >= after.TargetScore Then
+            AudioService.Instance.Play(SoundCue.Victory)
         Else
-            BigGameTablo.ShowAnswers()
+            AudioService.Instance.Play(If(CInt(_points(index).Value) = 0, SoundCue.BigWrong, SoundCue.OpenAnswer))
         End If
     End Sub
 
-    Private Sub NextBtn_Click(sender As Object, e As EventArgs) Handles NextBtn.Click
-        State += 1
-        If State < 21 Then
-            UpdateState(State, True)
-        End If
+    Private Sub Run(description As String, action As Action(Of MatchState))
+        _session.Execute(description, action)
     End Sub
 
-    Private Sub UpdateState(e As Integer, UpdScore As Boolean)
-        Select Case e
-            Case 1
-                BigGameTablo.Reveal(1, Answer1Txt.Text)
-            Case 2
-                If UpdScore = True Then ScoreTxt.Text += Int(Answer1CostTxt.Text)
-                BigGameTablo.Reveal("1A", Answer1CostTxt.Text)
-            Case 3
-                BigGameTablo.Reveal(2, Answer2Txt.Text)
-            Case 4
-                If UpdScore = True Then ScoreTxt.Text += Int(Answer2CostTxt.Text)
-                BigGameTablo.Reveal("2A", Answer2CostTxt.Text)
-            Case 5
-                BigGameTablo.Reveal(3, Answer3Txt.Text)
-            Case 6
-                If UpdScore = True Then ScoreTxt.Text += Int(Answer3CostTxt.Text)
-                BigGameTablo.Reveal("3A", Answer3CostTxt.Text)
-            Case 7
-                BigGameTablo.Reveal(4, Answer4Txt.Text)
-            Case 8
-                If UpdScore = True Then ScoreTxt.Text += Int(Answer4CostTxt.Text)
-                BigGameTablo.Reveal("4A", Answer4CostTxt.Text)
-            Case 9
-                BigGameTablo.Reveal(5, Answer5Txt.Text)
-            Case 10
-                If UpdScore = True Then ScoreTxt.Text += Int(Answer5CostTxt.Text)
-                BigGameTablo.Reveal("5A", Answer5CostTxt.Text)
-            Case 11
-                BigGameTablo.Reveal(6, Answer6Txt.Text)
-            Case 12
-                If UpdScore = True Then ScoreTxt.Text += Int(Answer6CostTxt.Text)
-                BigGameTablo.Reveal("6A", Answer6CostTxt.Text)
-            Case 13
-                BigGameTablo.Reveal(7, Answer7Txt.Text)
-            Case 14
-                If UpdScore = True Then ScoreTxt.Text += Int(Answer7CostTxt.Text)
-                BigGameTablo.Reveal("7A", Answer7CostTxt.Text)
-            Case 15
-                BigGameTablo.Reveal(8, Answer8Txt.Text)
-            Case 16
-                If UpdScore = True Then ScoreTxt.Text += Int(Answer8CostTxt.Text)
-                BigGameTablo.Reveal("8A", Answer8CostTxt.Text)
-            Case 17
-                BigGameTablo.Reveal(9, Answer9Txt.Text)
-            Case 18
-                If UpdScore = True Then ScoreTxt.Text += Int(Answer9CostTxt.Text)
-                BigGameTablo.Reveal("9A", Answer9CostTxt.Text)
-            Case 19
-                BigGameTablo.Reveal(10, Answer10Txt.Text)
-            Case 20
-                If UpdScore = True Then ScoreTxt.Text += Int(Answer10CostTxt.Text)
-                BigGameTablo.Reveal("10A", Answer10CostTxt.Text)
+    Private Shared Function AnswerName(index As Integer) As String
+        Return "участник " & (index \ 5 + 1) & ", вопрос " & (index Mod 5 + 1)
+    End Function
 
-        End Select
+    Private Sub SaveDrafts()
+        _session.Execute("Сохранить черновики большой игры", Sub(state)
+                                                                  For i = 0 To 9
+                                                                      Dim answer = state.Big.Answers(i)
+                                                                      If answer.TextVisible OrElse answer.ScoreVisible Then Continue For
+                                                                      If Not String.IsNullOrWhiteSpace(_texts(i).Text) Then GameRules.CheckAnswer(_texts(i).Text, CInt(_points(i).Value))
+                                                                      answer.Text = _texts(i).Text.Trim()
+                                                                      answer.Points = CInt(_points(i).Value)
+                                                                  Next
+                                                              End Sub)
     End Sub
 
-    Private Sub ScoreUpdateBtn_Click(sender As Object, e As EventArgs) Handles ScoreUpdateBtn.Click
-        BigGameTablo.UpdateScores(ScoreTxt.Text)
+    Private Sub ResetGame()
+        If Not OperatorUi.Confirm(Me, "Очистить все ответы и итог большой игры? Цель для победы сохранится.") Then Return
+        ReloadDrafts()
+        _session.Execute("Новая большая игра", Sub(state) state.Big = New BigGameState With {.TargetScore = state.Big.TargetScore})
+        _countdown.Stop()
     End Sub
 
-    Private Sub Upd1Btn_Click(sender As Object, e As EventArgs) Handles Upd1Btn.Click
-        BigGameTablo.Reveal(1, Answer1Txt.Text)
+    Friend Sub ReloadDrafts()
+        _last = Nothing
     End Sub
 
-    Private Sub Upd1ABtn_Click(sender As Object, e As EventArgs) Handles Upd1ABtn.Click
-        BigGameTablo.Reveal("1A", Answer1CostTxt.Text)
+    Private Sub SessionChanged(sender As Object, e As EventArgs)
+        _updating = True
+        Dim state = _session.State.Big
+        For i = 0 To 9
+            Dim answer = state.Answers(i)
+            If _last Is Nothing OrElse _last.Answers(i).Text <> answer.Text Then _texts(i).Text = answer.Text
+            If _last Is Nothing OrElse _last.Answers(i).Points <> answer.Points Then _points(i).Value = answer.Points
+            _textButtons(i).Text = If(answer.TextVisible, "Исправить текст", "Показать текст")
+            _pointButtons(i).Text = If(answer.ScoreVisible, "Исправить очки", "Начислить")
+            _pointButtons(i).Enabled = answer.TextVisible
+        Next
+        If _last Is Nothing OrElse _last.Total <> state.Total Then _total.Value = state.Total
+        If _last Is Nothing OrElse _last.TargetScore <> state.TargetScore Then _target.Value = state.TargetScore
+        _hide.Checked = state.HideFirstPlayer
+        Dim nextStep = state.NextStep
+        _next.Enabled = nextStep < 20
+        _next.Text = If(nextStep >= 20, "Все ответы и очки открыты", "Далее: " & If(nextStep Mod 2 = 0, "текст", "очки") & " · " & AnswerName(Math.Min(9, nextStep \ 2)))
+        _undo.Enabled = _session.UndoDescription <> ""
+        _actionStatus.Text = "Итог: " & state.Total & " / " & state.TargetScore & ". " & If(_session.UndoDescription = "", "История действий пуста.", "Можно отменить: " & _session.UndoDescription)
+        _last = state
+        _updating = False
     End Sub
 
-    Private Sub Upd2Btn_Click(sender As Object, e As EventArgs) Handles Upd2Btn.Click
-        BigGameTablo.Reveal(2, Answer2Txt.Text)
-    End Sub
-
-    Private Sub Upd2ABtn_Click(sender As Object, e As EventArgs) Handles Upd2ABtn.Click
-        BigGameTablo.Reveal("2A", Answer2CostTxt.Text)
-    End Sub
-
-    Private Sub Upd3Btn_Click(sender As Object, e As EventArgs) Handles Upd3Btn.Click
-        BigGameTablo.Reveal(3, Answer3Txt.Text)
-    End Sub
-
-    Private Sub Upd3ABtn_Click(sender As Object, e As EventArgs) Handles Upd3ABtn.Click
-        BigGameTablo.Reveal("3A", Answer3CostTxt.Text)
-    End Sub
-
-    Private Sub Upd4Btn_Click(sender As Object, e As EventArgs) Handles Upd4Btn.Click
-        BigGameTablo.Reveal(4, Answer4Txt.Text)
-    End Sub
-
-    Private Sub Upd4ABtn_Click(sender As Object, e As EventArgs) Handles Upd4ABtn.Click
-        BigGameTablo.Reveal("4A", Answer4CostTxt.Text)
-    End Sub
-
-    Private Sub Upd5Btn_Click(sender As Object, e As EventArgs) Handles Upd5Btn.Click
-        BigGameTablo.Reveal(5, Answer5Txt.Text)
-    End Sub
-
-    Private Sub Upd5ABtn_Click(sender As Object, e As EventArgs) Handles Upd5ABtn.Click
-        BigGameTablo.Reveal("5A", Answer5CostTxt.Text)
-    End Sub
-
-    Private Sub Upd6Btn_Click(sender As Object, e As EventArgs) Handles Upd6Btn.Click
-        BigGameTablo.Reveal(6, Answer6Txt.Text)
-    End Sub
-
-    Private Sub Upd6ABtn_Click(sender As Object, e As EventArgs) Handles Upd6ABtn.Click
-        BigGameTablo.Reveal("6A", Answer6CostTxt.Text)
-    End Sub
-
-    Private Sub Upd7Btn_Click(sender As Object, e As EventArgs) Handles Upd7Btn.Click
-        BigGameTablo.Reveal(7, Answer7Txt.Text)
-    End Sub
-
-    Private Sub Upd7ABtn_Click(sender As Object, e As EventArgs) Handles Upd7ABtn.Click
-        BigGameTablo.Reveal("7A", Answer7CostTxt.Text)
-    End Sub
-
-    Private Sub Upd8Btn_Click(sender As Object, e As EventArgs) Handles Upd8Btn.Click
-        BigGameTablo.Reveal(8, Answer8Txt.Text)
-    End Sub
-
-    Private Sub Upd8ABtn_Click(sender As Object, e As EventArgs) Handles Upd8ABtn.Click
-        BigGameTablo.Reveal("8A", Answer8CostTxt.Text)
-    End Sub
-
-    Private Sub Upd9Btn_Click(sender As Object, e As EventArgs) Handles Upd9Btn.Click
-        BigGameTablo.Reveal(9, Answer9Txt.Text)
-    End Sub
-
-    Private Sub Upd9ABtn_Click(sender As Object, e As EventArgs) Handles Upd9ABtn.Click
-        BigGameTablo.Reveal("9A", Answer9CostTxt.Text)
-    End Sub
-
-    Private Sub Upd10Btn_Click(sender As Object, e As EventArgs) Handles Upd10Btn.Click
-        BigGameTablo.Reveal(10, Answer10Txt.Text)
-    End Sub
-
-    Private Sub Upd10ABtn_Click(sender As Object, e As EventArgs) Handles Upd10ABtn.Click
-        BigGameTablo.Reveal("10A", Answer10CostTxt.Text)
+    Private Sub CountdownChanged(sender As Object, e As EventArgs)
+        _timerStatus.Text = If(_countdown.Running, "Осталось: " & _countdown.SecondsRemaining & " с", If(_countdown.Visible, "Время истекло · 0 с", "Таймер остановлен"))
     End Sub
 End Class

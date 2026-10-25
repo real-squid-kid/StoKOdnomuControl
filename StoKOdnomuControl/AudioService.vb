@@ -1,173 +1,198 @@
-﻿Imports System.Threading
+Option Strict On
+Imports System.Collections.Concurrent
+Imports System.IO
 Imports NAudio.Wave
 Imports NAudio.Wave.SampleProviders
-Imports System.IO
-Public Class AudioService
-    Private Shared _instance As AudioService
-    Private Shared ReadOnly _lock As New Object()
 
-    Private ReadOnly _mixer As MixingSampleProvider
-    Private ReadOnly _waveOut As WaveOutEvent
-    Private ReadOnly _mixerLock As New Object()
-    Private ReadOnly _activeInputs As New List(Of ISampleProvider)()
+Public Enum SoundCue
+    OpenAnswer
+    NoScore
+    WrongAnswer
+    BigWrong
+    SameAnswer
+    Transfer
+    Victory
+    Buzzer
+    Countdown20
+    Countdown25
+    Reveal1
+    Reveal2
+    Reveal3
+    Reveal4
+    Reveal5
+    EasterEgg
+End Enum
+
+Public Enum AudioChannel
+    Effect
+    Countdown
+    Buzzer
+    EasterEgg
+End Enum
+
+' Decode each resource once; playback owns only a cursor into immutable PCM samples.
+' Readers are disposed during decoding, not on the audio callback thread.
+Public NotInheritable Class AudioService
+    Implements IDisposable
+    Private Shared ReadOnly _instance As New AudioService()
+    Private ReadOnly _gate As New Object()
+    Private ReadOnly _cache As New Dictionary(Of SoundCue, Single())()
+    Private ReadOnly _active As New ConcurrentDictionary(Of Guid, CachedSoundProvider)()
+    Private ReadOnly _mixer As New MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(48000, 2)) With {.ReadFully = True}
+    Private _output As WaveOutEvent
+    Private _disposed As Boolean
+    Public Property Enabled As Boolean = True
+    Public Event AudioError As Action(Of String)
 
     Private Sub New()
-        _mixer = New MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(44100, 2))
-        _mixer.ReadFully = True
-        _waveOut = New WaveOutEvent()
-        _waveOut.Init(_mixer)
-        _waveOut.Play()
+        AddHandler _mixer.MixerInputEnded, Sub(sender, e)
+                                              Dim sound = TryCast(e.SampleProvider, CachedSoundProvider)
+                                              If sound IsNot Nothing Then
+                                                  Dim removed As CachedSoundProvider = Nothing
+                                                  _active.TryRemove(sound.Id, removed)
+                                              End If
+                                          End Sub
     End Sub
 
     Public Shared ReadOnly Property Instance As AudioService
         Get
-            If _instance Is Nothing Then
-                SyncLock _lock
-                    If _instance Is Nothing Then
-                        _instance = New AudioService()
-                    End If
-                End SyncLock
-            End If
             Return _instance
         End Get
     End Property
 
-    ' Воспроизвести звук поверх текущего.
-    ' Короткие SFX диспозятся автоматически после проигрывания.
-    Public Sub Play(filePath As String, Optional volume As Single = 1.0F)
-        SyncLock _mixerLock
-            Dim reader As New AudioFileReader(filePath)
-            _mixer.AddMixerInput(PrepareSampleProvider(reader, volume))
-        End SyncLock
-    End Sub
-    Public Sub Play(resourceData As Byte(), Optional volume As Single = 1.0F)
-        SyncLock _mixerLock
-            Dim ms As New MemoryStream(resourceData)
-            Dim reader As New WaveFileReader(ms)
-            _mixer.AddMixerInput(PrepareSampleProvider(reader.ToSampleProvider(), volume))
-        End SyncLock
-    End Sub
-
-
-    ' Перегрузка для UnmanagedMemoryStream (некоторые ресурсы возвращают его)
-    Public Sub Play(resourceStream As Stream, Optional volume As Single = 1.0F)
-        SyncLock _mixerLock
-            Dim ms As New MemoryStream()
-            resourceStream.CopyTo(ms)
-            ms.Position = 0
-
-            Dim reader As New WaveFileReader(ms)
-            Dim sampleProvider = reader.ToSampleProvider()
-
-            ' Приводим к формату микшера (44100 Hz, Stereo)
-            If Not sampleProvider.WaveFormat.Equals(_mixer.WaveFormat) Then
-                sampleProvider = New MediaFoundationResampler(
-                    sampleProvider.ToWaveProvider(),
-                    _mixer.WaveFormat
-                ).ToSampleProvider()
-            End If
-
-            If Math.Abs(volume - 1.0F) > 0.001F Then
-                sampleProvider = New VolumeSampleProvider(sampleProvider) With {.Volume = volume}
-            End If
-
-            _mixer.AddMixerInput(sampleProvider)
-        End SyncLock
-    End Sub
-
-    ' Остановить все звуки (кроме фонового режима ReadFully)
-    Public Sub StopAll()
-        SyncLock _mixerLock
-            _mixer.RemoveAllMixerInputs()
-            _activeInputs.Clear()
-        End SyncLock
-    End Sub
-    Public Function PlayStoppable(resourceData As Byte(), Optional volume As Single = 1.0F) As Guid
-        Dim id = Guid.NewGuid()
-
-        SyncLock _mixerLock
-            Dim ms As New MemoryStream(resourceData)
-            Dim reader As New WaveFileReader(ms)
-            Dim sampleProvider = reader.ToSampleProvider()
-
-            If Math.Abs(volume - 1.0F) > 0.001F Then
-                sampleProvider = New VolumeSampleProvider(sampleProvider) With {.Volume = volume}
-            End If
-
-            ' Оборачиваем в провайдер, который можно удалить из микшера
-            Dim tracked = New TrackedSampleProvider(sampleProvider, id)
-            _activeInputs.Add(tracked)
-            _mixer.AddMixerInput(tracked)
-        End SyncLock
-
-        Return id
+    Public Function Play(cue As SoundCue, Optional channel As AudioChannel = AudioChannel.Effect) As Guid
+        Try
+            SyncLock _gate
+                If _disposed OrElse Not Enabled Then Return Guid.Empty
+                If Not _cache.ContainsKey(cue) Then _cache.Add(cue, Decode(cue))
+                If _output Is Nothing Then
+                    Dim output As New WaveOutEvent()
+                    Try
+                        output.Init(_mixer)
+                        AddHandler output.PlaybackStopped, AddressOf OnPlaybackStopped
+                        output.Play()
+                        _output = output
+                    Catch
+                        output.Dispose()
+                        Throw
+                    End Try
+                End If
+                StopChannel(channel)
+                Dim sound As New CachedSoundProvider(_cache(cue), channel, _mixer.WaveFormat)
+                _active.TryAdd(sound.Id, sound)
+                _mixer.AddMixerInput(sound)
+                If _output.PlaybackState <> PlaybackState.Playing Then _output.Play()
+                Return sound.Id
+            End SyncLock
+        Catch ex As Exception
+            RaiseEvent AudioError("Звук недоступен: " & ex.Message)
+            Return Guid.Empty
+        End Try
     End Function
 
-    ''' <summary>
-    ''' Остановить конкретный звук по ID
-    ''' </summary>
     Public Sub [Stop](id As Guid)
-        SyncLock _mixerLock
-            Dim input = _activeInputs.OfType(Of TrackedSampleProvider)().
-            FirstOrDefault(Function(t) t.Id = id)
-
-            If input IsNot Nothing Then
-                _mixer.RemoveMixerInput(input)
-                _activeInputs.Remove(input)
-            End If
+        SyncLock _gate
+            Dim sound As CachedSoundProvider = Nothing
+            If _active.TryRemove(id, sound) Then _mixer.RemoveMixerInput(sound)
         End SyncLock
     End Sub
 
-    ''' <summary>
-    ''' Остановить всё и освободить ресурсы.
-    ''' Вызывать при закрытии приложения.
-    ''' </summary>
-    Public Sub Shutdown()
-        SyncLock _mixerLock
-            _waveOut?.Stop()
-            _waveOut?.Dispose()
+    Public Sub StopChannel(channel As AudioChannel)
+        SyncLock _gate
+            For Each pair In _active.ToArray()
+                If pair.Value.Channel = channel Then [Stop](pair.Key)
+            Next
         End SyncLock
     End Sub
-    Private Function PrepareSampleProvider(source As ISampleProvider, volume As Single) As ISampleProvider
-        ' Приведение к формату микшера
-        If Not source.WaveFormat.Equals(_mixer.WaveFormat) Then
-            source = New MediaFoundationResampler(
-                source.ToWaveProvider(),
-                _mixer.WaveFormat
-            ).ToSampleProvider()
-        End If
 
-        ' Регулировка громкости
-        If Math.Abs(volume - 1.0F) > 0.001F Then
-            source = New VolumeSampleProvider(source) With {.Volume = volume}
-        End If
-
-        Return source
-    End Function
-End Class
-
-''' <summary>
-''' Обёртка вокруг ISampleProvider для идентификации и удаления из микшера
-''' </summary>
-Public Class TrackedSampleProvider
-    Implements ISampleProvider
-
-    Public ReadOnly Property Id As Guid
-    Private ReadOnly _source As ISampleProvider
-
-    Public Sub New(source As ISampleProvider, id As Guid)
-        _source = source
-        Me.Id = id
+    Public Sub StopAll()
+        SyncLock _gate
+            _mixer.RemoveAllMixerInputs()
+            _active.Clear()
+        End SyncLock
     End Sub
 
-    Public ReadOnly Property WaveFormat As WaveFormat Implements ISampleProvider.WaveFormat
-        Get
-            Return _source.WaveFormat
-        End Get
-    End Property
+    Private Sub OnPlaybackStopped(sender As Object, e As StoppedEventArgs)
+        If e.Exception IsNot Nothing Then RaiseEvent AudioError("Ошибка аудиоустройства: " & e.Exception.Message)
+    End Sub
 
-    Public Function Read(buffer As Single(), offset As Integer, count As Integer) As Integer _
-        Implements ISampleProvider.Read
-        Return _source.Read(buffer, offset, count)
+    Private Shared Function OpenResource(cue As SoundCue) As Stream
+        Select Case cue
+            Case SoundCue.OpenAnswer : Return My.Resources._26_open
+            Case SoundCue.NoScore : Return My.Resources._26_noscore
+            Case SoundCue.WrongAnswer : Return My.Resources._26_wrong
+            Case SoundCue.BigWrong : Return My.Resources._26_bigwrong
+            Case SoundCue.SameAnswer : Return My.Resources._26_same
+            Case SoundCue.Transfer : Return My.Resources.bing
+            Case SoundCue.Victory : Return My.Resources._26_win
+            Case SoundCue.Buzzer : Return My.Resources._26_buzzer
+            Case SoundCue.Countdown20 : Return My.Resources._20sec
+            Case SoundCue.Countdown25 : Return My.Resources._25sec
+            Case SoundCue.Reveal1 : Return My.Resources.ff_reveal1
+            Case SoundCue.Reveal2 : Return My.Resources.ff_reveal2
+            Case SoundCue.Reveal3 : Return My.Resources.ff_reveal3
+            Case SoundCue.Reveal4 : Return My.Resources.ff_reveal4
+            Case SoundCue.Reveal5 : Return My.Resources.ff_reveal5
+            Case SoundCue.EasterEgg : Return My.Resources.run
+            Case Else : Throw New ArgumentOutOfRangeException(NameOf(cue))
+        End Select
     End Function
+
+    Private Function Decode(cue As SoundCue) As Single()
+        Using stream = OpenResource(cue), reader As New WaveFileReader(stream)
+            Dim provider = reader.ToSampleProvider()
+            If provider.WaveFormat.Channels = 1 Then provider = New MonoToStereoSampleProvider(provider)
+            If provider.WaveFormat.Channels <> 2 Then Throw New InvalidDataException("Ожидается моно или стерео WAV.")
+            If provider.WaveFormat.SampleRate <> 48000 Then provider = New WdlResamplingSampleProvider(provider, 48000)
+            Dim samples As New List(Of Single)()
+            Dim buffer(8191) As Single
+            Do
+                Dim count = provider.Read(buffer, 0, buffer.Length)
+                If count = 0 Then Exit Do
+                For i = 0 To count - 1
+                    samples.Add(buffer(i))
+                Next
+            Loop
+            Return samples.ToArray()
+        End Using
+    End Function
+
+    Public Sub Dispose() Implements IDisposable.Dispose
+        Dim output As WaveOutEvent
+        SyncLock _gate
+            If _disposed Then Return
+            _disposed = True
+            output = _output
+            _output = Nothing
+            StopAll()
+            _cache.Clear()
+        End SyncLock
+        If output IsNot Nothing Then
+            RemoveHandler output.PlaybackStopped, AddressOf OnPlaybackStopped
+            output.Stop()
+            output.Dispose()
+        End If
+    End Sub
+
+    Private NotInheritable Class CachedSoundProvider
+        Implements ISampleProvider
+        Public ReadOnly Id As Guid = Guid.NewGuid()
+        Public ReadOnly Channel As AudioChannel
+        Private ReadOnly _samples As Single()
+        Private _position As Integer
+        Public ReadOnly Property WaveFormat As WaveFormat Implements ISampleProvider.WaveFormat
+
+        Public Sub New(samples As Single(), channel As AudioChannel, format As WaveFormat)
+            _samples = samples
+            Me.Channel = channel
+            WaveFormat = format
+        End Sub
+
+        Public Function Read(buffer As Single(), offset As Integer, count As Integer) As Integer Implements ISampleProvider.Read
+            Dim available = Math.Min(count, _samples.Length - _position)
+            Array.Copy(_samples, _position, buffer, offset, available)
+            _position += available
+            Return available
+        End Function
+    End Class
 End Class

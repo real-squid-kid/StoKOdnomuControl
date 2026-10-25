@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<?xml version='1.0' encoding='utf-8'?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -22,7 +22,6 @@
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
     <DocumentationFile>StoKOdnomuControl.xml</DocumentationFile>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -33,7 +32,6 @@
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DocumentationFile>StoKOdnomuControl.xml</DocumentationFile>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
@@ -43,7 +41,7 @@
     <OptionCompare>Binary</OptionCompare>
   </PropertyGroup>
   <PropertyGroup>
-    <OptionStrict>Off</OptionStrict>
+    <OptionStrict>On</OptionStrict>
   </PropertyGroup>
   <PropertyGroup>
     <OptionInfer>On</OptionInfer>
@@ -55,23 +53,8 @@
     <Reference Include="Microsoft.Win32.Registry, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Win32.Registry.4.7.0\lib\net461\Microsoft.Win32.Registry.dll</HintPath>
     </Reference>
-    <Reference Include="NAudio, Version=2.3.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
-      <HintPath>..\packages\NAudio.2.3.0\lib\net472\NAudio.dll</HintPath>
-    </Reference>
-    <Reference Include="NAudio.Asio, Version=2.3.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
-      <HintPath>..\packages\NAudio.Asio.2.3.0\lib\netstandard2.0\NAudio.Asio.dll</HintPath>
-    </Reference>
     <Reference Include="NAudio.Core, Version=2.3.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
       <HintPath>..\packages\NAudio.Core.2.3.0\lib\netstandard2.0\NAudio.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="NAudio.Midi, Version=2.3.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
-      <HintPath>..\packages\NAudio.Midi.2.3.0\lib\netstandard2.0\NAudio.Midi.dll</HintPath>
-    </Reference>
-    <Reference Include="NAudio.Wasapi, Version=2.3.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
-      <HintPath>..\packages\NAudio.Wasapi.2.3.0\lib\netstandard2.0\NAudio.Wasapi.dll</HintPath>
-    </Reference>
-    <Reference Include="NAudio.WinForms, Version=2.3.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
-      <HintPath>..\packages\NAudio.WinForms.2.3.0\lib\net472\NAudio.WinForms.dll</HintPath>
     </Reference>
     <Reference Include="NAudio.WinMM, Version=2.3.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
       <HintPath>..\packages\NAudio.WinMM.2.3.0\lib\netstandard2.0\NAudio.WinMM.dll</HintPath>
@@ -128,9 +111,12 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="AudioService.vb" />
-    <Compile Include="BigGameControl.Designer.vb">
-      <DependentUpon>BigGameControl.vb</DependentUpon>
-    </Compile>
+    <Compile Include="GameState.vb" />
+    <Compile Include="GameSession.vb" />
+    <Compile Include="QuestionBankReader.vb" />
+    <Compile Include="OperatorUi.vb" />
+    <Compile Include="BoardLayout.vb" />
+    <Compile Include="Countdown.vb" />
     <Compile Include="BigGameControl.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -142,10 +128,6 @@
     </Compile>
     <Compile Include="BuzzManager.vb" />
     <Compile Include="Form1.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Form1.Designer.vb">
-      <DependentUpon>Form1.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -180,14 +162,8 @@
     <EmbeddedResource Include="AboutBox1.resx">
       <DependentUpon>AboutBox1.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="BigGameControl.resx">
-      <DependentUpon>BigGameControl.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="BigGameTablo.resx">
       <DependentUpon>BigGameTablo.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
@@ -219,70 +195,17 @@
     <None Include="Resources\bing.wav" />
   </ItemGroup>
   <ItemGroup>
-    <COMReference Include="AxWMPLib">
-      <Guid>{6BF52A50-394A-11D3-B153-00C04F79FAA6}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>aximp</WrapperTool>
-      <Isolated>False</Isolated>
-    </COMReference>
-    <COMReference Include="WMPLib">
-      <Guid>{6BF52A50-394A-11D3-B153-00C04F79FAA6}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Digital Dismay.otf" />
-    <None Include="Resources\digital-7 %28mono%29.ttf" />
-    <None Include="Resources\line_wrong.wav" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\wrong.wav" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\line_open.wav" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\prosto_open_first.wav" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\prosto_wrong.wav" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\prosto_open.wav" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\sto_layout_main.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\sto_layout_big.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\prosto_duplicate.wav" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\1995_sto_main.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\1995_sto_big.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\duplicate.wav" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\alarm.wav" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\sto_dulpicate.wav" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="base.txt" />
+    <Content Include="*.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Новый дизигн\static\JetBrainsMono-Regular.ttf;Новый дизигн\static\JetBrainsMono-Bold.ttf">
+      <Link>Fonts\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Новый дизигн\OFL.txt">
+      <Link>Fonts\OFL.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Resources\2026\25sec.wav" />
     <None Include="Resources\2026\20sec.wav" />
     <None Include="Resources\2026\26_buzzer.wav" />
@@ -298,24 +221,11 @@
     <None Include="Resources\2026\26_main.jpg" />
     <None Include="Resources\2026\26_chance_r.png" />
     <None Include="Resources\2026\26_chance_l.png" />
-    <None Include="Новый дизигн\strike_left.png" />
-    <None Include="Новый дизигн\life_right.png" />
-    <None Include="Новый дизигн\life_left.png" />
-    <None Include="Новый дизигн\Осн игра new.jpg" />
-    <None Include="Новый дизигн\Блиц new.jpg" />
-    <None Include="Новый дизигн\strike_right.png" />
-    <None Include="Новые звуки\wrong_new.wav" />
-    <None Include="Новые звуки\same_new.wav" />
-    <None Include="Новые звуки\no_score_new.wav" />
-    <None Include="Новые звуки\line_new.wav" />
-    <None Include="Новые звуки\line_first_new.wav" />
     <None Include="Новые звуки\ff_reveal5.wav" />
     <None Include="Новые звуки\ff_reveal4.wav" />
     <None Include="Новые звуки\ff_reveal3.wav" />
     <None Include="Новые звуки\ff_reveal2.wav" />
     <None Include="Новые звуки\ff_reveal1.wav" />
-    <None Include="Resources\Осн игра.png" />
-    <None Include="Resources\Большая игра.png" />
     <None Include="Resources\run.wav" />
     <None Include="Resources\download.png" />
   </ItemGroup>

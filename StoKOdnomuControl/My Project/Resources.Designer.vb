@@ -22,10 +22,10 @@ Namespace My.Resources
     '''<summary>
     '''  Класс ресурса со строгой типизацией для поиска локализованных строк и т.д.
     '''</summary>
-    <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0"),  _
+    <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0"),  _
      Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
      Global.System.Runtime.CompilerServices.CompilerGeneratedAttribute(),  _
-     Global.Microsoft.VisualBasic.HideModuleNameAttribute()>  _
+     Microsoft.VisualBasic.HideModuleNameAttribute()>  _
     Friend Module Resources
         
         Private resourceMan As Global.System.Resources.ResourceManager
@@ -58,26 +58,6 @@ Namespace My.Resources
             Set
                 resourceCulture = value
             End Set
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        '''</summary>
-        Friend ReadOnly Property _1995_sto_big() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("_1995_sto_big", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        '''</summary>
-        Friend ReadOnly Property _1995_sto_main() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("_1995_sto_main", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
         End Property
         
         '''<summary>
@@ -224,15 +204,6 @@ Namespace My.Resources
         '''<summary>
         '''  Поиск локализованного ресурса типа System.IO.UnmanagedMemoryStream, аналогичного System.IO.MemoryStream.
         '''</summary>
-        Friend ReadOnly Property alarm() As System.IO.UnmanagedMemoryStream
-            Get
-                Return ResourceManager.GetStream("alarm", resourceCulture)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.IO.UnmanagedMemoryStream, аналогичного System.IO.MemoryStream.
-        '''</summary>
         Friend ReadOnly Property bing() As System.IO.UnmanagedMemoryStream
             Get
                 Return ResourceManager.GetStream("bing", resourceCulture)
@@ -246,15 +217,6 @@ Namespace My.Resources
             Get
                 Dim obj As Object = ResourceManager.GetObject("download", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.IO.UnmanagedMemoryStream, аналогичного System.IO.MemoryStream.
-        '''</summary>
-        Friend ReadOnly Property duplicate() As System.IO.UnmanagedMemoryStream
-            Get
-                Return ResourceManager.GetStream("duplicate", resourceCulture)
             End Get
         End Property
         
@@ -304,228 +266,11 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        '''</summary>
-        Friend ReadOnly Property life_left() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("life_left", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        '''</summary>
-        Friend ReadOnly Property life_right() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("life_right", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.IO.UnmanagedMemoryStream, аналогичного System.IO.MemoryStream.
-        '''</summary>
-        Friend ReadOnly Property line_first_new() As System.IO.UnmanagedMemoryStream
-            Get
-                Return ResourceManager.GetStream("line_first_new", resourceCulture)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.IO.UnmanagedMemoryStream, аналогичного System.IO.MemoryStream.
-        '''</summary>
-        Friend ReadOnly Property line_new() As System.IO.UnmanagedMemoryStream
-            Get
-                Return ResourceManager.GetStream("line_new", resourceCulture)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.IO.UnmanagedMemoryStream, аналогичного System.IO.MemoryStream.
-        '''</summary>
-        Friend ReadOnly Property line_open() As System.IO.UnmanagedMemoryStream
-            Get
-                Return ResourceManager.GetStream("line_open", resourceCulture)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.IO.UnmanagedMemoryStream, аналогичного System.IO.MemoryStream.
-        '''</summary>
-        Friend ReadOnly Property line_wrong() As System.IO.UnmanagedMemoryStream
-            Get
-                Return ResourceManager.GetStream("line_wrong", resourceCulture)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.IO.UnmanagedMemoryStream, аналогичного System.IO.MemoryStream.
-        '''</summary>
-        Friend ReadOnly Property no_score_new() As System.IO.UnmanagedMemoryStream
-            Get
-                Return ResourceManager.GetStream("no_score_new", resourceCulture)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.IO.UnmanagedMemoryStream, аналогичного System.IO.MemoryStream.
-        '''</summary>
-        Friend ReadOnly Property prosto_duplicate() As System.IO.UnmanagedMemoryStream
-            Get
-                Return ResourceManager.GetStream("prosto_duplicate", resourceCulture)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.IO.UnmanagedMemoryStream, аналогичного System.IO.MemoryStream.
-        '''</summary>
-        Friend ReadOnly Property prosto_open() As System.IO.UnmanagedMemoryStream
-            Get
-                Return ResourceManager.GetStream("prosto_open", resourceCulture)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.IO.UnmanagedMemoryStream, аналогичного System.IO.MemoryStream.
-        '''</summary>
-        Friend ReadOnly Property prosto_open_first() As System.IO.UnmanagedMemoryStream
-            Get
-                Return ResourceManager.GetStream("prosto_open_first", resourceCulture)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.IO.UnmanagedMemoryStream, аналогичного System.IO.MemoryStream.
-        '''</summary>
-        Friend ReadOnly Property prosto_wrong() As System.IO.UnmanagedMemoryStream
-            Get
-                Return ResourceManager.GetStream("prosto_wrong", resourceCulture)
-            End Get
-        End Property
-        
-        '''<summary>
         '''  Поиск локализованного ресурса типа System.IO.UnmanagedMemoryStream, аналогичного System.IO.MemoryStream.
         '''</summary>
         Friend ReadOnly Property run() As System.IO.UnmanagedMemoryStream
             Get
                 Return ResourceManager.GetStream("run", resourceCulture)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.IO.UnmanagedMemoryStream, аналогичного System.IO.MemoryStream.
-        '''</summary>
-        Friend ReadOnly Property same_new() As System.IO.UnmanagedMemoryStream
-            Get
-                Return ResourceManager.GetStream("same_new", resourceCulture)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.IO.UnmanagedMemoryStream, аналогичного System.IO.MemoryStream.
-        '''</summary>
-        Friend ReadOnly Property sto_dulpicate() As System.IO.UnmanagedMemoryStream
-            Get
-                Return ResourceManager.GetStream("sto_dulpicate", resourceCulture)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        '''</summary>
-        Friend ReadOnly Property sto_layout_big() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("sto_layout_big", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        '''</summary>
-        Friend ReadOnly Property sto_layout_main() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("sto_layout_main", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        '''</summary>
-        Friend ReadOnly Property strike_left() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("strike_left", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        '''</summary>
-        Friend ReadOnly Property strike_right() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("strike_right", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.IO.UnmanagedMemoryStream, аналогичного System.IO.MemoryStream.
-        '''</summary>
-        Friend ReadOnly Property wrong() As System.IO.UnmanagedMemoryStream
-            Get
-                Return ResourceManager.GetStream("wrong", resourceCulture)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.IO.UnmanagedMemoryStream, аналогичного System.IO.MemoryStream.
-        '''</summary>
-        Friend ReadOnly Property wrong_new() As System.IO.UnmanagedMemoryStream
-            Get
-                Return ResourceManager.GetStream("wrong_new", resourceCulture)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        '''</summary>
-        Friend ReadOnly Property Блиц_new() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("Блиц_new", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        '''</summary>
-        Friend ReadOnly Property Большая_игра() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("Большая_игра", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        '''</summary>
-        Friend ReadOnly Property Осн_игра() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("Осн_игра", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        '''</summary>
-        Friend ReadOnly Property Осн_игра_new() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("Осн_игра_new", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
     End Module
