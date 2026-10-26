@@ -192,8 +192,11 @@ Public NotInheritable Class AudioService
         ' блокировку, которую удерживал бы UI-поток во время ожидания Stop.
         If output IsNot Nothing Then
             RemoveHandler output.PlaybackStopped, AddressOf OnPlaybackStopped
-            output.Stop()
-            output.Dispose()
+            Try
+                output.Stop()
+            Finally
+                output.Dispose()
+            End Try
         End If
     End Sub
 

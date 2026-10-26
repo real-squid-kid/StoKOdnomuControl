@@ -130,6 +130,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="BuzzManager.vb" />
+    <Compile Include="BuzzReceiver.vb" />
     <Compile Include="Form1.vb">
       <SubType>Form</SubType>
     </Compile>

@@ -1,10 +1,7 @@
 Option Strict On
-Imports System.IO
 Imports System.Diagnostics
-Imports System.Runtime.InteropServices
 Imports System.Threading
 Imports System.Threading.Tasks
-Imports HidLibrary
 
 ' Арбитраж отделён от USB, чтобы проверить его без приёмника.
 ' Несколько новых нажатий в одном отчёте дают ничью, а не преимущество младшего номера.
@@ -45,198 +42,230 @@ Public Class BuzzerGate
     End Function
 End Class
 
+Public Enum BuzzState
+    Disconnected
+    Connecting
+    Ready
+    Armed
+    Winner
+    Tie
+    Faulted
+    Disposed
+End Enum
+
+' Неизменяемый снимок. Кнопки определяются состоянием, а не словами в Message.
+Public NotInheritable Class BuzzStatus
+    Public ReadOnly Property State As BuzzState
+    Public ReadOnly Property Message As String
+    Public ReadOnly Property Warning As String
+    Public ReadOnly Property WinningPad As Integer
+
+    Public Sub New(state As BuzzState, Optional message As String = "", Optional winner As Integer = -1, Optional warning As String = "")
+        Me.State = state
+        Me.Message = message
+        WinningPad = winner
+        Me.Warning = warning
+    End Sub
+
+    Public ReadOnly Property CanConnect As Boolean
+        Get
+            Return State = BuzzState.Disconnected OrElse State = BuzzState.Faulted
+        End Get
+    End Property
+    Public ReadOnly Property CanArm As Boolean
+        Get
+            Return State = BuzzState.Ready OrElse State = BuzzState.Winner OrElse State = BuzzState.Tie
+        End Get
+    End Property
+    Public ReadOnly Property CanDisarm As Boolean
+        Get
+            Return State = BuzzState.Armed
+        End Get
+    End Property
+End Class
+
 Public NotInheritable Class BuzzManager
     Implements IDisposable
     Public Event BuzzerPressed(pad As Integer)
-    Public Event SimultaneousPress()
-    Public Event StatusChanged(message As String)
-    Private Const VendorId As Integer = &H54C
-    Private Const ProductId As Integer = &H1000
-    Private Const HidSuccess As Integer = &H110000
+    Public Event StatusChanged As EventHandler
     Private ReadOnly _gate As New Object()
-    ' UI меняет допуск, рабочий поток принимает отчёты; общие поля защищаются _gate.
+    Private ReadOnly _openReceiver As Func(Of IBuzzReceiver)
+    Private _status As New BuzzStatus(BuzzState.Disconnected, "Не подключён")
     Private _input As New BuzzerGate()
-    Private _device As HidDevice
-    Private _worker As Task
     Private _cancel As CancellationTokenSource
-    Private _preparsed As IntPtr
+    Private _worker As Task = Task.CompletedTask
+    Private _disposed As Boolean
     Private _activePad As Integer = -1
     Private _ledDirty As Boolean
     Private _lastLed As Boolean
     Private ReadOnly _blink As New Stopwatch()
 
-    Public Sub Initialize()
-        ' Сначала завершаем прежний цикл. Новый запуск не должен читать другой приёмник,
-        ' пока старый ещё использует общий указатель дескриптора _preparsed.
-        StopWorker()
-        Dim device As HidDevice = Nothing
-        Try
-            Dim devices = HidDevices.Enumerate(VendorId, ProductId).ToArray()
-            If devices.Length = 0 Then
-                RaiseEvent StatusChanged("Buzz!: приёмник не найден. Подключите USB и нажмите «Подключить Buzz!».")
-                Return
-            End If
-            If devices.Length > 1 Then Throw New InvalidOperationException("Найдено несколько приёмников Buzz!. Оставьте подключённым один.")
-            device = devices(0)
-            ' Чтение и лампы относятся к одному VID/PID-устройству. Overlapped позволяет
-            ' Read(100) регулярно проверять отмену, вместо зависания UI на чтении USB.
-            device.OpenDevice(DeviceMode.Overlapped, DeviceMode.Overlapped, ShareMode.ShareRead Or ShareMode.ShareWrite)
-            If Not device.IsOpen Then Throw New InvalidOperationException("Не удалось открыть приёмник.")
-            If Not HidD_GetPreparsedData(device.ReadHandle, _preparsed) Then Throw New InvalidOperationException("Не удалось прочитать описание кнопок приёмника.")
-            _device = device
-            _input = New BuzzerGate()
-            _activePad = -1
-            _ledDirty = True
-            _cancel = New CancellationTokenSource()
-            Dim token = _cancel.Token
-            _worker = Task.Run(Sub() ReadLoop(device, token))
-            RaiseEvent StatusChanged("Buzz!: подключён, кнопки заблокированы. Нажмите «Разрешить Buzz!» перед розыгрышем.")
-        Catch ex As Exception
-            If _preparsed <> IntPtr.Zero Then
-                HidD_FreePreparsedData(_preparsed)
-                _preparsed = IntPtr.Zero
-            End If
-            If device IsNot Nothing Then device.Dispose()
-            _device = Nothing
-            RaiseEvent StatusChanged("Buzz!: " & ex.Message)
-        End Try
+    Public Sub New(Optional openReceiver As Func(Of IBuzzReceiver) = Nothing)
+        _openReceiver = If(openReceiver, AddressOf HidBuzzReceiver.Open)
     End Sub
+
+    Public ReadOnly Property Status As BuzzStatus
+        Get
+            SyncLock _gate
+                Return _status
+            End SyncLock
+        End Get
+    End Property
+
+    Public Function ConnectAsync() As Task
+        Dim ready As New TaskCompletionSource(Of Boolean)(TaskCreationOptions.RunContinuationsAsynchronously)
+        SyncLock _gate
+            If _disposed Then Throw New ObjectDisposedException(NameOf(BuzzManager))
+            If Not _status.CanConnect Then Return Task.CompletedTask
+            Dim previous = _worker
+            Dim cancellation As New CancellationTokenSource()
+            _cancel = cancellation
+            _status = New BuzzStatus(BuzzState.Connecting, "Поиск приёмника…")
+            ' И поиск, и ожидание прежнего чтения происходят вне UI. Старый цикл
+            ' полностью освобождает свой HID-дескриптор до открытия следующего.
+            _worker = Task.Run(Sub() RunConnection(previous, cancellation, ready))
+        End SyncLock
+        NotifyStatus()
+        Return ready.Task
+    End Function
 
     Public Sub Arm()
         SyncLock _gate
-            If _device Is Nothing Then Throw New InvalidOperationException("Сначала подключите приёмник Buzz!.")
+            If Not _status.CanArm Then Throw New InvalidOperationException("Приёмник Buzz! не готов к розыгрышу.")
             _input.Arm()
             _activePad = -1
             _ledDirty = True
+            _status = New BuzzStatus(BuzzState.Armed, "Ожидание нажатия", warning:=_status.Warning)
         End SyncLock
-        RaiseEvent StatusChanged("Buzz!: приём ответов разрешён. Если кнопка удерживается, отпустите её перед новым нажатием.")
+        NotifyStatus()
     End Sub
 
     Public Sub Disarm()
-        ' Блокируем новый ответ и гасим лампу; история игрового счёта от этого не меняется.
         SyncLock _gate
             _input.Disarm()
             _activePad = -1
             _ledDirty = True
+            ' Сброс раунда допустим и без USB. Он не делает отключённый приёмник готовым.
+            If Not _status.CanArm AndAlso Not _status.CanDisarm Then Return
+            _status = New BuzzStatus(BuzzState.Ready, "Приём заблокирован", warning:=_status.Warning)
         End SyncLock
-        RaiseEvent StatusChanged("Buzz!: приём ответов заблокирован.")
+        NotifyStatus()
     End Sub
 
-    Private Sub ReadLoop(device As HidDevice, token As CancellationToken)
-        ' Цикл работает в Task, не в WinForms.Timer. Здесь нельзя обращаться к контролам:
-        ' владелец переводит события в UI-поток через OperatorUi.OnUi.
+    Private Sub RunConnection(previous As Task, cancellation As CancellationTokenSource, ready As TaskCompletionSource(Of Boolean))
+        Dim receiver As IBuzzReceiver = Nothing
+        Dim terminal = New BuzzStatus(BuzzState.Disconnected, "Не подключён")
         Try
-            While Not token.IsCancellationRequested
-                Dim data = device.Read(100)
-                If token.IsCancellationRequested Then Exit While
-                Select Case data.Status
-                    Case HidDeviceData.ReadStatus.Success
-                        Dim mask = DecodeReport(data.Data)
-                        Dim winner As Integer
-                        SyncLock _gate
-                            winner = _input.Accept(mask)
-                            If winner >= 0 Then
-                                _activePad = winner
-                                _blink.Restart()
-                                _ledDirty = True
-                            End If
-                        End SyncLock
-                        If winner >= 0 Then RaiseEvent BuzzerPressed(winner)
-                        If winner = -2 Then RaiseEvent SimultaneousPress()
-                    Case HidDeviceData.ReadStatus.WaitTimedOut, HidDeviceData.ReadStatus.NoDataRead
-                        ' Приёмник может молчать до изменения кнопок; тайм-аут ещё не потеря связи.
-                    Case Else
-                        Throw New IOException("Приёмник отключён или ошибка чтения. Подключите его заново.")
-                End Select
-                UpdateLeds(device)
+            previous.GetAwaiter().GetResult()
+            If cancellation.IsCancellationRequested Then Return
+            receiver = _openReceiver()
+            If receiver Is Nothing Then Return
+            SyncLock _gate
+                If cancellation.IsCancellationRequested Then Return
+                _input = New BuzzerGate()
+                _activePad = -1
+                _ledDirty = True
+                _status = New BuzzStatus(BuzzState.Ready, "Приём заблокирован")
+            End SyncLock
+            NotifyStatus()
+            ready.TrySetResult(True)
+            While Not cancellation.IsCancellationRequested
+                Dim mask = receiver.ReadButtons()
+                If cancellation.IsCancellationRequested Then Exit While
+                Dim winner = -1
+                If mask.HasValue Then
+                    SyncLock _gate
+                        winner = _input.Accept(mask.Value)
+                        If winner >= 0 Then
+                            _activePad = winner
+                            _blink.Restart()
+                            _ledDirty = True
+                            _status = New BuzzStatus(BuzzState.Winner, "Первым нажал пульт " & (winner + 1), winner, _status.Warning)
+                        ElseIf winner = -2 Then
+                            _status = New BuzzStatus(BuzzState.Tie, "Ничья · переигровка", warning:=_status.Warning)
+                        End If
+                    End SyncLock
+                End If
+                If winner <> -1 Then NotifyStatus()
+                If winner >= 0 Then RaiseEvent BuzzerPressed(winner)
+                UpdateLeds(receiver)
             End While
         Catch ex As Exception
-            RaiseEvent StatusChanged("Buzz!: " & ex.Message)
+            terminal = New BuzzStatus(BuzzState.Faulted, ex.Message)
         Finally
-            ' Очистка выполняется и при отмене, и при отключении USB/ошибке разбора.
-            ' Указатель preparsed освобождается только после завершения чтения.
+            ' Ни UI, ни повторный Connect не закрывают handle во время ReadButtons.
+            If receiver IsNot Nothing Then
+                Try
+                    receiver.SetLamp(-1, False)
+                Catch ex As Exception
+                    Debug.WriteLine(ex.Message)
+                End Try
+                Try
+                    receiver.Dispose()
+                Catch ex As Exception
+                    Debug.WriteLine(ex.Message)
+                End Try
+            End If
             SyncLock _gate
                 _input.Disarm()
                 _activePad = -1
-                _device = Nothing
+                If Not _disposed Then _status = terminal
+                If _cancel Is cancellation Then _cancel = Nothing
+                cancellation.Dispose()
             End SyncLock
-            Try
-                WriteLeds(device, -1, False)
-            Catch ex As Exception
-                Debug.WriteLine(ex.Message)
-            End Try
-            If _preparsed <> IntPtr.Zero Then
-                HidD_FreePreparsedData(_preparsed)
-                _preparsed = IntPtr.Zero
-            End If
-            device.Dispose()
+            NotifyStatus()
+            ready.TrySetResult(False)
         End Try
     End Sub
 
-    Private Function DecodeReport(report As Byte()) As Integer
-        Dim usages(31) As UShort
-        Dim count As UInteger = CUInt(usages.Length)
-        ' HIDP_Input=0, Usage Page 9=кнопки. Windows разбирает фактический дескриптор,
-        ' поэтому здесь нет предположения о смещении байтов или выборе чужого WinMM-джойстика.
-        Dim result = HidP_GetUsages(0, 9US, 0US, usages, count, _preparsed, report, CUInt(report.Length))
-        If result <> HidSuccess Then Throw New InvalidDataException("Не удалось разобрать HID-отчёт кнопок (" & result.ToString("X8") & ").")
-        Dim mask As Integer
-        For i = 0 To CInt(count) - 1
-            Dim usage = CInt(usages(i))
-            ' Красные кнопки имеют usages 1, 6, 11, 16; цветные кнопки не участвуют в гонке.
-            If usage >= 1 AndAlso usage <= 16 AndAlso (usage - 1) Mod 5 = 0 Then mask = mask Or (1 << ((usage - 1) \ 5))
-        Next
-        Return mask
-    End Function
-
-    Private Sub UpdateLeds(device As HidDevice)
-        ' Мигание длится до 15 секунд, но не снимает блокировку арбитража.
-        ' Следующий розыгрыш разрешает только явная команда оператора Arm.
-        Dim pad As Integer
-        Dim light As Boolean
+    Private Sub UpdateLeds(receiver As IBuzzReceiver)
+        Dim pad As Integer, lit As Boolean
         SyncLock _gate
             pad = _activePad
-            light = pad >= 0 AndAlso _blink.Elapsed.TotalSeconds < 15 AndAlso (CLng(_blink.ElapsedMilliseconds) \ 125) Mod 2 = 0
-            If Not _ledDirty AndAlso light = _lastLed Then Return
-            _lastLed = light
+            lit = pad >= 0 AndAlso _blink.Elapsed.TotalSeconds < 15 AndAlso (CLng(_blink.ElapsedMilliseconds) \ 125) Mod 2 = 0
+            If Not _ledDirty AndAlso lit = _lastLed Then Return
+            _lastLed = lit
             _ledDirty = False
         End SyncLock
-        If Not WriteLeds(device, pad, light) Then RaiseEvent StatusChanged("Buzz!: кнопки читаются, но не удалось обновить лампы.")
+        Dim success As Boolean
+        Try
+            success = receiver.SetLamp(pad, lit)
+        Catch ex As Exception
+            Debug.WriteLine(ex.Message)
+        End Try
+        Dim warning = If(success, "", "Не удалось обновить лампы")
+        SyncLock _gate
+            If warning = _status.Warning OrElse _disposed Then Return
+            _status = New BuzzStatus(_status.State, _status.Message, _status.WinningPad, warning)
+        End SyncLock
+        ' Отказ ламп не блокирует рабочее чтение кнопок и не изображает потерю USB.
+        NotifyStatus()
     End Sub
 
-    Private Shared Function WriteLeds(device As HidDevice, pad As Integer, light As Boolean) As Boolean
-        ' Сохраняем формат LED-команды исходного приёмника: лампы в байтах 2..5.
-        ' Длина берётся не меньше прежних 8 байт и учитывает объявленную HID-длину.
-        Dim length = Math.Max(8, CInt(device.Capabilities.OutputReportByteLength))
-        Dim command(length - 1) As Byte
-        If pad >= 0 AndAlso pad <= 3 AndAlso light Then command(2 + pad) = &HFF
-        Return device.Write(command, 100)
+    Private Sub NotifyStatus()
+        ' Событие не содержит устаревающий снимок: UI читает актуальный Status,
+        ' даже если несколько сообщений успели накопиться в очереди BeginInvoke.
+        RaiseEvent StatusChanged(Me, EventArgs.Empty)
+    End Sub
+
+    Public Function ShutdownAsync() As Task
+        Dispose()
+        SyncLock _gate
+            Return _worker
+        End SyncLock
     End Function
-
-    Private Sub StopWorker()
-        ' Ждём только завершения фонового чтения. Устройство освобождает сам ReadLoop;
-        ' нельзя закрывать его handle из UI, пока нативное чтение ещё использует этот handle.
-        If _cancel Is Nothing Then Return
-        _cancel.Cancel()
-        If _worker IsNot Nothing AndAlso Not _worker.Wait(1500) Then Throw New InvalidOperationException("Buzz!: чтение ещё завершается. Повторите подключение через несколько секунд.")
-        _cancel.Dispose()
-        _cancel = Nothing
-        _worker = Nothing
-    End Sub
 
     Public Sub Dispose() Implements IDisposable.Dispose
-        StopWorker()
+        SyncLock _gate
+            If _disposed Then Return
+            _disposed = True
+            _input.Disarm()
+            If _cancel IsNot Nothing Then _cancel.Cancel()
+            _status = New BuzzStatus(BuzzState.Disposed)
+        End SyncLock
+        ' Освобождение выполняет worker; закрытие формы может дождаться ShutdownAsync,
+        ' продолжая обрабатывать сообщения Windows вместо синхронного Wait.
+        NotifyStatus()
     End Sub
-
-    <DllImport("hid.dll", SetLastError:=True)>
-    Private Shared Function HidD_GetPreparsedData(handle As IntPtr, ByRef data As IntPtr) As <MarshalAs(UnmanagedType.U1)> Boolean
-    End Function
-
-    <DllImport("hid.dll")>
-    Private Shared Function HidD_FreePreparsedData(data As IntPtr) As <MarshalAs(UnmanagedType.U1)> Boolean
-    End Function
-
-    <DllImport("hid.dll")>
-    Private Shared Function HidP_GetUsages(reportType As Integer, usagePage As UShort, linkCollection As UShort, <Out> usages As UShort(), ByRef count As UInteger, preparsed As IntPtr, report As Byte(), reportLength As UInteger) As Integer
-    End Function
 End Class
+

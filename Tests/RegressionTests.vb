@@ -3,6 +3,9 @@ Imports Microsoft.VisualBasic
 Imports System.Drawing
 Imports System.IO
 Imports System.Windows.Forms
+Imports System.Collections.Concurrent
+Imports System.Threading
+Imports System.Threading.Tasks
 Imports StoKOdnomuControl
 
 Module Checks
@@ -21,6 +24,7 @@ Module Checks
             TestMainGame(temporary)
             TestBigGame(temporary)
             TestBuzzer()
+            TestBuzzConnection()
             TestPersistence(temporary)
             TestCountdown()
             If args.Contains("--ui") Then TestUi(temporary)
@@ -178,9 +182,129 @@ Module Checks
         Check(gate.Accept(1) = -1, "explicit disarm")
     End Sub
 
+    Private NotInheritable Class FakeReceiver
+        Implements IBuzzReceiver
+        Public ReadOnly Inputs As New BlockingCollection(Of Integer)()
+        Public Failure As Exception
+        Public LampWorks As Boolean = True
+        Public DisposedCount As Integer
+        Public BeforeRead As Action
+
+        Public Function ReadButtons() As Integer? Implements IBuzzReceiver.ReadButtons
+            If BeforeRead IsNot Nothing Then BeforeRead()
+            If Failure IsNot Nothing Then Throw Failure
+            Dim mask As Integer
+            If Inputs.TryTake(mask, 20) Then Return mask
+            Return Nothing
+        End Function
+        Public Function SetLamp(pad As Integer, lit As Boolean) As Boolean Implements IBuzzReceiver.SetLamp
+            Return LampWorks
+        End Function
+        Public Sub Dispose() Implements IDisposable.Dispose
+            Interlocked.Increment(DisposedCount)
+        End Sub
+    End Class
+
+    Private Sub WaitFor(condition As Func(Of Boolean), description As String, Optional ui As Boolean = False)
+        Dim watch = Diagnostics.Stopwatch.StartNew()
+        While Not condition() AndAlso watch.ElapsedMilliseconds < 3000
+            If ui Then Application.DoEvents()
+            Thread.Sleep(5)
+        End While
+        Check(condition(), description)
+    End Sub
+
+    Private Sub TestBuzzConnection()
+        ' Реальный менеджер и его события, но управляемый источник HID-отчётов.
+        Using missing As New BuzzManager(Function() Nothing)
+            missing.ConnectAsync().GetAwaiter().GetResult()
+            Check(missing.Status.State = BuzzState.Disconnected AndAlso missing.Status.CanConnect, "missing receiver is a normal state")
+            Reject(Sub() missing.Arm(), "cannot arm missing receiver")
+            missing.Disarm()
+            Check(missing.Status.State = BuzzState.Disconnected, "round reset cannot invent connection")
+            missing.ShutdownAsync().GetAwaiter().GetResult()
+        End Using
+        Using opened As New ManualResetEventSlim(), release As New ManualResetEventSlim()
+            Dim first As New FakeReceiver With {.LampWorks = False}
+            Dim second As New FakeReceiver()
+            Dim attempts As Integer
+            Using manager As New BuzzManager(Function()
+                                                If Interlocked.Increment(attempts) = 1 Then
+                                                    opened.Set()
+                                                    release.Wait()
+                                                    Return first
+                                                End If
+                                                Return second
+                                            End Function)
+                Dim connecting = manager.ConnectAsync()
+                Check(opened.Wait(2000) AndAlso Not connecting.IsCompleted, "slow USB search runs outside caller")
+                Check(manager.Status.State = BuzzState.Connecting AndAlso Not manager.Status.CanArm AndAlso Not manager.Status.CanConnect, "commands disabled while connecting")
+                manager.ConnectAsync().GetAwaiter().GetResult()
+                Check(attempts = 1, "repeated click cannot start concurrent search")
+                release.Set()
+                connecting.GetAwaiter().GetResult()
+                WaitFor(Function() manager.Status.Warning <> "", "lamp failure reported")
+                Check(manager.Status.CanArm AndAlso manager.Status.State = BuzzState.Ready, "lamp failure does not disable input")
+                first.LampWorks = True
+                manager.Arm()
+                WaitFor(Function() manager.Status.Warning = "", "lamp recovery clears warning")
+                first.Inputs.Add(8)
+                WaitFor(Function() manager.Status.State = BuzzState.Winner, "manager accepts fourth pad")
+                Check(manager.Status.WinningPad = 3 AndAlso manager.Status.CanArm AndAlso Not manager.Status.CanDisarm, "winner locks input but allows explicit next round")
+                manager.Arm()
+                first.Inputs.Add(8)
+                Thread.Sleep(40)
+                Check(manager.Status.State = BuzzState.Armed, "held winning button cannot win new round")
+                first.Inputs.Add(0)
+                first.Inputs.Add(3)
+                WaitFor(Function() manager.Status.State = BuzzState.Tie, "manager reports same-report tie")
+                first.Failure = New IOException("test unplugged")
+                WaitFor(Function() manager.Status.State = BuzzState.Faulted, "unplug blocks hardware commands")
+                Check(manager.Status.CanConnect AndAlso Not manager.Status.CanArm AndAlso Not manager.Status.CanDisarm, "unplug availability")
+                manager.Disarm()
+                Check(manager.Status.State = BuzzState.Faulted, "disarm after unplug preserves fault")
+                Reject(Sub() manager.Arm(), "arm rechecks connection after unplug")
+                manager.ConnectAsync().GetAwaiter().GetResult()
+                Check(manager.Status.State = BuzzState.Ready AndAlso Not manager.Status.CanDisarm, "reconnect never rearms automatically")
+                Check(first.DisposedCount = 1, "old receiver disposed before new connection")
+                manager.ShutdownAsync().GetAwaiter().GetResult()
+                Check(second.DisposedCount = 1 AndAlso manager.Status.State = BuzzState.Disposed, "shutdown releases current receiver")
+            End Using
+        End Using
+        Using release As New ManualResetEventSlim(), entered As New ManualResetEventSlim()
+            Dim receiver As New FakeReceiver()
+            Using manager As New BuzzManager(Function()
+                                                entered.Set()
+                                                release.Wait()
+                                                Return receiver
+                                            End Function)
+                manager.ConnectAsync()
+                Check(entered.Wait(2000), "shutdown test entered search")
+                Dim stopping = manager.ShutdownAsync()
+                Check(Not stopping.IsCompleted AndAlso manager.Status.State = BuzzState.Disposed, "shutdown during search returns without blocking caller")
+                release.Set()
+                stopping.GetAwaiter().GetResult()
+                Check(receiver.DisposedCount = 1 AndAlso manager.Status.State = BuzzState.Disposed, "cancelled search releases receiver without publishing ready")
+            End Using
+        End Using
+    End Sub
+
+    Private Sub TestScoreDialog(owner As Form, commit As Boolean, value As Integer, Optional buttonName As String = "CorrectScore0")
+        owner.BeginInvoke(New Action(Sub()
+                                        Dim dialog = Application.OpenForms.Cast(Of Form)().Single(Function(form) form.Name = "NumberDialog")
+                                        DirectCast(FindControl(dialog, "NewValue"), NumericUpDown).Value = value
+                                        If commit Then
+                                            DirectCast(FindControl(dialog, "ApplyNumber"), Button).PerformClick()
+                                        Else
+                                            dialog.DialogResult = DialogResult.Cancel
+                                        End If
+                                    End Sub))
+        DirectCast(FindControl(owner, buttonName), Button).PerformClick()
+    End Sub
+
     Private Sub TestPersistence(directory As String)
         ' История должна переживать перезапуск, а повреждённый XML — не заменять
-        ' открытую игру. File.Replace требует обычных прав ОС без запрета песочницы.
+        ' открытую игру. Для File.Replace нужны права на замену тестового файла.
         Dim game = Session(directory, "persist")
         game.Execute("left 42", Sub(s) s.Main.LeftScore = 42)
         game.Execute("big answer", Sub(s) GameRules.ShowBigText(s.Big, 7, "Сохранённый ответ"))
@@ -215,9 +339,10 @@ Module Checks
         Application.EnableVisualStyles()
         AudioService.Instance.Enabled = False
         Environment.SetEnvironmentVariable("STOKODNOMU_DATA_DIR", Path.Combine(directory, "ui"))
-        Using main As New Form1(), countdown As New Countdown()
+        Dim uiReceiver As FakeReceiver = Nothing
+        Using buzz As New BuzzManager(Function() uiReceiver), main As New Form1(buzz), countdown As New Countdown()
             Dim game = Session(directory, "ui-big")
-            Using big As New BigGameControl(game, countdown, Sub() Return, Sub() game.Undo()), board As New Tablo(), bigBoard As New BigGameTablo()
+            Using big As New BigGameControl(game, countdown, Sub() Return, Sub() game.Undo(), Sub() Return, Sub() Return, Sub() Return), board As New Tablo(), bigBoard As New BigGameTablo()
                 For Each form As Form In New Form() {main, big, board, bigBoard}
                     ' Show создаёт layout/контролы; непоказанная форма давала пустой DrawToBitmap.
                     ' Прозрачность скрывает тестовые окна от пользователя.
@@ -226,19 +351,56 @@ Module Checks
                     form.Show()
                     Application.DoEvents()
                     If form Is main Then
+                        Check(FindControl(main, "ConnectBuzz").Enabled AndAlso Not FindControl(main, "ArmBuzz").Enabled AndAlso Not FindControl(main, "BlockBuzz").Enabled, "missing receiver disables only hardware commands")
+                        uiReceiver = New FakeReceiver()
+                        DirectCast(FindControl(main, "ConnectBuzz"), Button).PerformClick()
+                        WaitFor(Function() FindControl(main, "ArmBuzz").Enabled, "UI connected and locked", True)
+                        DirectCast(FindControl(main, "ArmBuzz"), Button).PerformClick()
+                        Check(Not FindControl(main, "ArmBuzz").Enabled AndAlso FindControl(main, "BlockBuzz").Enabled, "UI arm updates availability")
+                        uiReceiver.Inputs.Add(1)
+                        WaitFor(Function() FindControl(main, "ArmBuzz").Enabled, "UI winner allows next round", True)
+                        uiReceiver.Failure = New IOException("test unplugged")
+                        WaitFor(Function() FindControl(main, "ConnectBuzz").Enabled, "UI unplug restores connect command", True)
+                        Check(Not FindControl(main, "ArmBuzz").Enabled AndAlso Not FindControl(main, "BlockBuzz").Enabled, "UI unplug blocks arm and disarm")
+                        uiReceiver = Nothing
+                        DirectCast(FindControl(main, "ConnectBuzz"), Button).PerformClick()
+                        WaitFor(Function() FindControl(main, "BuzzStatus").Text = "Не подключён", "UI retry without receiver remains disconnected", True)
                         DirectCast(FindControl(main, "MainAnswer0"), TextBox).Text = "Проверочный ответ"
                         DirectCast(FindControl(main, "MainPoints0"), NumericUpDown).Value = 10
                         DirectCast(FindControl(main, "ToggleMainAnswer0"), Button).PerformClick()
-                        Check(DirectCast(FindControl(main, "RoundBank"), NumericUpDown).Value = 10, "main operator reveal updates bank")
+                        Check(Integer.Parse(FindControl(main, "RoundBank").Text) = 10, "main operator reveal updates bank")
                         DirectCast(FindControl(main, "ToggleMainAnswer0"), Button).PerformClick()
                         DirectCast(FindControl(main, "ToggleMainAnswer0"), Button).PerformClick()
-                        Check(DirectCast(FindControl(main, "RoundBank"), NumericUpDown).Value = 10, "main operator hide/reopen preserves bank")
+                        Check(Integer.Parse(FindControl(main, "RoundBank").Text) = 10, "main operator hide/reopen preserves bank")
                         DirectCast(FindControl(main, "MainPoints0"), NumericUpDown).Value = 15
                         DirectCast(FindControl(main, "EditMainAnswer0"), Button).PerformClick()
-                        Check(DirectCast(FindControl(main, "RoundBank"), NumericUpDown).Value = 15, "main operator applies correction")
+                        Check(Integer.Parse(FindControl(main, "RoundBank").Text) = 15, "main operator applies correction")
                         DirectCast(FindControl(main, "UndoLastAction"), Button).PerformClick()
-                        Check(DirectCast(FindControl(main, "RoundBank"), NumericUpDown).Value = 10, "main operator undo works")
+                        Check(Integer.Parse(FindControl(main, "RoundBank").Text) = 10, "main operator undo works")
+                        TestScoreDialog(main, False, 120)
+                        Check(FindControl(main, "LeftScore").Text = "0", "cancel score dialog leaves match unchanged")
+                        TestScoreDialog(main, True, 120)
+                        Check(FindControl(main, "LeftScore").Text = "120", "score dialog commits selected team")
+                        DirectCast(FindControl(main, "UndoLastAction"), Button).PerformClick()
+                        Check(FindControl(main, "LeftScore").Text = "0", "score dialog action can be undone")
+                        TestScoreDialog(main, True, GameRules.MaximumScore)
+                        Dim scoreLabel = FindControl(main, "LeftScore")
+                        Check(TextRenderer.MeasureText(scoreLabel.Text, scoreLabel.Font, Size.Empty, TextFormatFlags.NoPadding).Width <= scoreLabel.ClientSize.Width, "six-digit score fits without ellipsis")
+                        DirectCast(FindControl(main, "UndoLastAction"), Button).PerformClick()
+                        Dim editor = DirectCast(FindControl(main, "MainAnswer1"), TextBox)
+                        editor.Focus()
+                        Dim key As New KeyEventArgs(Keys.Control Or Keys.Z)
+                        GetType(Form).GetMethod("OnKeyDown", Reflection.BindingFlags.Instance Or Reflection.BindingFlags.NonPublic).Invoke(main, New Object() {key})
+                        Check(Not key.SuppressKeyPress AndAlso Integer.Parse(FindControl(main, "RoundBank").Text) = 10, "Ctrl+Z in answer editor does not undo match")
+                        Check(OperatorUi.EditingText(FindControl(main, "MainPoints0")), "number editor also retains text undo")
+                        Dim strike = DirectCast(FindControl(main, "LeftStrike0"), Button)
+                        Check(strike.Text = "× 1" AndAlso strike.AccessibleDescription = "Промаха нет", "inactive strike uses cross")
+                        strike.PerformClick()
+                        Check(strike.Text = "× 1" AndAlso strike.AccessibleDescription = "Промах поставлен" AndAlso strike.BackColor = Color.MistyRose, "active strike retains cross and changes state")
+                        DirectCast(FindControl(main, "UndoLastAction"), Button).PerformClick()
+                        Check(strike.AccessibleDescription = "Промаха нет", "strike undo preserves button symbol")
                     ElseIf form Is big Then
+                        TestBigTabOrder(big)
                         DirectCast(FindControl(big, "BigAnswer0"), TextBox).Text = "Первый ответ"
                         DirectCast(FindControl(big, "BigPoints0"), NumericUpDown).Value = 50
                         DirectCast(FindControl(big, "BigAnswer1"), TextBox).Text = "Черновик второго ответа"
@@ -251,6 +413,36 @@ Module Checks
                         Check(game.State.Big.Total = 70, "big operator per-question correction")
                         game.Undo()
                         Check(game.State.Big.Total = 50 AndAlso DirectCast(FindControl(big, "BigPoints0"), NumericUpDown).Value = 50, "big operator correction undo")
+                        TestScoreDialog(big, True, 80, "CorrectBigTotal")
+                        Check(game.State.Big.Total = 80, "big total dialog applies manual adjustment")
+                        game.Undo()
+                        Check(game.State.Big.Total = 50, "big total dialog undo")
+                        TestScoreDialog(big, True, 200, "CorrectBigTarget")
+                        Check(game.State.Big.TargetScore = 200, "big target dialog applies value")
+                        game.Undo()
+                        DirectCast(FindControl(big, "SaveBigDrafts"), Button).PerformClick()
+                        Check(game.State.Big.Answers(1).Text = "Черновик второго ответа" AndAlso Not game.State.Big.Answers(1).TextVisible AndAlso game.State.Big.Total = 50, "save drafts never reveals or counts them")
+                        DirectCast(FindControl(big, "Start20"), Button).PerformClick()
+                        Check(countdown.SecondsRemaining = 20, "big UI starts 20 seconds")
+                        DirectCast(FindControl(big, "Start25"), Button).PerformClick()
+                        Check(countdown.SecondsRemaining = 25, "big UI restarts at 25 seconds")
+                        DirectCast(FindControl(big, "BigStopAllAudio"), Button).PerformClick()
+                        Check(Not countdown.Running AndAlso game.State.Big.Total = 50, "stop all keeps score")
+                    End If
+                    If form Is main OrElse form Is big Then
+                        Check(Not form.MaximizeBox, "operator maximize button disabled: " & form.GetType().Name)
+                        form.ClientSize = New Size(1280, 720)
+                        form.PerformLayout()
+                        Application.DoEvents()
+                        Dim scroll = DirectCast(FindControl(form, "ConsoleScroll"), Panel)
+                        Check(Not scroll.HorizontalScroll.Visible, "no horizontal scroll at 1280: " & form.GetType().Name)
+                        Dim lastCommand = FindControl(form, If(form Is main, "ToggleMainAnswer5", "ShowBigPoints9"))
+                        Dim lastBottom = scroll.PointToClient(lastCommand.PointToScreen(New Point(0, lastCommand.Height))).Y
+                        Check(lastBottom <= scroll.ClientSize.Height, "last answer action fits viewport: " & form.GetType().Name)
+                        Dim footer = FindControl(form, "ConsoleFooter")
+                        Dim bottom = form.PointToClient(footer.PointToScreen(New Point(0, footer.Height))).Y
+                        Check(bottom <= form.ClientSize.Height, "footer remains in client area: " & form.GetType().Name)
+                        Check(Not AllControls(form).OfType(Of Label)().Any(Function(label) label.Text.StartsWith("Последнее действие:") OrElse label.Text.Contains("Автосохранение: сохранено")), "no routine event feed")
                     End If
                     Dim handle = form.Handle
                     form.PerformLayout()
@@ -269,8 +461,90 @@ Module Checks
                 Check(FindControl(main, "MainAnswer0") IsNot Nothing, "operator answer editor exists")
                 Check(FindControl(big, "BigPoints9") IsNot Nothing, "per-question editor exists for second player")
             End Using
+            main.Show()
+            Using entered As New ManualResetEventSlim(), release As New ManualResetEventSlim()
+                uiReceiver = New FakeReceiver With {.BeforeRead = Sub()
+                                                                    entered.Set()
+                                                                    release.Wait()
+                                                                End Sub}
+                Try
+                    DirectCast(FindControl(main, "ConnectBuzz"), Button).PerformClick()
+                    WaitFor(Function() entered.IsSet, "exit test entered pending USB read", True)
+                    Dim rootTimer = DirectCast(GetType(Form1).GetField("_countdown", Reflection.BindingFlags.NonPublic Or Reflection.BindingFlags.Instance).GetValue(main), Countdown)
+                    rootTimer.Start(25)
+                    TestExitDialog(main, False, Path.Combine(directory, "ExitConfirmation.png"))
+                    Check(Not main.IsDisposed AndAlso main.Enabled AndAlso rootTimer.Running AndAlso buzz.Status.State = BuzzState.Ready, "declined exit leaves app and services running")
+                    TestExitDialog(main, True, Nothing)
+                    Check(Not main.IsDisposed AndAlso Not main.Enabled AndAlso Not rootTimer.Running, "confirmed exit stops timer and waits for receiver")
+                    Dim responsive As Boolean
+                    main.BeginInvoke(New Action(Sub() responsive = True))
+                    WaitFor(Function() responsive, "UI remains responsive during graceful shutdown", True)
+                    ' Повторный Close в ожидании USB не открывает новый диалог.
+                    main.Close()
+                    Check(Not Application.OpenForms.Cast(Of Form)().Any(Function(form) form.Name = "ExitConfirmation"), "shutdown never asks twice")
+                    release.Set()
+                    WaitFor(Function() main.IsDisposed, "graceful exit finishes after receiver releases", True)
+                    Check(uiReceiver.DisposedCount = 1 AndAlso buzz.Status.State = BuzzState.Disposed, "graceful exit disposes receiver once")
+                Finally
+                    release.Set()
+                End Try
+            End Using
+        End Using
+        Using fastBuzz As New BuzzManager(Function() Nothing), fast As New Form1(fastBuzz)
+            fast.ShowInTaskbar = False
+            fast.Opacity = 0
+            fast.Show()
+            WaitFor(Function() fastBuzz.Status.State = BuzzState.Disconnected, "exit without receiver finishes initial search", True)
+            TestExitDialog(fast, True, Nothing)
+            WaitFor(Function() fast.IsDisposed, "confirmed exit without receiver closes on next UI turn", True)
         End Using
         Console.WriteLine("UI snapshots: " & directory)
+    End Sub
+
+    Private Sub TestExitDialog(main As Form1, accept As Boolean, snapshotPath As String)
+        main.BeginInvoke(New Action(Sub()
+                                        Dim dialog = Application.OpenForms.Cast(Of Form)().Single(Function(form) form.Name = "ExitConfirmation")
+                                        dialog.Opacity = 0
+                                        Check(FindControl(dialog, "ExitQuestion").Text = "Закрыть приложение?", "exit confirmation question")
+                                        Check(DirectCast(dialog.AcceptButton, Button).Text = "Нет", "exit defaults to keeping app open")
+                                        Check(dialog.ActiveControl Is FindControl(dialog, "ConfirmExitNo"), "exit keyboard focus starts on No")
+                                        If snapshotPath IsNot Nothing Then
+                                            dialog.PerformLayout()
+                                            Using bitmap As New Bitmap(dialog.Width, dialog.Height)
+                                                dialog.DrawToBitmap(bitmap, New Rectangle(Point.Empty, bitmap.Size))
+                                                bitmap.Save(snapshotPath)
+                                            End Using
+                                        End If
+                                        DirectCast(FindControl(dialog, If(accept, "ConfirmExitYes", "ConfirmExitNo")), Button).PerformClick()
+                                    End Sub))
+        main.Close()
+    End Sub
+
+    Private Sub TestBigTabOrder(big As BigGameControl)
+        big.Activate()
+        Dim processKey = GetType(BigGameControl).GetMethod("ProcessDialogKey", Reflection.BindingFlags.NonPublic Or Reflection.BindingFlags.Instance)
+        For i = 0 To 9
+            Dim answer = FindControl(big, "BigAnswer" & i)
+            Dim points = FindControl(big, "BigPoints" & i)
+            answer.Focus()
+            processKey.Invoke(big, New Object() {Keys.Tab})
+            Check(points.ContainsFocus, "Tab moves answer to its points: " & i)
+            processKey.Invoke(big, New Object() {Keys.Tab Or Keys.Shift})
+            Check(answer.ContainsFocus, "Shift+Tab moves points back to answer: " & i)
+            If i < 9 Then
+                points.Focus()
+                processKey.Invoke(big, New Object() {Keys.Tab})
+                Dim nextAnswer = FindControl(big, "BigAnswer" & (i + 1))
+                Check(nextAnswer.ContainsFocus, "Tab from points skips reveal buttons to next answer: " & i)
+                processKey.Invoke(big, New Object() {Keys.Tab Or Keys.Shift})
+                Check(points.ContainsFocus, "Shift+Tab crosses questions and players: " & i)
+            End If
+        Next
+        FindControl(big, "BigPoints9").Focus()
+        processKey.Invoke(big, New Object() {Keys.Tab})
+        Check(FindControl(big, "ShowBigText0").ContainsFocus, "reveal commands remain keyboard accessible after input")
+        processKey.Invoke(big, New Object() {Keys.Tab})
+        Check(FindControl(big, "ShowBigText1").ContainsFocus, "Tab skips disabled reveal-points command")
     End Sub
 
     Private Iterator Function AllControls(parent As Control) As IEnumerable(Of Control)

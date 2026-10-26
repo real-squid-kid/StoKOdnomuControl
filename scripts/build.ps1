@@ -1,6 +1,5 @@
 ﻿param(
     [ValidateSet('Debug', 'Release')][string]$Configuration = 'Release',
-    # Скрипт только собирает локальные файлы; отправки/публикации здесь нет.
     [switch]$Package
 )
 $ErrorActionPreference = 'Stop'
@@ -18,6 +17,5 @@ if ($Package) {
 if ($LASTEXITCODE -ne 0) { throw "Сборка завершилась с кодом $LASTEXITCODE." }
 if ($Package) {
     Copy-Item -LiteralPath (Join-Path $projectRoot 'OPERATOR_GUIDE.MD') -Destination (Join-Path $packageRoot 'app/OPERATOR_GUIDE.MD')
-    # Памятка остаётся локальным файлом, даже если Markdown исключён правилами .gitignore.
     Write-Output "Комплект запуска: $packageRoot/app"
 }

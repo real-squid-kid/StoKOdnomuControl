@@ -2,205 +2,306 @@ Option Strict On
 Imports System.IO
 Imports System.Windows.Forms
 
-' Главный пульт владеет общей сессией, окнами табло и оборудованием.
-' Обработчики отправляют команды в GameSession; поля формы не являются счётом игры.
+' Главное окно владеет единственной сессией, оборудованием и зрительскими окнами.
 Public Class Form1
     Inherits Form
     Private ReadOnly _session As GameSession
-    Private ReadOnly _buzz As New BuzzManager()
+    Private ReadOnly _buzz As BuzzManager
+    Private ReadOnly _countdown As New Countdown()
     Private _bank As QuestionBank
-    ' Предыдущий опубликованный снимок нужен для обновления только изменившихся полей.
-    ' Несвязанный рендер не должен стирать ещё не применённый ввод оператора.
     Private _last As MainGameState
     Private _board As Tablo
     Private _bigControl As BigGameControl
     Private _bigBoard As BigGameTablo
-    Private ReadOnly _countdown As New Countdown()
+    Private _surface As ConsoleLayout
     Private ReadOnly _answers(5) As TextBox
     Private ReadOnly _points(5) As NumericUpDown
     Private ReadOnly _show(5) As Button
-    Private ReadOnly _answerStatus(5) As Label
+    Private ReadOnly _awardLabels(5) As Label
     Private ReadOnly _strikes(1, 2) As Button
-    Private ReadOnly _scores(2) As NumericUpDown
+    Private ReadOnly _scores(2) As Label
     Private ReadOnly _roundButtons As New List(Of Button)()
-    Private ReadOnly _screens As New ComboBox With {.DropDownStyle = ComboBoxStyle.DropDownList, .Width = 290}
-    Private ReadOnly _fullscreen As New CheckBox With {.Text = "На весь экран", .Checked = True, .AutoSize = True, .Margin = New Padding(6, 12, 4, 4)}
-    Private ReadOnly _award As New CheckBox With {.Text = "При открытии начислять очки в банк", .Checked = True, .AutoSize = True, .Margin = New Padding(6, 12, 4, 4)}
-    Private ReadOnly _round As Label = OperatorUi.Label("", 350)
-    Private ReadOnly _status As Label = OperatorUi.Label("Загрузите базу или введите ответы вручную.", 1200)
-    Private ReadOnly _buzzStatus As Label = OperatorUi.Label("Buzz!: не подключён", 500)
+    Private ReadOnly _screens As New ComboBox With {.DropDownStyle = ComboBoxStyle.DropDownList, .Width = 270}
+    Private ReadOnly _fullscreen As New CheckBox With {.Text = "На весь экран", .Checked = True, .AutoSize = True}
+    Private ReadOnly _award As New CheckBox With {.Text = "Начислять при открытии", .Checked = True, .AutoSize = True}
+    Private ReadOnly _bankName As Label = OperatorUi.Label("Ручной ввод", 270)
+    Private ReadOnly _buzzStatus As Label = OperatorUi.Label("Не подключён", 270)
+    Private ReadOnly _matchMenu As New ContextMenuStrip()
+    Private _displaySettings As Form
     Private _undo As Button
-    Private _restore As Button
+    Private _restore As ToolStripMenuItem
+    Private _connectBuzz As Button
+    Private _armBuzz As Button
+    Private _blockBuzz As Button
+    Private _returnAnswers As Button
+    Private _awardHeading As Label
+    Private _answerPriceHeading As Label
+    Private _closing As Boolean
+    Private _confirmingClose As Boolean
+    Private _closed As Boolean
+    Private _servicesDisposed As Boolean
 
     Public Sub New()
-        ' Тесты задают отдельный каталог. В обычном запуске данные принадлежат текущему
-        ' пользователю Windows и не записываются в каталог исходников/установки.
+        Me.New(New BuzzManager())
+    End Sub
+
+    ' Подмена только транспорта позволяет проверить настоящий пульт без USB.
+    Public Sub New(buzz As BuzzManager)
+        _buzz = buzz
         Dim dataDirectory = Environment.GetEnvironmentVariable("STOKODNOMU_DATA_DIR")
         If String.IsNullOrWhiteSpace(dataDirectory) Then dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "StoKOdnomuControl")
         _session = New GameSession(dataDirectory)
         BuildUi()
         AddHandler _session.Changed, AddressOf SessionChanged
-        AddHandler _session.StorageError, Sub(message) SetStatus(message)
+        AddHandler _session.StorageError, AddressOf SetStatus
         AddHandler AudioService.Instance.AudioError, AddressOf SetStatus
         AddHandler _countdown.Changed, Sub() RenderCountdown()
-        AddHandler _buzz.StatusChanged, Sub(message) OperatorUi.OnUi(Me, Sub() _buzzStatus.Text = message)
-        AddHandler _buzz.BuzzerPressed, Sub(pad)
-                                           ' Событие приходит с потока HID; контролы и звук запускаем
-                                           ' через UI-поток, не блокируя чтение следующего USB-отчёта.
-                                           OperatorUi.OnUi(Me, Sub()
-                                                                  _buzzStatus.Text = "Первым нажал пульт " & (pad + 1) & ". Для нового розыгрыша нажмите «Разрешить Buzz!» ."
-                                                                  AudioService.Instance.Play(SoundCue.Buzzer, AudioChannel.Buzzer)
-                                                              End Sub)
-                                       End Sub
-        AddHandler _buzz.SimultaneousPress, Sub() OperatorUi.OnUi(Me, Sub() _buzzStatus.Text = "Buzz!: несколько нажатий в одном отчёте. Переиграйте розыгрыш.")
-        AddHandler Shown, Sub()
-                              _buzz.Initialize()
-                              _restore.Enabled = _session.HasSavedGame
+        AddHandler _buzz.StatusChanged, AddressOf BuzzStatusChanged
+        AddHandler _buzz.BuzzerPressed, Sub(pad) OperatorUi.OnUi(Me, Sub()
+                                                                      If Not _closing Then AudioService.Instance.Play(SoundCue.Buzzer, AudioChannel.Buzzer)
+                                                                  End Sub)
+        AddHandler Shown, Async Sub()
+                              Await _buzz.ConnectAsync()
+                              If Not IsDisposed AndAlso Not _closing Then _restore.Enabled = _session.HasSavedGame
                           End Sub
-        AddHandler FormClosed, AddressOf CloseServices
-        KeyPreview = True
-        AddHandler KeyDown, Sub(sender, e)
-                                If e.Control AndAlso e.KeyCode = Keys.Z Then
-                                    UndoAction()
-                                    e.SuppressKeyPress = True
-                                End If
-                            End Sub
+        AddHandler FormClosing, AddressOf CloseAsync
+        OperatorUi.InstallUndo(Me, AddressOf UndoAction)
         SessionChanged(Me, EventArgs.Empty)
+        RenderBuzz()
     End Sub
 
     Private Sub BuildUi()
-        ' Пульт собирается программно вместо прежнего Form1.Designer.vb.
-        ' Общие размеры/создание контролов — в OperatorUi; здесь остаётся смысл действий.
-        Dim page = OperatorUi.Page(Me, "Сто к одному — пульт оператора")
-        OperatorUi.Heading(page, "Основная игра")
-        Dim actions = OperatorUi.Row(page)
-        OperatorUi.Button(actions, "Загрузить базу TXT…", AddressOf LoadBank)
-        _undo = OperatorUi.Button(actions, "Отменить действие", AddressOf UndoAction)
+        _surface = New ConsoleLayout(Me, "Сто к одному — основная игра")
+        BuildToolbar()
+        BuildRoundPanel()
+        BuildScoresPanel()
+        BuildAnswersPanel()
+        BuildSplashPanel()
+        BuildBuzzPanel()
+        BuildScreenPanel()
+        _undo = OperatorUi.Button(Nothing, "Отменить действие", AddressOf UndoAction)
         _undo.Name = "UndoLastAction"
-        OperatorUi.Button(actions, "Открыть большую игру", AddressOf OpenBigGame)
-        _restore = OperatorUi.Button(actions, "Восстановить игру…", AddressOf RestoreGame)
-        OperatorUi.Button(actions, "Новый матч…", AddressOf NewMatch, 145)
-        OperatorUi.Button(actions, "О программе", Sub()
-                                                         Using about As New AboutBox1()
-                                                             about.ShowDialog(Me)
-                                                         End Using
-                                                     End Sub, 140)
-        Dim display = OperatorUi.Row(page)
-        For i = 0 To Screen.AllScreens.Length - 1
-            Dim displayScreen = Screen.AllScreens(i)
-            _screens.Items.Add("Экран " & (i + 1) & " · " & displayScreen.Bounds.Width & "×" & displayScreen.Bounds.Height & If(displayScreen.Primary, " · основной", ""))
-        Next
-        _screens.SelectedIndex = If(Screen.AllScreens.Length > 1, 1, 0)
-        display.Controls.Add(_screens)
-        display.Controls.Add(_fullscreen)
-        OperatorUi.Button(display, "Показать основное табло", AddressOf ShowMainBoard, 235)
-        OperatorUi.Button(display, "Скрыть оба табло", AddressOf HideBoards)
-        OperatorUi.Button(display, "Остановить все звуки", Sub()
-                                                                 _countdown.Stop()
-                                                                 AudioService.Instance.StopAll()
-                                                             End Sub, 210)
-        Dim soundEnabled As New CheckBox With {.Text = "Звук включён", .Checked = True, .AutoSize = True, .Margin = New Padding(6, 12, 4, 4)}
-        display.Controls.Add(soundEnabled)
-        AddHandler soundEnabled.CheckedChanged, Sub()
-                                                    AudioService.Instance.Enabled = soundEnabled.Checked
-                                                    If Not soundEnabled.Checked Then AudioService.Instance.StopAll()
-                                                End Sub
-        Dim rounds = OperatorUi.Row(page)
+        OperatorUi.Cell(_surface.Footer, _undo, 0, 0)
+        Dim stopAll = OperatorUi.Button(Nothing, "Остановить все звуки", AddressOf StopAllAudio)
+        stopAll.Name = "StopAllAudio"
+        stopAll.ForeColor = Color.DarkRed
+        OperatorUi.Cell(_surface.Footer, stopAll, 2, 0)
+    End Sub
+
+    Private Sub BuildToolbar()
+        _surface.Toolbar.Controls.Add(OperatorUi.Label("Основная игра", 145))
+        OperatorUi.Button(_surface.Toolbar, "Большая игра", AddressOf OpenBigGame, 155)
+        OperatorUi.Button(_surface.Toolbar, "Загрузить базу…", AddressOf LoadBank, 165)
+        Dim service = OperatorUi.Button(_surface.Toolbar, "Матч и сбросы…", Sub() Return, 165)
+        _restore = MenuAction("Восстановить игру…", AddressOf RestoreGame)
+        _matchMenu.Items.Add(New ToolStripSeparator())
+        MenuAction("Сбросить текущий раунд…", AddressOf ResetCurrentRound)
+        MenuAction("Новый матч…", AddressOf NewMatch)
+        _matchMenu.Items.Add(New ToolStripSeparator())
+        MenuAction("О программе…", Sub()
+                                        Using about As New AboutBox1()
+                                            about.ShowDialog(Me)
+                                        End Using
+                                    End Sub)
+        AddHandler service.Click, Sub() _matchMenu.Show(service, New Point(0, service.Height))
+        _bankName.Name = "LoadedBank"
+        _surface.Toolbar.Controls.Add(_bankName)
+    End Sub
+
+    Private Function MenuAction(text As String, action As Action) As ToolStripMenuItem
+        Dim item As New ToolStripMenuItem(text)
+        AddHandler item.Click, Sub() OperatorUi.RunCommand(Me, action)
+        _matchMenu.Items.Add(item)
+        Return item
+    End Function
+
+    Private Sub BuildRoundPanel()
+        Dim panel = OperatorUi.Group(_surface.Left, "Раунд", "RoundPanel")
+        Dim row = OperatorUi.Grid(panel, -1, -1, -1, -1)
         For i = 1 To 4
-            ' Отдельная локальная копия захватывается обработчиком конкретной кнопки.
             Dim number = i
-            _roundButtons.Add(OperatorUi.Button(rounds, {"", "Простая · ×1", "Двойная · ×2", "Тройная · ×3", "Игра наоборот"}(i), Sub() StartRound(number), 138))
+            Dim button = OperatorUi.Button(Nothing, {"", "Простая · ×1", "Двойная · ×2", "Тройная · ×3", "Игра наоборот"}(i), Sub() StartRound(number))
+            button.Name = "StartRound" & i
+            _roundButtons.Add(button)
+            OperatorUi.Cell(row, button, i - 1, 0)
         Next
-        OperatorUi.Button(rounds, "Сбросить раунд…", AddressOf ResetCurrentRound, 220)
-        rounds.Controls.Add(_round)
-        Dim scores = OperatorUi.Row(page)
-        Dim scoreNames = {"Левая команда", "Банк раунда", "Правая команда"}
-        ' Порядок массива полей совпадает с ApplyScore: 0 — слева, 1 — банк, 2 — справа.
-        For i = 0 To 2
-            Dim index = i
-            scores.Controls.Add(OperatorUi.Label(scoreNames(i), 130))
-            _scores(i) = OperatorUi.Number()
-            _scores(i).Name = {"LeftScore", "RoundBank", "RightScore"}(i)
-            scores.Controls.Add(_scores(i))
-            Dim apply = OperatorUi.Button(scores, "Применить", Sub() ApplyScore(index), 110)
-            apply.Name = "ApplyScore" & index
+    End Sub
+
+    Private Sub BuildScoresPanel()
+        Dim panel = OperatorUi.Group(_surface.Left, "Команды и банк", "ScoresPanel")
+        Dim columns = OperatorUi.Grid(panel, -1, -1.25F, -1)
+        For column = 0 To 2
+            Dim index = column
+            Dim unit = OperatorUi.Stack()
+            unit.Name = "ScoreUnit" & column
+            unit.BorderStyle = BorderStyle.FixedSingle
+            unit.Padding = New Padding(4)
+            unit.Margin = New Padding(3)
+            OperatorUi.Cell(columns, unit, column, 0)
+            Dim valueRow = OperatorUi.Grid(unit, 0, 105)
+            OperatorUi.Cell(valueRow, OperatorUi.Label({"Левая команда", "Банк раунда", "Правая команда"}(column)), 0, 0)
+            _scores(column) = OperatorUi.Label("0")
+            _scores(column).Name = {"LeftScore", "RoundBank", "RightScore"}(column)
+            _scores(column).TextAlign = ContentAlignment.MiddleCenter
+            OperatorUi.LargeValue(_scores(column))
+            OperatorUi.Cell(valueRow, _scores(column), 1, 0)
+            If column = 1 Then
+                Dim transfers = OperatorUi.Grid(unit, -1, -1)
+                OperatorUi.Cell(transfers, OperatorUi.Button(Nothing, "← Передать левой", Sub() Transfer(TeamSide.Left)), 0, 0)
+                OperatorUi.Cell(transfers, OperatorUi.Button(Nothing, "Передать правой →", Sub() Transfer(TeamSide.Right)), 1, 0)
+            End If
+            Dim correct = OperatorUi.Button(unit, If(column = 1, "Исправить банк…", "Исправить счёт…"), Sub() OperatorUi.EditNumber(Me, {"Счёт левой команды", "Банк раунда", "Счёт правой команды"}(index), Integer.Parse(_scores(index).Text), GameRules.MaximumScore, Sub(value) ApplyScore(index, value)))
+            correct.Name = "CorrectScore" & column
+            If column <> 1 Then
+                Dim side = If(column = 0, TeamSide.Left, TeamSide.Right)
+                Dim strikes = OperatorUi.Grid(unit, -1, -1, -1)
+                For i = 0 To 2
+                    Dim strike = i
+                    _strikes(CInt(side), i) = OperatorUi.Button(Nothing, "× " & (i + 1), Sub() ToggleStrike(side, strike))
+                    _strikes(CInt(side), i).Name = If(side = TeamSide.Left, "LeftStrike", "RightStrike") & i
+                    _strikes(CInt(side), i).AccessibleName = "Промах " & (i + 1) & If(side = TeamSide.Left, " левой команды", " правой команды")
+                    OperatorUi.Cell(strikes, _strikes(CInt(side), i), i, 0)
+                Next
+            End If
         Next
-        Dim transfers = OperatorUi.Row(page)
-        OperatorUi.Button(transfers, "Отдать банк левой команде", Sub() Transfer(TeamSide.Left), 265)
-        OperatorUi.Button(transfers, "Отдать банк правой команде", Sub() Transfer(TeamSide.Right), 265)
-        transfers.Controls.Add(_award)
-        Dim dimFields As New CheckBox With {.Text = "Приглушить поля пульта", .AutoSize = True, .Margin = New Padding(6, 12, 4, 4)}
-        transfers.Controls.Add(dimFields)
+    End Sub
+
+    Private Sub BuildAnswersPanel()
+        Dim panel = OperatorUi.Group(_surface.Left, "Ответы", "AnswersPanel")
+        Dim options = OperatorUi.Row(panel)
+        options.Controls.Add(_award)
+        Dim dimFields As New CheckBox With {.Text = "Приглушить поля", .AutoSize = True, .Margin = New Padding(12, 0, 0, 0)}
+        options.Controls.Add(dimFields)
         AddHandler dimFields.CheckedChanged, Sub()
                                                  For i = 0 To 5
-                                                     _answers(i).ForeColor = If(dimFields.Checked, Color.LightGray, SystemColors.WindowText)
-                                                     _points(i).ForeColor = If(dimFields.Checked, Color.LightGray, SystemColors.WindowText)
+                                                     _answers(i).ForeColor = If(dimFields.Checked, Color.Gray, SystemColors.WindowText)
+                                                     _points(i).ForeColor = If(dimFields.Checked, Color.Gray, SystemColors.WindowText)
                                                  Next
                                              End Sub
-        Dim table = OperatorUi.Grid(page, 42, 0, 95, 170, 180, 190)
-        Dim headings = {"№", "Ответ (изменение поля — черновик)", "Очки ×1", "Показ / скрытие", "Правка текста и цены", "Состояние"}
-        For column = 0 To headings.Length - 1
-            OperatorUi.Cell(table, OperatorUi.Label(headings(column), CInt(If(column = 1, 360, Math.Max(40, table.ColumnStyles(column).Width - 8)))), column, 0)
+        Dim table = OperatorUi.Grid(panel, 28, 0, 75, 65, 137, 137)
+        _answerPriceHeading = OperatorUi.Label("Ответили" & Environment.NewLine & "чел.")
+        _awardHeading = OperatorUi.Label("В банк" & Environment.NewLine & "×1")
+        For Each heading As Label In New Label() {_answerPriceHeading, _awardHeading}
+            heading.Height = 42
+            heading.AutoEllipsis = False
+        Next
+        Dim headings = {OperatorUi.Label("№"), OperatorUi.Label("Ответ"), _answerPriceHeading, _awardHeading, OperatorUi.Label("Показ"), OperatorUi.Label("Правка")}
+        For c = 0 To headings.Length - 1
+            OperatorUi.Cell(table, headings(c), c, 0)
         Next
         For i = 0 To 5
             Dim index = i
-            ' Name — стабильный адрес контрола в проверках кнопок; подпись можно менять.
-            _answers(i) = New TextBox With {.Name = "MainAnswer" & i, .MaxLength = 120, .Margin = New Padding(4, 10, 4, 4)}
+            _answers(i) = New TextBox With {.Name = "MainAnswer" & i, .MaxLength = 120, .Margin = New Padding(3)}
             _points(i) = OperatorUi.Number(GameRules.MaximumAnswerPoints)
-            _points(i).Width = 80
             _points(i).Name = "MainPoints" & i
-            OperatorUi.Cell(table, OperatorUi.Label((i + 1).ToString(), 34), 0, i + 1)
-            OperatorUi.Cell(table, _answers(i), 1, i + 1)
-            OperatorUi.Cell(table, _points(i), 2, i + 1)
-            _show(i) = OperatorUi.Button(table, "Открыть ответ", Sub() ToggleAnswer(index), 158)
+            AddHandler _points(i).ValueChanged, Sub() RefreshAward(index)
+            _awardLabels(i) = OperatorUi.Label("0")
+            _awardLabels(i).Name = "MainAward" & i
+            _show(i) = OperatorUi.Button(Nothing, "Открыть ответ", Sub() ToggleAnswer(index))
             _show(i).Name = "ToggleMainAnswer" & i
-            table.SetCellPosition(_show(i), New TableLayoutPanelCellPosition(3, i + 1))
-            Dim edit = OperatorUi.Button(table, "Применить правку", Sub() EditAnswer(index), 168)
+            Dim edit = OperatorUi.Button(Nothing, "Исправить ответ", Sub() EditAnswer(index))
             edit.Name = "EditMainAnswer" & i
-            table.SetCellPosition(edit, New TableLayoutPanelCellPosition(4, i + 1))
-            _answerStatus(i) = OperatorUi.Label("", 180)
-            OperatorUi.Cell(table, _answerStatus(i), 5, i + 1)
-        Next
-        Dim note = OperatorUi.Label("Скрытие не отменяет очки. Повторный показ не начисляет их снова. Для отмены начисления используйте «Отменить» (Ctrl+Z).", 1200)
-        note.Height = 34
-        page.Controls.Add(note)
-        Dim strikes = OperatorUi.Row(page)
-        For side = 0 To 1
-            strikes.Controls.Add(OperatorUi.Label(If(side = 0, "Ошибки слева:", "Ошибки справа:"), 145))
-            For i = 0 To 2
-                Dim team = CType(side, TeamSide)
-                Dim index = i
-                _strikes(side, i) = OperatorUi.Button(strikes, "Ошибка " & (i + 1), Sub() ToggleStrike(team, index), 130)
+            For Each answerButton As Button In New Button() {_show(i), edit}
+                answerButton.MinimumSize = New Size(0, 30)
+                answerButton.Height = 32
+            Next
+            Dim controls As Control() = {OperatorUi.Label((i + 1).ToString()), _answers(i), _points(i), _awardLabels(i), _show(i), edit}
+            For c = 0 To controls.Length - 1
+                OperatorUi.Cell(table, controls(c), c, i + 1)
             Next
         Next
-        Dim splashes = OperatorUi.Row(page)
-        splashes.Controls.Add(OperatorUi.Label("Заставка:", 100))
-        Dim names = {"Сто к одному", "Простая", "Двойная", "Тройная", "Наоборот", "Большая"}
-        For i = 0 To 5
-            Dim splash = i
-            OperatorUi.Button(splashes, names(i), Sub() _session.Execute("Заставка «" & names(splash) & "»", Sub(state) state.Main.Splash = splash), 140)
-        Next
-        OperatorUi.Button(splashes, "Вернуть игру", Sub() _session.Execute("Вернуть игру с заставки", Sub(state) state.Main.Splash = -1), 155)
-        Dim buzz = OperatorUi.Row(page)
-        OperatorUi.Button(buzz, "Подключить Buzz!", Sub() _buzz.Initialize(), 170)
-        OperatorUi.Button(buzz, "Разрешить Buzz!", Sub() _buzz.Arm(), 170)
-        OperatorUi.Button(buzz, "Заблокировать Buzz!", Sub() _buzz.Disarm(), 200)
-        OperatorUi.Button(buzz, "Звук ошибки", Sub() AudioService.Instance.Play(SoundCue.WrongAnswer), 150)
-        buzz.Controls.Add(_buzzStatus)
-        _buzzStatus.Height = 50
-        _status.Height = 42
-        _status.ForeColor = Color.FromArgb(25, 64, 110)
-        Dim scroll = page.Parent
-        ' Нижний статус вынесен из прокрутки, чтобы ошибки сохранения оставались видны.
-        Controls.Remove(scroll)
-        Dim frame As New TableLayoutPanel With {.Dock = DockStyle.Fill, .RowCount = 2, .ColumnCount = 1, .Margin = New Padding(0), .Padding = New Padding(0)}
-        frame.RowStyles.Add(New RowStyle(SizeType.Percent, 100))
-        frame.RowStyles.Add(New RowStyle(SizeType.Absolute, 42))
-        frame.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100))
-        frame.Controls.Add(scroll, 0, 0)
-        _status.Dock = DockStyle.Fill
-        frame.Controls.Add(_status, 0, 1)
-        Controls.Add(frame)
+    End Sub
+
+    Private Sub RefreshAward(index As Integer)
+        Dim multiplier = If(_last Is Nothing, 1, _last.Multiplier)
+        _awardLabels(index).Text = (CInt(_points(index).Value) * multiplier).ToString()
+    End Sub
+
+    Private Sub BuildSplashPanel()
+        ' Пресет меняет режим показа, сохраняя ответы и начисления в сессии.
+        Dim panel = OperatorUi.Group(_surface.Right, "Заставка", "SplashPanel")
+        Dim presets As New ComboBox With {.Name = "SplashPresets", .DropDownStyle = ComboBoxStyle.DropDownList}
+        presets.Items.AddRange(New Object() {"Сто к одному", "Простая игра", "Двойная игра", "Тройная игра", "Игра наоборот", "Большая игра"})
+        presets.SelectedIndex = 0
+        OperatorUi.Append(panel, presets)
+        OperatorUi.Button(panel, "Показать заставку", Sub() _session.Execute("Показать заставку", Sub(state) state.Main.Splash = presets.SelectedIndex))
+        _returnAnswers = OperatorUi.Button(panel, "Вернуть ответы", Sub() _session.Execute("Вернуть ответы", Sub(state) state.Main.Splash = -1))
+    End Sub
+
+    Private Sub BuildBuzzPanel()
+        Dim panel = OperatorUi.Group(_surface.Right, "Buzz!", "BuzzPanel")
+        _buzzStatus.Name = "BuzzStatus"
+        OperatorUi.Append(panel, _buzzStatus)
+        _connectBuzz = OperatorUi.AsyncButton(panel, "Подключить Buzz!", Function() _buzz.ConnectAsync())
+        _connectBuzz.Name = "ConnectBuzz"
+        Dim commands = OperatorUi.Grid(panel, -1, -1)
+        _armBuzz = OperatorUi.Button(Nothing, "Разрешить приём", Sub() _buzz.Arm())
+        _armBuzz.Name = "ArmBuzz"
+        _blockBuzz = OperatorUi.Button(Nothing, "Заблокировать", Sub() _buzz.Disarm())
+        _blockBuzz.Name = "BlockBuzz"
+        OperatorUi.Cell(commands, _armBuzz, 0, 0)
+        OperatorUi.Cell(commands, _blockBuzz, 1, 0)
+    End Sub
+
+    Private Sub BuzzStatusChanged(sender As Object, e As EventArgs)
+        OperatorUi.OnUi(Me, AddressOf RenderBuzz)
+    End Sub
+
+    Private Sub RenderBuzz()
+        Dim status = _buzz.Status
+        _connectBuzz.Enabled = status.CanConnect
+        _armBuzz.Enabled = status.CanArm
+        _blockBuzz.Enabled = status.CanDisarm
+        _buzzStatus.Text = status.Message & If(status.Warning = "", "", Environment.NewLine & status.Warning)
+        _buzzStatus.Height = If(status.Warning = "", 32, 56)
+        _buzzStatus.ForeColor = If(status.State = BuzzState.Faulted OrElse status.Warning <> "", Color.DarkRed, SystemColors.ControlText)
+        _surface.Tips.SetToolTip(_buzzStatus, _buzzStatus.Text)
+    End Sub
+
+    Private Sub BuildScreenPanel()
+        Dim panel = OperatorUi.Group(_surface.Right, "Экран и звук", "ScreenPanel")
+        OperatorUi.Button(panel, "Выбрать экран…", AddressOf ShowDisplaySettings)
+        OperatorUi.Button(panel, "Показать табло", AddressOf ShowMainBoard)
+        OperatorUi.Button(panel, "Скрыть оба табло", AddressOf HideBoards)
+        OperatorUi.Button(panel, "Звук промаха", Sub() AudioService.Instance.Play(SoundCue.WrongAnswer))
+    End Sub
+
+    Private Sub ShowDisplaySettings()
+        ' Экран и звук принадлежат общему владельцу обоих пультов.
+        If _displaySettings Is Nothing Then
+            _displaySettings = New Form With {.Text = "Экран и звук", .Font = Font, .ClientSize = New Size(360, 170), .FormBorderStyle = FormBorderStyle.FixedDialog, .MaximizeBox = False, .MinimizeBox = False, .ShowInTaskbar = False, .StartPosition = FormStartPosition.CenterParent}
+            Dim fields = OperatorUi.Stack()
+            fields.Dock = DockStyle.Fill
+            fields.Padding = New Padding(12)
+            For i = 0 To Screen.AllScreens.Length - 1
+                Dim displayScreen = Screen.AllScreens(i)
+                _screens.Items.Add("Экран " & (i + 1) & " · " & displayScreen.Bounds.Width & "×" & displayScreen.Bounds.Height)
+            Next
+            _screens.SelectedIndex = If(Screen.AllScreens.Length > 1, 1, 0)
+            OperatorUi.Append(fields, _screens)
+            OperatorUi.Append(fields, _fullscreen)
+            Dim sound As New CheckBox With {.Text = "Звук включён", .Checked = AudioService.Instance.Enabled, .AutoSize = True}
+            AddHandler sound.CheckedChanged, Sub()
+                                                AudioService.Instance.Enabled = sound.Checked
+                                                If Not sound.Checked Then StopAllAudio()
+                                            End Sub
+            OperatorUi.Append(fields, sound)
+            OperatorUi.Button(fields, "Закрыть", Sub() _displaySettings.Hide())
+            _displaySettings.Controls.Add(fields)
+            AddHandler _displaySettings.FormClosing, Sub(sender, e)
+                                                         If e.CloseReason = CloseReason.UserClosing Then
+                                                             e.Cancel = True
+                                                             _displaySettings.Hide()
+                                                         End If
+                                                     End Sub
+        End If
+        _displaySettings.Show(Me)
+        _displaySettings.BringToFront()
+    End Sub
+
+    Private Sub StopAllAudio()
+        _countdown.Stop()
+        AudioService.Instance.StopAll()
     End Sub
 
     Private Sub LoadBank()
@@ -210,7 +311,7 @@ Public Class Form1
             ' Только полностью проверенная база заменяет предыдущую. До этого момента
             ' отмена диалога/ошибка разбора не меняют ни базу, ни игровую сессию.
             _bank = loaded
-            SetStatus("Загружена база «" & Path.GetFileName(dialog.FileName) & "». Выберите раунд. Текущая игра сохранена.")
+            _bankName.Text = Path.GetFileName(dialog.FileName)
         End Using
     End Sub
 
@@ -241,9 +342,8 @@ Public Class Form1
         _buzz.Disarm()
     End Sub
 
-    Private Sub ApplyScore(index As Integer)
+    Private Sub ApplyScore(index As Integer, value As Integer)
         ' В отличие от старых ручных обработчиков стороны здесь не зеркалятся.
-        Dim value = CInt(_scores(index).Value)
         _session.Execute("Исправить " & {"счёт левой команды", "банк раунда", "счёт правой команды"}(index) & " → " & value, Sub(state)
                                                                                                                                   Select Case index
                                                                                                                                       Case 0 : state.Main.LeftScore = value
@@ -304,7 +404,6 @@ Public Class Form1
         _session.Restore()
         _countdown.Stop()
         _buzz.Disarm()
-        SetStatus("Игра восстановлена. Таймер и Buzz! запускаются отдельно. Для следующих раундов при необходимости загрузите базу.")
     End Sub
 
     Private Sub NewMatch()
@@ -321,42 +420,50 @@ Public Class Form1
     End Sub
 
     Private Sub SessionChanged(sender As Object, e As EventArgs)
-        ' Обновляем ввод только при изменении соответствующего значения модели.
-        ' Без сравнения с _last каждый клик стирал бы черновики остальных строк.
+        ' Не трогаем несвязанные черновики и не заменяем сообщение об ошибке
+        ' очередным успешным действием. Обычного журнала событий у пульта нет.
         Dim state = _session.State.Main
         For i = 0 To 5
             Dim answer = state.Answers(i)
             If _last Is Nothing OrElse _last.Answers(i).Text <> answer.Text Then _answers(i).Text = answer.Text
             If _last Is Nothing OrElse _last.Answers(i).Points <> answer.Points Then _points(i).Value = answer.Points
             _show(i).Text = If(answer.TextVisible, "Скрыть ответ", "Открыть ответ")
-            _answerStatus(i).Text = If(answer.AwardedBank >= 0, If(answer.AwardedBank = state.BankId, "+" & answer.AwardedPoints & " в банке", "Очки уже переданы"), "Без начисления")
-            _answerStatus(i).ForeColor = If(answer.TextVisible, Color.DarkGreen, Color.DimGray)
         Next
         Dim values = {state.LeftScore, state.Bank, state.RightScore}
-        Dim previous = If(_last Is Nothing, Nothing, New Integer() {_last.LeftScore, _last.Bank, _last.RightScore})
         For i = 0 To 2
-            If previous Is Nothing OrElse values(i) <> previous(i) Then _scores(i).Value = values(i)
+            _scores(i).Text = values(i).ToString()
             For side = 0 To 1
-                Dim enabled = If(side = 0, state.LeftStrikes(i), state.RightStrikes(i))
-                _strikes(side, i).Text = If(enabled, "Убрать ошибку ", "Ошибка ") & (i + 1)
-                _strikes(side, i).BackColor = If(enabled, Color.MistyRose, SystemColors.Control)
+                Dim active = If(side = 0, state.LeftStrikes(i), state.RightStrikes(i))
+                _strikes(side, i).Text = "× " & (i + 1)
+                OperatorUi.Selected(_strikes(side, i), active)
+                _strikes(side, i).BackColor = If(active, Color.MistyRose, SystemColors.Control)
+                _strikes(side, i).ForeColor = If(active, Color.DarkRed, SystemColors.ControlText)
+                _strikes(side, i).AccessibleDescription = If(active, "Промах поставлен", "Промаха нет")
+                _surface.Tips.SetToolTip(_strikes(side, i), If(active, "Убрать промах ", "Поставить промах ") & (i + 1))
             Next
         Next
-        _round.Text = "Раунд " & state.Round & " · в банк ×" & state.Multiplier & If(_bank Is Nothing, " · ручной ввод", " · база загружена")
+        For i = 0 To _roundButtons.Count - 1
+            OperatorUi.Selected(_roundButtons(i), state.Round = i + 1)
+        Next
+        _answerPriceHeading.Text = If(state.Round = 4, "Цена", "Ответили" & Environment.NewLine & "чел.")
+        _awardHeading.Text = "В банк" & Environment.NewLine & "×" & state.Multiplier
         _undo.Enabled = _session.UndoDescription <> ""
-        If _undo.Enabled Then _restore.Enabled = True
-        _undo.Text = "Отменить (Ctrl+Z)"
-        Dim description = _session.UndoDescription
-        _status.Text = If(description = "", "Готово. Загрузите базу или введите ответы вручную.", "Последнее действие: " & description & ". Отмена доступна из обоих пультов.")
+        _surface.Tips.SetToolTip(_undo, _session.UndoDescription)
+        _restore.Enabled = _session.HasSavedGame
+        _returnAnswers.Enabled = state.Splash >= 0
         If _board IsNot Nothing Then _board.Render(state)
         If _bigBoard IsNot Nothing Then _bigBoard.Render(_session.State.Big)
         _last = state
+        For i = 0 To 5
+            RefreshAward(i)
+        Next
     End Sub
 
     Private Function SelectedScreen() As Screen
         ' Состав мониторов мог измениться после запуска; ограничиваем устаревший индекс.
         Dim screens = Screen.AllScreens
-        Return screens(Math.Max(0, Math.Min(_screens.SelectedIndex, screens.Length - 1)))
+        Dim index = If(_screens.SelectedIndex < 0, If(screens.Length > 1, 1, 0), _screens.SelectedIndex)
+        Return screens(Math.Max(0, Math.Min(index, screens.Length - 1)))
     End Function
 
     Private Sub ShowMainBoard()
@@ -384,7 +491,7 @@ Public Class Form1
     Private Sub OpenBigGame()
         ' Скрытый пульт переиспользуется с черновиками; общие сервисы не создаются повторно.
         _buzz.Disarm()
-        If _bigControl Is Nothing OrElse _bigControl.IsDisposed Then _bigControl = New BigGameControl(_session, _countdown, AddressOf ShowBigBoard, AddressOf UndoAction)
+        If _bigControl Is Nothing OrElse _bigControl.IsDisposed Then _bigControl = New BigGameControl(_session, _countdown, AddressOf ShowBigBoard, AddressOf UndoAction, AddressOf HideBoards, AddressOf ShowDisplaySettings, AddressOf ReturnToMain)
         _bigControl.Show(Me)
         _bigControl.BringToFront()
         ShowBigBoard()
@@ -394,20 +501,66 @@ Public Class Form1
         If _bigBoard IsNot Nothing Then _bigBoard.RenderTimer(_countdown.SecondsRemaining, _countdown.Visible)
     End Sub
 
-    Private Sub SetStatus(message As String)
-        OperatorUi.OnUi(Me, Sub() _status.Text = message)
+    Private Sub ReturnToMain()
+        If _bigControl IsNot Nothing Then _bigControl.Hide()
+        Activate()
+        ShowMainBoard()
     End Sub
 
-    Private Sub CloseServices(sender As Object, e As FormClosedEventArgs)
-        ' Единственный владелец закрывает USB, отсчёт и аудиовыход при завершении приложения.
-        ' Создание AudioService.Instance не открывает звуковую карту: тихий запуск
-        ' завершается без лишней попытки инициализировать аудиоустройство.
-        _buzz.Dispose()
-        _countdown.Dispose()
-        RemoveHandler AudioService.Instance.AudioError, AddressOf SetStatus
-        AudioService.Instance.Dispose()
-        If _bigControl IsNot Nothing Then _bigControl.Dispose()
-        If _board IsNot Nothing Then _board.Dispose()
-        If _bigBoard IsNot Nothing Then _bigBoard.Dispose()
+    Private Sub SetStatus(message As String)
+        OperatorUi.OnUi(Me, Sub() _surface.ShowError(message))
+    End Sub
+
+    Private Async Sub CloseAsync(sender As Object, e As FormClosingEventArgs)
+        If _closed Then Return
+        e.Cancel = True
+        If _closing OrElse _confirmingClose Then Return
+        If e.CloseReason = CloseReason.UserClosing Then
+            _confirmingClose = True
+            Try
+                If Not OperatorUi.ConfirmExit(Me) Then Return
+            Finally
+                _confirmingClose = False
+            End Try
+        End If
+        ' До ответа «Да» ничего не останавливаем. Повторный Close после await
+        ' пропускается по _closed и не открывает второе подтверждение.
+        _closing = True
+        Enabled = False
+        If _bigControl IsNot Nothing Then _bigControl.Enabled = False
+        If _displaySettings IsNot Nothing Then _displaySettings.Enabled = False
+        StopAllAudio()
+        HideBoards()
+        ' Продолжаем обрабатывать Windows-сообщения, пока worker освобождает USB.
+        Try
+            Await _buzz.ShutdownAsync()
+        Catch ex As Exception
+            Diagnostics.Debug.WriteLine(ex.Message)
+        End Try
+        _closed = True
+        ' Даже без приёмника ShutdownAsync может завершиться синхронно.
+        ' Следующий WM_CLOSE отправляем после выхода из текущего FormClosing.
+        If Not IsDisposed AndAlso IsHandleCreated Then BeginInvoke(New Action(AddressOf Close))
+    End Sub
+
+    Protected Overrides Sub Dispose(disposing As Boolean)
+        If disposing AndAlso Not _servicesDisposed Then
+            _servicesDisposed = True
+            If _buzz IsNot Nothing Then
+                RemoveHandler _buzz.StatusChanged, AddressOf BuzzStatusChanged
+            End If
+            RemoveHandler AudioService.Instance.AudioError, AddressOf SetStatus
+            ' Ошибка одного драйвера при выходе не должна оставлять остальные
+            ' сервисы и окна неосвобождёнными. Аудиовыход закрываем последним.
+            For Each resource As IDisposable In New IDisposable() {_buzz, _countdown, _bigControl, _displaySettings, _board, _bigBoard, _matchMenu, AudioService.Instance}
+                If resource Is Nothing Then Continue For
+                Try
+                    resource.Dispose()
+                Catch ex As Exception
+                    Diagnostics.Debug.WriteLine(ex.Message)
+                End Try
+            Next
+        End If
+        MyBase.Dispose(disposing)
     End Sub
 End Class
