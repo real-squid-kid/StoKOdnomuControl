@@ -2,11 +2,15 @@ Option Strict On
 Imports System.IO
 Imports System.Windows.Forms
 
+' Главный пульт владеет общей сессией, окнами табло и оборудованием.
+' Обработчики отправляют команды в GameSession; поля формы не являются счётом игры.
 Public Class Form1
     Inherits Form
     Private ReadOnly _session As GameSession
     Private ReadOnly _buzz As New BuzzManager()
     Private _bank As QuestionBank
+    ' Предыдущий опубликованный снимок нужен для обновления только изменившихся полей.
+    ' Несвязанный рендер не должен стирать ещё не применённый ввод оператора.
     Private _last As MainGameState
     Private _board As Tablo
     Private _bigControl As BigGameControl
@@ -29,6 +33,8 @@ Public Class Form1
     Private _restore As Button
 
     Public Sub New()
+        ' Тесты задают отдельный каталог. В обычном запуске данные принадлежат текущему
+        ' пользователю Windows и не записываются в каталог исходников/установки.
         Dim dataDirectory = Environment.GetEnvironmentVariable("STOKODNOMU_DATA_DIR")
         If String.IsNullOrWhiteSpace(dataDirectory) Then dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "StoKOdnomuControl")
         _session = New GameSession(dataDirectory)
@@ -39,6 +45,8 @@ Public Class Form1
         AddHandler _countdown.Changed, Sub() RenderCountdown()
         AddHandler _buzz.StatusChanged, Sub(message) OperatorUi.OnUi(Me, Sub() _buzzStatus.Text = message)
         AddHandler _buzz.BuzzerPressed, Sub(pad)
+                                           ' Событие приходит с потока HID; контролы и звук запускаем
+                                           ' через UI-поток, не блокируя чтение следующего USB-отчёта.
                                            OperatorUi.OnUi(Me, Sub()
                                                                   _buzzStatus.Text = "Первым нажал пульт " & (pad + 1) & ". Для нового розыгрыша нажмите «Разрешить Buzz!» ."
                                                                   AudioService.Instance.Play(SoundCue.Buzzer, AudioChannel.Buzzer)
@@ -61,6 +69,8 @@ Public Class Form1
     End Sub
 
     Private Sub BuildUi()
+        ' Пульт собирается программно вместо прежнего Form1.Designer.vb.
+        ' Общие размеры/создание контролов — в OperatorUi; здесь остаётся смысл действий.
         Dim page = OperatorUi.Page(Me, "Сто к одному — пульт оператора")
         OperatorUi.Heading(page, "Основная игра")
         Dim actions = OperatorUi.Row(page)
@@ -97,6 +107,7 @@ Public Class Form1
                                                 End Sub
         Dim rounds = OperatorUi.Row(page)
         For i = 1 To 4
+            ' Отдельная локальная копия захватывается обработчиком конкретной кнопки.
             Dim number = i
             _roundButtons.Add(OperatorUi.Button(rounds, {"", "Простая · ×1", "Двойная · ×2", "Тройная · ×3", "Игра наоборот"}(i), Sub() StartRound(number), 138))
         Next
@@ -104,6 +115,7 @@ Public Class Form1
         rounds.Controls.Add(_round)
         Dim scores = OperatorUi.Row(page)
         Dim scoreNames = {"Левая команда", "Банк раунда", "Правая команда"}
+        ' Порядок массива полей совпадает с ApplyScore: 0 — слева, 1 — банк, 2 — справа.
         For i = 0 To 2
             Dim index = i
             scores.Controls.Add(OperatorUi.Label(scoreNames(i), 130))
@@ -132,6 +144,7 @@ Public Class Form1
         Next
         For i = 0 To 5
             Dim index = i
+            ' Name — стабильный адрес контрола в проверках кнопок; подпись можно менять.
             _answers(i) = New TextBox With {.Name = "MainAnswer" & i, .MaxLength = 120, .Margin = New Padding(4, 10, 4, 4)}
             _points(i) = OperatorUi.Number(GameRules.MaximumAnswerPoints)
             _points(i).Width = 80
@@ -178,6 +191,7 @@ Public Class Form1
         _status.Height = 42
         _status.ForeColor = Color.FromArgb(25, 64, 110)
         Dim scroll = page.Parent
+        ' Нижний статус вынесен из прокрутки, чтобы ошибки сохранения оставались видны.
         Controls.Remove(scroll)
         Dim frame As New TableLayoutPanel With {.Dock = DockStyle.Fill, .RowCount = 2, .ColumnCount = 1, .Margin = New Padding(0), .Padding = New Padding(0)}
         frame.RowStyles.Add(New RowStyle(SizeType.Percent, 100))
@@ -193,12 +207,16 @@ Public Class Form1
         Using dialog As New OpenFileDialog With {.Title = "Выберите базу из 24 ответов", .Filter = "Базы ответов (*.txt)|*.txt|Все файлы (*.*)|*.*"}
             If dialog.ShowDialog(Me) <> DialogResult.OK Then Return
             Dim loaded = QuestionBankReader.ReadFile(dialog.FileName)
+            ' Только полностью проверенная база заменяет предыдущую. До этого момента
+            ' отмена диалога/ошибка разбора не меняют ни базу, ни игровую сессию.
             _bank = loaded
             SetStatus("Загружена база «" & Path.GetFileName(dialog.FileName) & "». Выберите раунд. Текущая игра сохранена.")
         End Using
     End Sub
 
     Private Sub StartRound(number As Integer)
+        ' Выбор раунда — одна отменяемая команда: цены остаются базовыми,
+        ' множитель, банк, раскрытия и ошибки обновляются согласованно.
         If Not OperatorUi.Confirm(Me, "Начать раунд «" & _roundButtons(number - 1).Text & "»? Банк, открытия и ошибки текущего раунда будут сброшены; счета команд сохранятся.") Then Return
         _last = Nothing
         _session.Execute("Начать раунд " & number, Sub(state)
@@ -217,12 +235,14 @@ Public Class Form1
     End Sub
 
     Private Sub ResetCurrentRound()
+        ' Сброс сохраняет счета команд и подготовленные ответы. Новый матч — другая команда.
         If Not OperatorUi.Confirm(Me, "Сбросить банк, открытия и ошибки? Тексты ответов и счета команд сохранятся.") Then Return
         _session.Execute("Сбросить текущий раунд", Sub(state) GameRules.ResetRound(state.Main))
         _buzz.Disarm()
     End Sub
 
     Private Sub ApplyScore(index As Integer)
+        ' В отличие от старых ручных обработчиков стороны здесь не зеркалятся.
         Dim value = CInt(_scores(index).Value)
         _session.Execute("Исправить " & {"счёт левой команды", "банк раунда", "счёт правой команды"}(index) & " → " & value, Sub(state)
                                                                                                                                   Select Case index
@@ -235,10 +255,13 @@ Public Class Form1
 
     Private Sub Transfer(side As TeamSide)
         _session.Execute("Передать банк " & If(side = TeamSide.Left, "левой", "правой") & " команде", Sub(state) GameRules.TransferBank(state.Main, side))
+        ' Эффект воспроизводится после успешной команды. Рендер/Undo его не повторяет.
         AudioService.Instance.Play(SoundCue.Transfer)
     End Sub
 
     Private Sub ToggleAnswer(index As Integer)
+        ' Решение принимается по модели, а не по BackColor. Скрытие убирает только показ;
+        ' защитой от двойного начисления управляет GameRules.ShowMainAnswer.
         Dim answer = _session.State.Main.Answers(index)
         If answer.TextVisible Then
             _session.Execute("Скрыть ответ " & (index + 1) & " без отмены очков", Sub(state)
@@ -253,6 +276,7 @@ Public Class Form1
     End Sub
 
     Private Sub EditAnswer(index As Integer)
+        ' Текст/цена отправляются одной командой; ввод в поле сам не публикует правку.
         _session.Execute("Исправить ответ " & (index + 1), Sub(state) GameRules.EditMainAnswer(state.Main, index, _answers(index).Text, CInt(_points(index).Value)))
     End Sub
 
@@ -266,10 +290,14 @@ Public Class Form1
     End Sub
 
     Friend Sub UndoAction()
+        ' История общая для обоих пультов. Не сбрасываем _last: тогда нетронутые
+        ' черновики других строк переживут отмену одного ответа или начисления.
         _session.Undo()
     End Sub
 
     Private Sub RestoreGame()
+        ' Явное восстановление заменяет и черновики. Runtime-таймер и допуск Buzz!
+        ' в сохранение не входят: после загрузки оборудование остаётся остановленным.
         If MessageBox.Show(Me, "Восстановить последнее автосохранение вместе с историей отмены? Текущие несохранённые черновики будут заменены.", "Восстановление", MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then Return
         _last = Nothing
         If _bigControl IsNot Nothing Then _bigControl.ReloadDrafts()
@@ -280,6 +308,7 @@ Public Class Form1
     End Sub
 
     Private Sub NewMatch()
+        ' Снимок до сброса остаётся в истории, поэтому новый матч тоже можно отменить.
         If Not OperatorUi.Confirm(Me, "Начать новый матч? Все счета, ответы и большая игра будут сброшены.") Then Return
         _last = Nothing
         If _bigControl IsNot Nothing Then _bigControl.ReloadDrafts()
@@ -292,6 +321,8 @@ Public Class Form1
     End Sub
 
     Private Sub SessionChanged(sender As Object, e As EventArgs)
+        ' Обновляем ввод только при изменении соответствующего значения модели.
+        ' Без сравнения с _last каждый клик стирал бы черновики остальных строк.
         Dim state = _session.State.Main
         For i = 0 To 5
             Dim answer = state.Answers(i)
@@ -323,11 +354,14 @@ Public Class Form1
     End Sub
 
     Private Function SelectedScreen() As Screen
+        ' Состав мониторов мог измениться после запуска; ограничиваем устаревший индекс.
         Dim screens = Screen.AllScreens
         Return screens(Math.Max(0, Math.Min(_screens.SelectedIndex, screens.Length - 1)))
     End Function
 
     Private Sub ShowMainBoard()
+        ' Используем явные экземпляры окон вместо глобальных VB default instances.
+        ' На экране показывается один режим; состояние второго продолжает жить в сессии.
         If _bigBoard IsNot Nothing Then _bigBoard.Hide()
         If _board Is Nothing OrElse _board.IsDisposed Then _board = New Tablo()
         _board.Render(_session.State.Main)
@@ -348,6 +382,7 @@ Public Class Form1
     End Sub
 
     Private Sub OpenBigGame()
+        ' Скрытый пульт переиспользуется с черновиками; общие сервисы не создаются повторно.
         _buzz.Disarm()
         If _bigControl Is Nothing OrElse _bigControl.IsDisposed Then _bigControl = New BigGameControl(_session, _countdown, AddressOf ShowBigBoard, AddressOf UndoAction)
         _bigControl.Show(Me)
@@ -364,6 +399,9 @@ Public Class Form1
     End Sub
 
     Private Sub CloseServices(sender As Object, e As FormClosedEventArgs)
+        ' Единственный владелец закрывает USB, отсчёт и аудиовыход при завершении приложения.
+        ' Создание AudioService.Instance не открывает звуковую карту: тихий запуск
+        ' завершается без лишней попытки инициализировать аудиоустройство.
         _buzz.Dispose()
         _countdown.Dispose()
         RemoveHandler AudioService.Instance.AudioError, AddressOf SetStatus

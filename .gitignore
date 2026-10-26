@@ -261,3 +261,7 @@ __pycache__/
 *.pyc
 # Local release packages
 /artifacts/
+
+# Local Markdown documentation, including .md, .MD, .Md and .mD at any depth.
+# Already tracked documents remain tracked until the owner changes the index.
+*.[mM][dD]

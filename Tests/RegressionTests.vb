@@ -6,12 +6,15 @@ Imports System.Windows.Forms
 Imports StoKOdnomuControl
 
 Module Checks
+    ' Консольные регрессии без дополнительного тестового фреймворка/NuGet.
+    ' Счётчик ниже — число утверждений, а не независимых пользовательских сценариев.
     Private _assertions As Integer
     Private ReadOnly _storageErrors As New List(Of String)()
 
     <STAThread>
     Public Sub Main(args As String())
         Try
+            ' Снимки/логи тестов отделены от сохранения реального матча оператора.
             Dim temporary = Path.Combine(Path.GetTempPath(), "StoKOdnomu-tests-" & Guid.NewGuid().ToString("N"))
             Directory.CreateDirectory(temporary)
             TestParser()
@@ -71,6 +74,8 @@ Module Checks
     End Sub
 
     Private Sub TestCountdown()
+        ' Перезапуск часов проверяется с выключенным звуком. Слышимая синхронизация
+        ' фонограммы требует отдельной репетиции на оборудовании.
         AudioService.Instance.Enabled = False
         Using countdown As New Countdown()
             countdown.Start(20)
@@ -158,6 +163,8 @@ Module Checks
     End Sub
 
     Private Sub TestBuzzer()
+        ' Чистый арбитраж: удержание, отпускание, победитель и ничья одного отчёта.
+        ' HID-дескриптор, USB-соединение и лампы проверяются отдельно на приёмнике.
         Dim gate As New BuzzerGate()
         Check(gate.Accept(1) = -1, "disarmed buttons ignored")
         gate.Arm()
@@ -172,6 +179,8 @@ Module Checks
     End Sub
 
     Private Sub TestPersistence(directory As String)
+        ' История должна переживать перезапуск, а повреждённый XML — не заменять
+        ' открытую игру. File.Replace требует обычных прав ОС без запрета песочницы.
         Dim game = Session(directory, "persist")
         game.Execute("left 42", Sub(s) s.Main.LeftScore = 42)
         game.Execute("big answer", Sub(s) GameRules.ShowBigText(s.Big, 7, "Сохранённый ответ"))
@@ -202,6 +211,7 @@ Module Checks
     End Sub
 
     Private Sub TestUi(directory As String)
+        ' Проверяем обработчики кнопок и шрифты; это не проверка аудиовыхода/проектора.
         Application.EnableVisualStyles()
         AudioService.Instance.Enabled = False
         Environment.SetEnvironmentVariable("STOKODNOMU_DATA_DIR", Path.Combine(directory, "ui"))
@@ -209,6 +219,8 @@ Module Checks
             Dim game = Session(directory, "ui-big")
             Using big As New BigGameControl(game, countdown, Sub() Return, Sub() game.Undo()), board As New Tablo(), bigBoard As New BigGameTablo()
                 For Each form As Form In New Form() {main, big, board, bigBoard}
+                    ' Show создаёт layout/контролы; непоказанная форма давала пустой DrawToBitmap.
+                    ' Прозрачность скрывает тестовые окна от пользователя.
                     form.ShowInTaskbar = False
                     form.Opacity = 0
                     form.Show()

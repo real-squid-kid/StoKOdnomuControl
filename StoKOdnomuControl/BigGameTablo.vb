@@ -1,4 +1,5 @@
 Option Strict On
+' Рендер не читает поля BigGameControl и не считает итог самостоятельно.
 Public Class BigGameTablo
     Private ReadOnly _layout As BoardLayout
     Private ReadOnly _texts As Label()
@@ -26,6 +27,8 @@ Public Class BigGameTablo
         For i = 0 To 9
             Dim answer = state.Answers(i)
             Dim masked = i < 5 AndAlso state.HideFirstPlayer
+            ' Маска меняет вывод, но не данные и стадию раскрытия.
+            ' Непоказанные тексты/цены не публикуются при скрытии первого участника.
             _texts(i).Visible = answer.TextVisible
             _scores(i).Visible = answer.ScoreVisible
             _texts(i).Text = If(masked, "••••••••", answer.Text)
@@ -35,6 +38,7 @@ Public Class BigGameTablo
     End Sub
 
     Public Sub RenderTimer(seconds As Integer, visible As Boolean)
+        ' Отсчётом и его звуком владеет Countdown; табло получает готовую цифру.
         TimerLbl.Text = seconds.ToString()
         TimerLbl.Visible = visible
         _layout.RefreshText()

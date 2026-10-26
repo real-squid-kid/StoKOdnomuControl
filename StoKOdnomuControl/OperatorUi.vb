@@ -2,8 +2,10 @@ Option Strict On
 Imports System.Drawing
 Imports System.Windows.Forms
 
+' Общая компоновка программных пультов; игровые правила здесь не размещаются.
 Public Module OperatorUi
     Public Function Page(form As Form, title As String) As FlowLayoutPanel
+        ' Прокрутка сохраняет доступ к дополнительным командам на малом экране.
         form.Text = title
         form.Font = New Font("Segoe UI", 10.0F)
         form.BackColor = Color.FromArgb(242, 245, 249)
@@ -41,6 +43,8 @@ Public Module OperatorUi
     End Function
 
     Public Function Button(parent As Control, text As String, action As Action, Optional width As Integer = 190) As Button
+        ' Единая граница ошибок операторской команды: причина показывается рядом с пультом.
+        ' Кнопка не исправляет состояние сама; атомарность обеспечивает GameSession.Execute.
         Dim commandButton As New Button With {.Text = text, .Width = width, .Height = 40, .Margin = New Padding(4), .UseVisualStyleBackColor = True}
         AddHandler commandButton.Click, Sub()
                                      Try
@@ -54,10 +58,12 @@ Public Module OperatorUi
     End Function
 
     Public Function Number(Optional maximum As Integer = GameRules.MaximumScore) As NumericUpDown
+        ' UI ограничивает ввод, но проверки GameRules нужны также для файлов и команд.
         Return New NumericUpDown With {.Minimum = 0, .Maximum = maximum, .Width = 95, .Height = 32, .Margin = New Padding(4, 9, 4, 4), .ThousandsSeparator = True}
     End Function
 
     Public Function Grid(parent As Control, ParamArray columns As Single()) As TableLayoutPanel
+        ' 0 — растягиваемый столбец; положительные значения — фиксированная ширина.
         Dim table As New TableLayoutPanel With {.ColumnCount = columns.Length, .AutoSize = True, .Width = 1210, .Padding = New Padding(4), .Margin = New Padding(0, 4, 0, 4), .BackColor = Color.White, .GrowStyle = TableLayoutPanelGrowStyle.AddRows}
         For Each width In columns
             table.ColumnStyles.Add(New ColumnStyle(If(width = 0, SizeType.Percent, SizeType.Absolute), If(width = 0, 100, width)))
@@ -76,12 +82,14 @@ Public Module OperatorUi
     End Function
 
     Public Sub OnUi(form As Form, action As Action)
+        ' HID/аудио вызывают события с рабочего потока. BeginInvoke не задерживает
+        ' этот поток ожиданием UI и отбрасывается, если окно уже закрывается.
         If form.IsDisposed OrElse Not form.IsHandleCreated Then Return
         If form.InvokeRequired Then
             Try
                 form.BeginInvoke(action)
             Catch ex As InvalidOperationException
-                ' A pending device callback may arrive while the operator window closes.
+                ' Между проверкой handle и BeginInvoke окно могло начать освобождение ресурсов.
             End Try
         Else
             action()

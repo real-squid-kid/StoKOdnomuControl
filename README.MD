@@ -2,6 +2,8 @@
 
 Windows Forms, VB.NET, .NET Framework 4.8. Версия ветки `EchoKnowsBest` — 0.2. Подробная [памятка оператора](OPERATOR_GUIDE.MD), [исходный аудит](AUDIT.MD) и [статус его пунктов](AUDIT_PROGRESS.MD).
 
+Дальнейшие работы описаны в [таймлайне](DEVELOPMENT_TIMELINE.MD). Каждый следующий этап начинается только после разрешения владельца. Git и публикацией владелец занимается самостоятельно. Markdown-документы хранятся локально и покрыты `.gitignore`; уже отслеживаемые файлы это правило само не исключает из индекса.
+
 ## Открытие в Visual Studio
 
 Откройте `StoKOdnomuControl.sln` в Visual Studio 2022 с компонентом «Разработка классических приложений .NET» и .NET Framework 4.8 Developer Pack. Стартовый проект — **StoKOdnomuControl**. `RegressionTests` — консольные проверки, запускать его вместо приложения не нужно.

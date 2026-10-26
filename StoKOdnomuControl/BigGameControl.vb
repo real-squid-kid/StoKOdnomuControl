@@ -1,6 +1,8 @@
 Option Strict On
 Imports System.Windows.Forms
 
+' Пульт большой игры использует ту же GameSession, что и основной пульт.
+' Индексы 0..4 — первый участник, 5..9 — второй; цена и текст раскрываются отдельно.
 Public Class BigGameControl
     Inherits Form
     Private ReadOnly _session As GameSession
@@ -18,9 +20,11 @@ Public Class BigGameControl
     Private _next As Button
     Private _undo As Button
     Private _last As BigGameState
+    ' Изменение Checked во время рендера не должно создать новую команду Undo.
     Private _updating As Boolean
 
     Public Sub New(session As GameSession, countdown As Countdown, showBoard As Action, undoAction As Action)
+        ' Зависимости передаются владельцем: второй пульт не создаёт свой матч или отсчёт.
         _session = session
         _countdown = countdown
         _undoAction = undoAction
@@ -48,6 +52,8 @@ Public Class BigGameControl
     End Sub
 
     Private Sub BuildUi(showBoard As Action)
+        ' Вместо прежнего Designer: два столбца участников и одинаковые действия пяти вопросов.
+        ' Надписи кнопок меняются со стадией раскрытия, а не с цветом контрола.
         Dim page = OperatorUi.Page(Me, "Сто к одному — большая игра")
         OperatorUi.Heading(page, "Большая игра · два участника, пять вопросов")
         Dim actions = OperatorUi.Row(page)
@@ -91,6 +97,7 @@ Public Class BigGameControl
             Next
             For question = 0 To 4
                 Dim index = player * 5 + question
+                ' Замыкание получает отдельный index для этой строки обоих участников.
                 _texts(index) = New TextBox With {.Name = "BigAnswer" & index, .MaxLength = 120, .Margin = New Padding(4, 10, 4, 4)}
                 _points(index) = OperatorUi.Number(GameRules.MaximumAnswerPoints)
                 _points(index).Width = 58
@@ -125,6 +132,8 @@ Public Class BigGameControl
     End Sub
 
     Private Sub NextStep()
+        ' Берём первый ещё не раскрытый элемент из модели. Нет отдельного State += 1,
+        ' который раньше пропускал вопрос при ошибке или отставал после ручной правки.
         Dim stepNumber = _session.State.Big.NextStep
         If stepNumber >= 20 Then Return
         Dim index = stepNumber \ 2
@@ -138,6 +147,7 @@ Public Class BigGameControl
     Private Sub ShowText(index As Integer)
         Dim wasVisible = _session.State.Big.Answers(index).TextVisible
         Run(If(wasVisible, "Исправить", "Показать") & " текст: " & AnswerName(index), Sub(state) GameRules.ShowBigText(state.Big, index, _texts(index).Text))
+        ' Только первое раскрытие озвучивается; коррекция текста не имитирует новый ответ.
         If Not wasVisible Then AudioService.Instance.Play(CType(CInt(SoundCue.Reveal1) + index Mod 5, SoundCue))
     End Sub
 
@@ -145,6 +155,8 @@ Public Class BigGameControl
         Dim before = _session.State.Big
         Run(If(before.Answers(index).ScoreVisible, "Исправить", "Начислить") & " очки: " & AnswerName(index), Sub(state) GameRules.ShowBigPoints(state.Big, index, CInt(_points(index).Value)))
         Dim after = _session.State.Big
+        ' Победный эффект связан с переходом через цель, а не с каждым рендером итога.
+        ' Undo не проходит через этот обработчик и не проигрывает победу заново.
         If before.Total < after.TargetScore AndAlso after.Total >= after.TargetScore Then
             AudioService.Instance.Play(SoundCue.Victory)
         Else
@@ -161,6 +173,8 @@ Public Class BigGameControl
     End Function
 
     Private Sub SaveDrafts()
+        ' Сохраняем только непоказанные строки. Опубликованные ответы меняются отдельными
+        ' кнопками, чтобы эта команда не исправила счёт/экран незаметно.
         _session.Execute("Сохранить черновики большой игры", Sub(state)
                                                                   For i = 0 To 9
                                                                       Dim answer = state.Big.Answers(i)
@@ -173,6 +187,7 @@ Public Class BigGameControl
     End Sub
 
     Private Sub ResetGame()
+        ' Сбрасываем публикацию и ручную поправку, сохраняя выбранную цель победы.
         If Not OperatorUi.Confirm(Me, "Очистить все ответы и итог большой игры? Цель для победы сохранится.") Then Return
         ReloadDrafts()
         _session.Execute("Новая большая игра", Sub(state) state.Big = New BigGameState With {.TargetScore = state.Big.TargetScore})
@@ -180,10 +195,13 @@ Public Class BigGameControl
     End Sub
 
     Friend Sub ReloadDrafts()
+        ' Явное восстановление/новый матч требуют замены старого ввода при следующем рендере.
         _last = Nothing
     End Sub
 
     Private Sub SessionChanged(sender As Object, e As EventArgs)
+        ' Защита от обратного вызова CheckedChanged и стирания несвязанных черновиков.
+        ' Доступность начисления определяется опубликованным текстом конкретной строки.
         _updating = True
         Dim state = _session.State.Big
         For i = 0 To 9

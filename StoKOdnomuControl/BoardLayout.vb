@@ -4,7 +4,8 @@ Imports System.Drawing.Text
 Imports System.IO
 Imports System.Windows.Forms
 
-' One proportional canvas keeps the labels aligned with the artwork at any display size.
+' Общий холст масштабирует фон и подписи в одной системе координат 1264x681.
+' Свободное место при другом соотношении сторон остаётся чёрным, без искажения макета.
 Public NotInheritable Class BoardLayout
     Implements IDisposable
     Private ReadOnly _form As Form
@@ -13,6 +14,7 @@ Public NotInheritable Class BoardLayout
     Private ReadOnly _fontSizes As New Dictionary(Of Control, Single)()
     Private ReadOnly _fontStyles As New Dictionary(Of Control, FontStyle)()
     Private ReadOnly _fonts As New PrivateFontCollection()
+    ' Освобождаем только созданные нами Font, а не унаследованный/общий Font формы.
     Private ReadOnly _ownedFonts As New Dictionary(Of Control, Font)()
     Private _fullScreen As Boolean
 
@@ -26,11 +28,14 @@ Public NotInheritable Class BoardLayout
         _canvas.BackgroundImageLayout = ImageLayout.Stretch
         form.BackgroundImage = Nothing
         For Each control As Control In form.Controls.Cast(Of Control)().ToArray()
+            ' Геометрия Designer запоминается один раз. Повторный resize всегда считает
+            ' координаты от оригинала, а не накапливает погрешность предыдущих масштабирований.
             _bounds.Add(control, control.Bounds)
             _fontSizes.Add(control, control.Font.SizeInPoints)
             _fontStyles.Add(control, control.Font.Style)
             Dim label = TryCast(control, Label)
             If label IsNot Nothing Then
+                ' Частные шрифты рисуются GDI+: одной загрузки TTF недостаточно для обычного GDI.
                 label.UseCompatibleTextRendering = True
                 label.AutoEllipsis = True
             End If
@@ -38,6 +43,7 @@ Public NotInheritable Class BoardLayout
         Next
         form.Controls.Add(_canvas)
         For Each name In {"JetBrainsMono-Regular.ttf", "JetBrainsMono-Bold.ttf"}
+            ' Эти файлы входят в комплект; установки всего семейства в Windows не требуется.
             Dim path = IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Fonts", name)
             If File.Exists(path) Then _fonts.AddFontFile(path)
         Next
@@ -48,6 +54,7 @@ Public NotInheritable Class BoardLayout
     End Sub
 
     Public Sub ShowOn(screen As Screen, fullscreen As Boolean)
+        ' Полный экран занимает Bounds монитора, оконный режим — его WorkingArea.
         _fullScreen = fullscreen
         _form.WindowState = FormWindowState.Normal
         _form.FormBorderStyle = If(fullscreen, FormBorderStyle.None, FormBorderStyle.Sizable)
@@ -73,12 +80,15 @@ Public NotInheritable Class BoardLayout
                 Dim family = If(_fonts.Families.Length > 0, _fonts.Families(0), FontFamily.GenericMonospace)
                 Dim size = Math.Max(8.0F, _fontSizes(control) * scale)
                 Dim font As New Font(family, size, _fontStyles(control))
+                ' Длинный текст уменьшается до нижнего порога; AutoEllipsis остаётся страховкой.
                 While control.Text.Length > 0 AndAlso size > 8 AndAlso graphics.MeasureString(control.Text, font).Width > control.Width - 6
                     font.Dispose()
                     size = Math.Max(8.0F, size - 1)
                     font = New Font(family, size, _fontStyles(control))
                 End While
                 If control.Font.Equals(font) Then
+                    ' WinForms может проигнорировать присваивание равного Font. В этой ветке
+                    ' уничтожаем НОВЫЙ лишний объект, иначе уничтожили бы ещё используемый Font.
                     font.Dispose()
                 Else
                     Dim oldFont As Font = Nothing
@@ -99,6 +109,8 @@ Public NotInheritable Class BoardLayout
     End Sub
 
     Private Sub OnClosing(sender As Object, e As FormClosingEventArgs)
+        ' Крестик скрывает зрительское окно, а не теряет его состояние/экземпляр.
+        ' При завершении приложения владелец вызывает Dispose явно.
         If e.CloseReason = CloseReason.UserClosing Then
             e.Cancel = True
             _form.Hide()

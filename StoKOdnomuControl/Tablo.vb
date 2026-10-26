@@ -1,4 +1,6 @@
 Option Strict On
+' Зрительское окно только рисует снимок. Здесь нет начислений, Undo и звуков,
+' поэтому повторный показ окна не меняет игру и не повторяет эффекты.
 Public Class Tablo
     Private ReadOnly _layout As BoardLayout
     Private ReadOnly _texts As Label()
@@ -8,6 +10,8 @@ Public Class Tablo
 
     Public Sub New()
         InitializeComponent()
+        ' Designer сохраняет геометрию; массивы заменяют одинаковые ветви рендера.
+        ' Картинки берутся из общих ресурсов, без шести копий в Tablo.resx.
         _texts = {Answer1Lbl, Answer2Lbl, Answer3Lbl, Answer4Lbl, Answer5Lbl, Answer6Lbl}
         _scores = {Answer1ScoreLbl, Answer2ScoreLbl, Answer3ScoreLbl, Answer4ScoreLbl, Answer5ScoreLbl, Answer6ScoreLbl}
         _left = {LeftStrike1Lbl, LeftStrike2Lbl, LeftStrike3Lbl}
@@ -22,6 +26,8 @@ Public Class Tablo
     End Sub
 
     Public Sub Render(state As MainGameState)
+        ' Полностью восстанавливаем картину из модели, затем накладываем заставку.
+        ' Возврат к игре не требует считывания значений с пульта.
         ScoreLeftLbl.Text = state.LeftScore.ToString()
         ScoreRightLbl.Text = state.RightScore.ToString()
         RoundScoreLbl.Text = state.Bank.ToString()
@@ -41,6 +47,7 @@ Public Class Tablo
             _right(i).Image = If(state.RightStrikes(i), My.Resources._26_wrong_r, My.Resources._26_chance_r)
         Next
         If state.Splash >= 0 Then
+            ' Меняем надписи окна; реальные ответы и банк в state остаются прежними.
             For i = 0 To 5
                 _texts(i).Text = ""
                 _scores(i).Text = ""

@@ -5,6 +5,7 @@ Imports NAudio.Wave
 Imports NAudio.Wave.SampleProviders
 
 Public Enum SoundCue
+    ' Имена описывают игровые события; соответствие WAV хранится только в OpenResource.
     OpenAnswer
     NoScore
     WrongAnswer
@@ -15,6 +16,7 @@ Public Enum SoundCue
     Buzzer
     Countdown20
     Countdown25
+    ' Reveal1..Reveal5 должны идти подряд: пульт выбирает звук по индексу вопроса.
     Reveal1
     Reveal2
     Reveal3
@@ -24,20 +26,27 @@ Public Enum SoundCue
 End Enum
 
 Public Enum AudioChannel
+    ' В каждом канале играет один звук; разные каналы могут накладываться.
+    ' Поэтому остановка Countdown не обрывает Buzzer или эффект ответа.
     Effect
     Countdown
     Buzzer
     EasterEgg
 End Enum
 
-' Decode each resource once; playback owns only a cursor into immutable PCM samples.
-' Readers are disposed during decoding, not on the audio callback thread.
+' WAV декодируется один раз; каждое проигрывание получает свой курсор в общем PCM-массиве.
+' Потоки/ридеры закрываются сразу после Decode, а не при завершении аудиоколбэка.
 Public NotInheritable Class AudioService
     Implements IDisposable
     Private Shared ReadOnly _instance As New AudioService()
     Private ReadOnly _gate As New Object()
     Private ReadOnly _cache As New Dictionary(Of SoundCue, Single())()
+    ' Завершение входов приходит с аудиопотока, а Play/Stop — с UI-потока.
+    ' В колбэке используем ConcurrentDictionary без _gate: иначе возможен обратный
+    ' порядок захвата _gate и внутренней блокировки микшера.
     Private ReadOnly _active As New ConcurrentDictionary(Of Guid, CachedSoundProvider)()
+    ' Актуальные WAV — 48 кГц/stereo. ReadFully поддерживает выход тишиной без входов;
+    ' завершение отдельного эффекта не требует перезапуска устройства.
     Private ReadOnly _mixer As New MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(48000, 2)) With {.ReadFully = True}
     Private _output As WaveOutEvent
     Private _disposed As Boolean
@@ -45,6 +54,7 @@ Public NotInheritable Class AudioService
     Public Event AudioError As Action(Of String)
 
     Private Sub New()
+        ' Сам конструктор не открывает аудиоустройство. Оно понадобится только первому Play.
         AddHandler _mixer.MixerInputEnded, Sub(sender, e)
                                               Dim sound = TryCast(e.SampleProvider, CachedSoundProvider)
                                               If sound IsNot Nothing Then
@@ -66,6 +76,8 @@ Public NotInheritable Class AudioService
                 If _disposed OrElse Not Enabled Then Return Guid.Empty
                 If Not _cache.ContainsKey(cue) Then _cache.Add(cue, Decode(cue))
                 If _output Is Nothing Then
+                    ' Устройство публикуется в поле только после успешного запуска;
+                    ' при неудаче локальный экземпляр освобождается для следующей попытки.
                     Dim output As New WaveOutEvent()
                     Try
                         output.Init(_mixer)
@@ -78,6 +90,8 @@ Public NotInheritable Class AudioService
                     End Try
                 End If
                 StopChannel(channel)
+                ' Guid адресует конкретное проигрывание. Повтор того же WAV имеет новый
+                ' курсор и не разделяет позицию чтения с предыдущим проигрыванием.
                 Dim sound As New CachedSoundProvider(_cache(cue), channel, _mixer.WaveFormat)
                 _active.TryAdd(sound.Id, sound)
                 _mixer.AddMixerInput(sound)
@@ -85,12 +99,14 @@ Public NotInheritable Class AudioService
                 Return sound.Id
             End SyncLock
         Catch ex As Exception
+            ' Сбой звука сообщает статус, но не отменяет уже выполненную игровую команду.
             RaiseEvent AudioError("Звук недоступен: " & ex.Message)
             Return Guid.Empty
         End Try
     End Function
 
     Public Sub [Stop](id As Guid)
+        ' Удаление отсутствующего/уже завершённого Guid безопасно и ничего не останавливает.
         SyncLock _gate
             Dim sound As CachedSoundProvider = Nothing
             If _active.TryRemove(id, sound) Then _mixer.RemoveMixerInput(sound)
@@ -98,6 +114,7 @@ Public NotInheritable Class AudioService
     End Sub
 
     Public Sub StopChannel(channel As AudioChannel)
+        ' Перебираем снимок: аудиопоток может одновременно удалить завершившийся вход.
         SyncLock _gate
             For Each pair In _active.ToArray()
                 If pair.Value.Channel = channel Then [Stop](pair.Key)
@@ -117,6 +134,7 @@ Public NotInheritable Class AudioService
     End Sub
 
     Private Shared Function OpenResource(cue As SoundCue) As Stream
+        ' Сюда вынесены все зависимости от имён .resx. Возвращённым потоком владеет Decode.
         Select Case cue
             Case SoundCue.OpenAnswer : Return My.Resources._26_open
             Case SoundCue.NoScore : Return My.Resources._26_noscore
@@ -139,6 +157,9 @@ Public NotInheritable Class AudioService
     End Function
 
     Private Function Decode(cue As SoundCue) As Single()
+        ' Приведение mono/stereo и частоты нужно и для старых bing/ff_reveal.
+        ' WDL работает с управляемыми PCM-сэмплами: отдельных нативных ресемплеров
+        ' на каждое нажатие кнопки больше не остаётся.
         Using stream = OpenResource(cue), reader As New WaveFileReader(stream)
             Dim provider = reader.ToSampleProvider()
             If provider.WaveFormat.Channels = 1 Then provider = New MonoToStereoSampleProvider(provider)
@@ -167,6 +188,8 @@ Public NotInheritable Class AudioService
             StopAll()
             _cache.Clear()
         End SyncLock
+        ' Останавливаем устройство вне _gate, чтобы завершение аудиопотока не ждало
+        ' блокировку, которую удерживал бы UI-поток во время ожидания Stop.
         If output IsNot Nothing Then
             RemoveHandler output.PlaybackStopped, AddressOf OnPlaybackStopped
             output.Stop()
@@ -179,6 +202,7 @@ Public NotInheritable Class AudioService
         Public ReadOnly Id As Guid = Guid.NewGuid()
         Public ReadOnly Channel As AudioChannel
         Private ReadOnly _samples As Single()
+        ' Только позиция индивидуальна. Сам массив после декодирования не изменяется.
         Private _position As Integer
         Public ReadOnly Property WaveFormat As WaveFormat Implements ISampleProvider.WaveFormat
 
@@ -189,6 +213,7 @@ Public NotInheritable Class AudioService
         End Sub
 
         Public Function Read(buffer As Single(), offset As Integer, count As Integer) As Integer Implements ISampleProvider.Read
+            ' Нулевой/короткий Read сигнализирует микшеру естественное завершение входа.
             Dim available = Math.Min(count, _samples.Length - _position)
             Array.Copy(_samples, _position, buffer, offset, available)
             _position += available

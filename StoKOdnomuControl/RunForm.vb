@@ -1,5 +1,6 @@
 ﻿Public Class RunForm
     Private Sub PictureBox1_Click(sender As Object, e As EventArgs) Handles PictureBox1.Click
+        ' Пасхалка использует свой канал: её закрытие не останавливает игру и отсчёт.
         AudioService.Instance.StopChannel(AudioChannel.EasterEgg)
         Me.Close()
     End Sub

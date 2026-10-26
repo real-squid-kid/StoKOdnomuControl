@@ -3,6 +3,7 @@
   <MySubMain>true</MySubMain>
   <MainForm>Form1</MainForm>
   <SingleInstance>true</SingleInstance>
+  <!-- Один экземпляр не позволяет двум пультам перезаписывать одно автосохранение матча. -->
   <ShutdownMode>0</ShutdownMode>
   <EnableVisualStyles>true</EnableVisualStyles>
   <AuthenticationMode>0</AuthenticationMode>

@@ -1,5 +1,7 @@
 ﻿$ErrorActionPreference = 'Stop'
 $msbuildCommand = Get-Command MSBuild.exe -ErrorAction SilentlyContinue
+# В Developer PowerShell используем PATH, иначе ищем Visual Studio через vswhere.
+# Возвращаем только путь, без самостоятельной установки инструментов/компонентов.
 if ($msbuildCommand) { return $msbuildCommand.Source }
 $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
 if (Test-Path -LiteralPath $vswhere) {
