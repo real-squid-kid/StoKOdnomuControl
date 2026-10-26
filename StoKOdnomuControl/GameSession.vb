@@ -82,9 +82,11 @@ Public Class GameSession
             loaded = DirectCast(New XmlSerializer(GetType(SavedMatch)).Deserialize(reader), SavedMatch)
         End Using
         If loaded Is Nothing OrElse loaded.History Is Nothing OrElse loaded.History.Count > 100 Then Throw New InvalidDataException("Неверный файл сохранения.")
+        GameRules.UpgradeLegacy(loaded.Current)
         GameRules.Validate(loaded.Current)
         For Each entry In loaded.History
             If entry Is Nothing OrElse entry.Description Is Nothing Then Throw New InvalidDataException("Неверная история действий.")
+            GameRules.UpgradeLegacy(entry.State)
             GameRules.Validate(entry.State)
         Next
         _saved = loaded

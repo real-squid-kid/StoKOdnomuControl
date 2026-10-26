@@ -33,7 +33,7 @@ Public Class Form1
     Private _connectBuzz As Button
     Private _armBuzz As Button
     Private _blockBuzz As Button
-    Private _returnAnswers As Button
+    Private _splashEditor As SplashEditor
     Private _awardHeading As Label
     Private _answerPriceHeading As Label
     Private _closing As Boolean
@@ -218,14 +218,26 @@ Public Class Form1
     End Sub
 
     Private Sub BuildSplashPanel()
-        ' Пресет меняет режим показа, сохраняя ответы и начисления в сессии.
         Dim panel = OperatorUi.Group(_surface.Right, "Заставка", "SplashPanel")
-        Dim presets As New ComboBox With {.Name = "SplashPresets", .DropDownStyle = ComboBoxStyle.DropDownList}
-        presets.Items.AddRange(New Object() {"Сто к одному", "Простая игра", "Двойная игра", "Тройная игра", "Игра наоборот", "Большая игра"})
-        presets.SelectedIndex = 0
-        OperatorUi.Append(panel, presets)
-        OperatorUi.Button(panel, "Показать заставку", Sub() _session.Execute("Показать заставку", Sub(state) state.Main.Splash = presets.SelectedIndex))
-        _returnAnswers = OperatorUi.Button(panel, "Вернуть ответы", Sub() _session.Execute("Вернуть ответы", Sub(state) state.Main.Splash = -1))
+        _splashEditor = New SplashEditor(Sub(line1, line2) _session.Execute("Показать заставку", Sub(state) GameRules.ShowSplash(state.Main.SplashScreen, line1, line2)),
+                                         Sub() _session.Execute("Вернуть ответы", Sub(state) state.Main.SplashScreen.Visible = False),
+                                         AddressOf PreviewSplash)
+        OperatorUi.Append(panel, _splashEditor)
+    End Sub
+
+    Private Sub PreviewSplash(line1 As String, line2 As String)
+        Dim state = _session.State.Main
+        GameRules.ShowSplash(state.SplashScreen, line1, line2)
+        ' Предпросмотр получает копию состояния и своё окно; сессию и живое табло не меняет.
+        Using preview As New Tablo(True)
+            preview.Text = "Предпросмотр заставки"
+            preview.Name = "SplashPreview"
+            preview.ShowInTaskbar = False
+            preview.StartPosition = FormStartPosition.CenterParent
+            preview.ClientSize = New Size(900, 485)
+            preview.Render(state)
+            preview.ShowDialog(Me)
+        End Using
     End Sub
 
     Private Sub BuildBuzzPanel()
@@ -400,6 +412,7 @@ Public Class Form1
         ' в сохранение не входят: после загрузки оборудование остаётся остановленным.
         If MessageBox.Show(Me, "Восстановить последнее автосохранение вместе с историей отмены? Текущие несохранённые черновики будут заменены.", "Восстановление", MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then Return
         _last = Nothing
+        _splashEditor.ReloadDrafts()
         If _bigControl IsNot Nothing Then _bigControl.ReloadDrafts()
         _session.Restore()
         _countdown.Stop()
@@ -410,6 +423,7 @@ Public Class Form1
         ' Снимок до сброса остаётся в истории, поэтому новый матч тоже можно отменить.
         If Not OperatorUi.Confirm(Me, "Начать новый матч? Все счета, ответы и большая игра будут сброшены.") Then Return
         _last = Nothing
+        _splashEditor.ReloadDrafts()
         If _bigControl IsNot Nothing Then _bigControl.ReloadDrafts()
         _session.Execute("Новый матч", Sub(state)
                                           state.Main = New MainGameState()
@@ -450,7 +464,7 @@ Public Class Form1
         _undo.Enabled = _session.UndoDescription <> ""
         _surface.Tips.SetToolTip(_undo, _session.UndoDescription)
         _restore.Enabled = _session.HasSavedGame
-        _returnAnswers.Enabled = state.Splash >= 0
+        _splashEditor.Render(state.SplashScreen)
         If _board IsNot Nothing Then _board.Render(state)
         If _bigBoard IsNot Nothing Then _bigBoard.Render(_session.State.Big)
         _last = state

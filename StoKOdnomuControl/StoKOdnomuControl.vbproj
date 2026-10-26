@@ -119,6 +119,8 @@
     <Compile Include="QuestionBankReader.vb" />
     <Compile Include="OperatorUi.vb" />
     <Compile Include="BoardLayout.vb" />
+    <Compile Include="SplashEditor.vb" />
+    <Compile Include="SplashOverlay.vb" />
     <Compile Include="Countdown.vb" />
     <Compile Include="BigGameControl.vb">
       <SubType>Form</SubType>

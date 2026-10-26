@@ -37,12 +37,12 @@ Partial Class Tablo
         Me.Answer4ScoreLbl = New System.Windows.Forms.Label()
         Me.Answer5ScoreLbl = New System.Windows.Forms.Label()
         Me.Answer6ScoreLbl = New System.Windows.Forms.Label()
-        Me.RightStrike3Lbl = New System.Windows.Forms.Label()
-        Me.RightStrike2Lbl = New System.Windows.Forms.Label()
-        Me.RightStrike1Lbl = New System.Windows.Forms.Label()
-        Me.LeftStrike3Lbl = New System.Windows.Forms.Label()
-        Me.LeftStrike2Lbl = New System.Windows.Forms.Label()
-        Me.LeftStrike1Lbl = New System.Windows.Forms.Label()
+        Me.RightStrike3Lbl = New System.Windows.Forms.PictureBox()
+        Me.RightStrike2Lbl = New System.Windows.Forms.PictureBox()
+        Me.RightStrike1Lbl = New System.Windows.Forms.PictureBox()
+        Me.LeftStrike3Lbl = New System.Windows.Forms.PictureBox()
+        Me.LeftStrike2Lbl = New System.Windows.Forms.PictureBox()
+        Me.LeftStrike1Lbl = New System.Windows.Forms.PictureBox()
         Me.LeftRoundLbl = New System.Windows.Forms.Label()
         Me.RightRoundLbl = New System.Windows.Forms.Label()
         Me.SuspendLayout()
@@ -230,74 +230,68 @@ Partial Class Tablo
         'RightStrike3Lbl
         '
         Me.RightStrike3Lbl.BackColor = System.Drawing.Color.Transparent
-        Me.RightStrike3Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.RightStrike3Lbl.ForeColor = System.Drawing.Color.Red
         Me.RightStrike3Lbl.Image = Global.StoKOdnomuControl.My.Resources.Resources._26_chance_r
         Me.RightStrike3Lbl.Location = New System.Drawing.Point(1099, 266)
         Me.RightStrike3Lbl.Name = "RightStrike3Lbl"
         Me.RightStrike3Lbl.Size = New System.Drawing.Size(156, 134)
         Me.RightStrike3Lbl.TabIndex = 0
-        Me.RightStrike3Lbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        Me.RightStrike3Lbl.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
+        Me.RightStrike3Lbl.TabStop = False
         '
         'RightStrike2Lbl
         '
         Me.RightStrike2Lbl.BackColor = System.Drawing.Color.Transparent
-        Me.RightStrike2Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.RightStrike2Lbl.ForeColor = System.Drawing.Color.Red
         Me.RightStrike2Lbl.Image = Global.StoKOdnomuControl.My.Resources.Resources._26_chance_r
         Me.RightStrike2Lbl.Location = New System.Drawing.Point(1099, 400)
         Me.RightStrike2Lbl.Name = "RightStrike2Lbl"
         Me.RightStrike2Lbl.Size = New System.Drawing.Size(156, 134)
         Me.RightStrike2Lbl.TabIndex = 0
-        Me.RightStrike2Lbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        Me.RightStrike2Lbl.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
+        Me.RightStrike2Lbl.TabStop = False
         '
         'RightStrike1Lbl
         '
         Me.RightStrike1Lbl.BackColor = System.Drawing.Color.Transparent
-        Me.RightStrike1Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.RightStrike1Lbl.ForeColor = System.Drawing.Color.Red
         Me.RightStrike1Lbl.Image = Global.StoKOdnomuControl.My.Resources.Resources._26_chance_r
         Me.RightStrike1Lbl.Location = New System.Drawing.Point(1099, 534)
         Me.RightStrike1Lbl.Name = "RightStrike1Lbl"
         Me.RightStrike1Lbl.Size = New System.Drawing.Size(156, 134)
         Me.RightStrike1Lbl.TabIndex = 0
-        Me.RightStrike1Lbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        Me.RightStrike1Lbl.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
+        Me.RightStrike1Lbl.TabStop = False
         '
         'LeftStrike3Lbl
         '
         Me.LeftStrike3Lbl.BackColor = System.Drawing.Color.Transparent
-        Me.LeftStrike3Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.LeftStrike3Lbl.ForeColor = System.Drawing.Color.Red
         Me.LeftStrike3Lbl.Image = Global.StoKOdnomuControl.My.Resources.Resources._26_chance_l
         Me.LeftStrike3Lbl.Location = New System.Drawing.Point(14, 266)
         Me.LeftStrike3Lbl.Name = "LeftStrike3Lbl"
         Me.LeftStrike3Lbl.Size = New System.Drawing.Size(156, 134)
         Me.LeftStrike3Lbl.TabIndex = 1
-        Me.LeftStrike3Lbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        Me.LeftStrike3Lbl.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
+        Me.LeftStrike3Lbl.TabStop = False
         '
         'LeftStrike2Lbl
         '
         Me.LeftStrike2Lbl.BackColor = System.Drawing.Color.Transparent
-        Me.LeftStrike2Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.LeftStrike2Lbl.ForeColor = System.Drawing.Color.Red
         Me.LeftStrike2Lbl.Image = Global.StoKOdnomuControl.My.Resources.Resources._26_chance_l
         Me.LeftStrike2Lbl.Location = New System.Drawing.Point(14, 400)
         Me.LeftStrike2Lbl.Name = "LeftStrike2Lbl"
         Me.LeftStrike2Lbl.Size = New System.Drawing.Size(156, 134)
         Me.LeftStrike2Lbl.TabIndex = 2
-        Me.LeftStrike2Lbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        Me.LeftStrike2Lbl.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
+        Me.LeftStrike2Lbl.TabStop = False
         '
         'LeftStrike1Lbl
         '
         Me.LeftStrike1Lbl.BackColor = System.Drawing.Color.Transparent
-        Me.LeftStrike1Lbl.Font = New System.Drawing.Font("Calibri", 63.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.LeftStrike1Lbl.ForeColor = System.Drawing.Color.Red
         Me.LeftStrike1Lbl.Image = Global.StoKOdnomuControl.My.Resources.Resources._26_chance_l
         Me.LeftStrike1Lbl.Location = New System.Drawing.Point(14, 534)
         Me.LeftStrike1Lbl.Name = "LeftStrike1Lbl"
         Me.LeftStrike1Lbl.Size = New System.Drawing.Size(156, 134)
         Me.LeftStrike1Lbl.TabIndex = 3
-        Me.LeftStrike1Lbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        Me.LeftStrike1Lbl.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
+        Me.LeftStrike1Lbl.TabStop = False
         '
         'LeftRoundLbl
         '
@@ -378,12 +372,12 @@ Partial Class Tablo
     Friend WithEvents Answer4ScoreLbl As Label
     Friend WithEvents Answer5ScoreLbl As Label
     Friend WithEvents Answer6ScoreLbl As Label
-    Friend WithEvents RightStrike3Lbl As Label
-    Friend WithEvents RightStrike2Lbl As Label
-    Friend WithEvents RightStrike1Lbl As Label
-    Friend WithEvents LeftStrike3Lbl As Label
-    Friend WithEvents LeftStrike2Lbl As Label
-    Friend WithEvents LeftStrike1Lbl As Label
+    Friend WithEvents RightStrike3Lbl As PictureBox
+    Friend WithEvents RightStrike2Lbl As PictureBox
+    Friend WithEvents RightStrike1Lbl As PictureBox
+    Friend WithEvents LeftStrike3Lbl As PictureBox
+    Friend WithEvents LeftStrike2Lbl As PictureBox
+    Friend WithEvents LeftStrike1Lbl As PictureBox
     Friend WithEvents LeftRoundLbl As Label
     Friend WithEvents RightRoundLbl As Label
 End Class

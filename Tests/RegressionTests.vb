@@ -23,6 +23,9 @@ Module Checks
             TestParser()
             TestMainGame(temporary)
             TestBigGame(temporary)
+            TestSplashes(temporary)
+            TestLegacySplashes(temporary)
+            TestRetiredBigSplash(temporary)
             TestBuzzer()
             TestBuzzConnection()
             TestPersistence(temporary)
@@ -120,9 +123,9 @@ Module Checks
         Check(game.State.Main.Bank = 0 AndAlso Not game.State.Main.Answers(0).TextVisible, "reset actual round state")
         game.Execute("open after reset", Sub(s) GameRules.ShowMainAnswer(s.Main, 0, "Ответ", 10, True))
         Check(game.State.Main.Bank = 20, "reset does not leave stale bank")
-        game.Execute("splash", Sub(s) s.Main.Splash = 2)
+        game.Execute("splash", Sub(s) GameRules.ShowSplash(s.Main.SplashScreen, "ДВОЙНАЯ", "ИГРА"))
         Check(game.State.Main.Answers(0).TextVisible AndAlso game.State.Main.Bank = 20, "splash preserves game")
-        game.Execute("return", Sub(s) s.Main.Splash = -1)
+        game.Execute("return", Sub(s) s.Main.SplashScreen.Visible = False)
         Check(game.State.Main.Answers(0).TextVisible, "return from splash restores answer")
         game.Execute("right score", Sub(s) s.Main.RightScore = 123)
         Check(game.State.Main.LeftScore = 0 AndAlso game.State.Main.RightScore = 123, "independent scores")
@@ -164,6 +167,137 @@ Module Checks
         Check(game.State.Big.NextStep = 0 AndAlso game.State.Big.Total = 0 AndAlso Not game.State.Big.HideFirstPlayer, "reset whole big game")
         game.Undo()
         Check(game.State.Big.Total = 195 AndAlso game.State.Big.HideFirstPlayer, "undo new big game")
+    End Sub
+
+    Private Sub TestSplashes(directory As String)
+        Dim game = Session(directory, "splashes")
+        game.Execute("seed", Sub(s)
+                                 s.Main.Round = 2
+                                 s.Main.LeftScore = 42
+                                 s.Main.RightScore = 71
+                                 s.Main.LeftStrikes(0) = True
+                                 GameRules.ShowMainAnswer(s.Main, 0, "Ответ", 10, True)
+                                 GameRules.ShowBigText(s.Big, 0, "Первый")
+                                 GameRules.ShowBigPoints(s.Big, 0, 30)
+                                 s.Big.HideFirstPlayer = True
+                             End Sub)
+        For i = 0 To 5
+            Dim preset = SplashPresets.Create(i)
+            game.Execute("presets", Sub(s)
+                                        GameRules.ShowSplash(s.Main.SplashScreen, preset.Line1, preset.Line2)
+                                    End Sub)
+            Dim state = game.State
+            Check(state.Main.SplashScreen.Line1 = preset.Line1 AndAlso state.Main.SplashScreen.Line2 = preset.Line2, "main game accepts preset " & i)
+            Check(state.Main.Round = 2 AndAlso state.Main.Bank = 20 AndAlso state.Main.LeftScore = 42 AndAlso state.Main.RightScore = 71 AndAlso state.Main.LeftStrikes(0), "splash preserves main game " & i)
+            Check(state.Big.Total = 30 AndAlso state.Big.NextStep = 2 AndAlso state.Big.HideFirstPlayer, "splash preserves big game " & i)
+            game.Undo()
+            Check(Not game.State.Main.SplashScreen.Visible, "undo removes main overlay " & i)
+        Next
+        game.Execute("custom", Sub(s)
+                                   GameRules.ShowSplash(s.Main.SplashScreen, "  ПАУЗА  ", "ПРОДОЛЖЕНИЕ & СТАРТ")
+                               End Sub)
+        Check(game.State.Main.SplashScreen.Line1 = "ПАУЗА", "splash trims surrounding whitespace")
+        For Each invalid In New String() {"", " ", New String("Я"c, 61), "ОДНА" & vbLf & "ДВЕ", "ОДНА" & vbCr & "ДВЕ"}
+            Reject(Sub() game.Execute("bad splash", Sub(s) GameRules.ShowSplash(s.Main.SplashScreen, invalid, "ИГРА")), "reject invalid splash line")
+            Check(game.UndoDescription = "custom" AndAlso game.State.Main.SplashScreen.Line1 = "ПАУЗА", "bad splash changes neither state nor undo")
+        Next
+        Dim maximum As New SplashState()
+        GameRules.ShowSplash(maximum, New String("Ш"c, 60), "ИГРА")
+        Check(maximum.Line1.Length = 60, "60-character splash accepted")
+        game.Execute("return", Sub(s) s.Main.SplashScreen.Visible = False)
+        Dim restored = Session(directory, "splashes")
+        restored.Restore()
+        Check(Not restored.State.Main.SplashScreen.Visible AndAlso restored.State.Main.SplashScreen.Line2 = "ПРОДОЛЖЕНИЕ & СТАРТ", "restore custom text and independent visibility")
+        restored.Undo()
+        Check(restored.State.Main.SplashScreen.Visible, "undo return after restart")
+        restored.Undo()
+        Check(Not restored.State.Main.SplashScreen.Visible AndAlso restored.State.Big.Total = 30, "undo custom text after restart")
+        game.Execute("show for correction", Sub(s) GameRules.ShowSplash(s.Main.SplashScreen, "ПАУЗА", "ИГРА"))
+        game.Execute("correct visible", Sub(s)
+                                            GameRules.EditMainAnswer(s.Main, 0, "Исправленный", 11)
+                                            GameRules.ShowBigText(s.Big, 0, "Исправленный")
+                                            GameRules.ShowBigPoints(s.Big, 0, 31)
+                                        End Sub)
+        Check(game.State.Main.SplashScreen.Visible, "corrections keep current display mode")
+        game.Execute("show again", Sub(s) GameRules.ShowSplash(s.Main.SplashScreen, "ПАУЗА", "ИГРА"))
+        game.Execute("open new", Sub(s)
+                                     GameRules.ShowMainAnswer(s.Main, 1, "Новый", 5, True)
+                                     GameRules.ShowBigText(s.Big, 1, "Новый")
+                                 End Sub)
+        Check(Not game.State.Main.SplashScreen.Visible AndAlso game.State.Main.Bank = 32, "new answers restore field and award once")
+        game.Undo()
+        Check(game.State.Main.SplashScreen.Visible AndAlso game.State.Main.Bank = 22, "undo restores splash with original bank")
+        game.Execute("text before price", Sub(s) GameRules.ShowBigText(s.Big, 1, "Новый"))
+        game.Execute("first price", Sub(s) GameRules.ShowBigPoints(s.Big, 1, 10))
+        Check(game.State.Main.SplashScreen.Visible AndAlso game.State.Big.Total = 41, "big price reveal preserves main splash")
+        game.Undo()
+        Check(game.State.Main.SplashScreen.Visible AndAlso game.State.Big.Total = 31, "undo big price preserves main splash")
+        Check(Not File.ReadAllText(Path.Combine(directory, "splashes", "game.xml")).Contains("<Splash>"), "new XML omits retired preset tag")
+    End Sub
+
+    Private Sub TestLegacySplashes(directory As String)
+        For index = -1 To 5
+            Dim target = Path.Combine(directory, "legacy-splash-" & index)
+            IO.Directory.CreateDirectory(target)
+            Dim saved As New SavedMatch With {.History = New List(Of UndoEntry) From {New UndoEntry With {.Description = "old action", .State = New MatchState()}}}
+            saved.Current.Main.LeftScore = 123
+            Dim xml As New Xml.XmlDocument()
+            Using writer As New StringWriter()
+                Dim serializer As New Xml.Serialization.XmlSerializer(GetType(SavedMatch))
+                serializer.Serialize(writer, saved)
+                xml.LoadXml(writer.ToString())
+            End Using
+            For Each snapshot As Xml.XmlNode In xml.SelectNodes("//Current | //UndoEntry/State")
+                snapshot.SelectSingleNode("FormatVersion").InnerText = "1"
+                Dim main = snapshot.SelectSingleNode("Main")
+                main.RemoveChild(main.SelectSingleNode("SplashScreen"))
+                Dim legacy = xml.CreateElement("Splash")
+                legacy.InnerText = If(snapshot.Name = "Current", index, 5).ToString()
+                main.AppendChild(legacy)
+            Next
+            xml.Save(Path.Combine(target, "game.xml"))
+            Dim restored As New GameSession(target)
+            AddHandler restored.StorageError, Sub(message) _storageErrors.Add(message)
+            restored.Restore()
+            Dim state = restored.State
+            Check(state.FormatVersion = 2 AndAlso state.Main.LeftScore = 123 AndAlso state.Main.SplashScreen.Visible = (index >= 0), "legacy main display migrates " & index)
+            Check(state.Main.SplashScreen.Line1 = SplashPresets.Create(Math.Max(0, index)).Line1 AndAlso state.Big.Total = 0, "legacy preset and big-game data " & index)
+            restored.Undo()
+            Check(restored.State.Main.SplashScreen.Line1 = "БОЛЬШАЯ" AndAlso restored.State.Main.SplashScreen.Visible, "legacy undo snapshots also migrate " & index)
+            xml.SelectSingleNode("//Current/FormatVersion").InnerText = "99"
+            xml.Save(Path.Combine(target, "game.xml"))
+            Reject(Sub() restored.Restore(), "unsupported save version rejected")
+            Check(restored.State.Main.SplashScreen.Line1 = "БОЛЬШАЯ", "bad save does not replace live state")
+        Next
+    End Sub
+
+    Private Sub TestRetiredBigSplash(directory As String)
+        Dim target = Path.Combine(directory, "retired-big-splash")
+        IO.Directory.CreateDirectory(target)
+        Dim saved As New SavedMatch()
+        GameRules.ShowBigText(saved.Current.Big, 0, "СЕМЬЯ")
+        GameRules.ShowBigPoints(saved.Current.Big, 0, 45)
+        saved.History.Add(New UndoEntry With {.Description = "old big splash", .State = GameRules.Clone(saved.Current)})
+        Dim xml As New Xml.XmlDocument()
+        Using writer As New StringWriter()
+            Dim serializer As New Xml.Serialization.XmlSerializer(GetType(SavedMatch))
+            serializer.Serialize(writer, saved)
+            xml.LoadXml(writer.ToString())
+        End Using
+        For Each big As Xml.XmlNode In xml.SelectNodes("//Big")
+            Dim obsolete = xml.CreateElement("SplashScreen")
+            obsolete.InnerXml = "<Visible>true</Visible><Line1>БОЛЬШАЯ</Line1><Line2>ИГРА</Line2>"
+            big.AppendChild(obsolete)
+        Next
+        xml.Save(Path.Combine(target, "game.xml"))
+        Dim restored As New GameSession(target)
+        AddHandler restored.StorageError, Sub(message) _storageErrors.Add(message)
+        restored.Restore()
+        Check(restored.State.Big.Total = 45 AndAlso restored.State.Big.Answers(0).TextVisible, "retired big splash does not hide restored answers")
+        restored.Undo()
+        Check(restored.State.Big.Total = 45 AndAlso restored.State.Big.NextStep = 2, "retired big splash history preserves gameplay")
+        xml.Load(Path.Combine(target, "game.xml"))
+        Check(xml.SelectSingleNode("//Big/SplashScreen") Is Nothing, "new saves omit retired big splash data")
     End Sub
 
     Private Sub TestBuzzer()
@@ -399,6 +533,8 @@ Module Checks
                         Check(strike.Text = "× 1" AndAlso strike.AccessibleDescription = "Промах поставлен" AndAlso strike.BackColor = Color.MistyRose, "active strike retains cross and changes state")
                         DirectCast(FindControl(main, "UndoLastAction"), Button).PerformClick()
                         Check(strike.AccessibleDescription = "Промаха нет", "strike undo preserves button symbol")
+                        Dim mainSession = DirectCast(GetType(Form1).GetField("_session", Reflection.BindingFlags.NonPublic Or Reflection.BindingFlags.Instance).GetValue(main), GameSession)
+                        TestSplashEditor(main, mainSession, directory, "Main")
                     ElseIf form Is big Then
                         TestBigTabOrder(big)
                         DirectCast(FindControl(big, "BigAnswer0"), TextBox).Text = "Первый ответ"
@@ -428,6 +564,7 @@ Module Checks
                         Check(countdown.SecondsRemaining = 25, "big UI restarts at 25 seconds")
                         DirectCast(FindControl(big, "BigStopAllAudio"), Button).PerformClick()
                         Check(Not countdown.Running AndAlso game.State.Big.Total = 50, "stop all keeps score")
+                        Check(FindControl(big, "SplashPresets") Is Nothing AndAlso FindControl(big, "PreviewSplash") Is Nothing, "big operator has no splash controls")
                     End If
                     If form Is main OrElse form Is big Then
                         Check(Not form.MaximizeBox, "operator maximize button disabled: " & form.GetType().Name)
@@ -460,6 +597,8 @@ Module Checks
                 Next
                 Check(FindControl(main, "MainAnswer0") IsNot Nothing, "operator answer editor exists")
                 Check(FindControl(big, "BigPoints9") IsNot Nothing, "per-question editor exists for second player")
+                TestSplashRendering(board, bigBoard, directory)
+                TestStrikeScaling(board, directory)
             End Using
             main.Show()
             Using entered As New ManualResetEventSlim(), release As New ManualResetEventSlim()
@@ -518,6 +657,140 @@ Module Checks
                                         DirectCast(FindControl(dialog, If(accept, "ConfirmExitYes", "ConfirmExitNo")), Button).PerformClick()
                                     End Sub))
         main.Close()
+    End Sub
+
+    Private Function Card(state As MatchState) As SplashState
+        Return state.Main.SplashScreen
+    End Function
+
+    Private Sub TestSplashEditor(form As Form, game As GameSession, directory As String, prefix As String)
+        Dim before = game.State
+        Dim description = game.UndoDescription
+        Dim presets = DirectCast(FindControl(form, "SplashPresets"), ComboBox)
+        For i = 0 To 5
+            presets.SelectedIndex = i
+            Dim preset = SplashPresets.Create(i)
+            Check(FindControl(form, "SplashLine1").Text = preset.Line1 AndAlso FindControl(form, "SplashLine2").Text = preset.Line2, "editor fills preset " & prefix & i)
+            Check(game.UndoDescription = description AndAlso Card(game.State).Line1 = Card(before).Line1, "preset selection never publishes " & prefix & i)
+        Next
+        FindControl(form, "SplashLine1").Text = "ПАУЗА"
+        FindControl(form, "SplashLine2").Text = "ПРОДОЛЖЕНИЕ"
+        Check(presets.Items.Count = 6 AndAlso presets.SelectedIndex = -1, "custom text retains all presets " & prefix)
+        form.BeginInvoke(New Action(Sub()
+                                        Dim preview = Application.OpenForms.Cast(Of Form)().Single(Function(item) item.Name = "SplashPreview")
+                                        preview.Opacity = 0
+                                        Check(FindControl(preview, "SplashOverlay").Text = "ПАУЗА" & vbLf & "ПРОДОЛЖЕНИЕ", "preview shows draft " & prefix)
+                                        SaveBitmap(preview, Path.Combine(directory, prefix & "SplashPreview.png"))
+                                        preview.Close()
+                                    End Sub))
+        DirectCast(FindControl(form, "PreviewSplash"), Button).PerformClick()
+        Check(game.UndoDescription = description AndAlso Card(game.State).Visible = Card(before).Visible, "preview leaves session untouched " & prefix)
+        DirectCast(FindControl(form, "ShowSplash"), Button).PerformClick()
+        Check(Card(game.State).Visible AndAlso Card(game.State).Line1 = "ПАУЗА", "publish custom text " & prefix)
+        FindControl(form, "SplashLine1").Text = "ЧЕРНОВИК"
+        game.Execute("unrelated", Sub(s) s.Main.RightScore += 1)
+        Check(FindControl(form, "SplashLine1").Text = "ЧЕРНОВИК", "unrelated command preserves splash draft " & prefix)
+        game.Undo()
+        DirectCast(FindControl(form, "ReturnAnswers"), Button).PerformClick()
+        Check(Not Card(game.State).Visible, "return button hides overlay " & prefix)
+        game.Undo()
+        Check(Card(game.State).Visible, "undo return restores overlay " & prefix)
+        game.Undo()
+        Check(Card(game.State).Line1 = Card(before).Line1 AndAlso Card(game.State).Visible = Card(before).Visible, "undo publication restores prior card " & prefix)
+        Check(game.State.Main.Bank = before.Main.Bank AndAlso game.State.Big.Total = before.Big.Total, "splash editor does not change scores " & prefix)
+    End Sub
+
+    Private Sub SaveBitmap(form As Form, path As String)
+        form.PerformLayout()
+        Using bitmap As New Bitmap(form.Width, form.Height)
+            form.DrawToBitmap(bitmap, New Rectangle(Point.Empty, bitmap.Size))
+            bitmap.Save(path)
+        End Using
+    End Sub
+
+    Private Sub TestSplashRendering(main As Tablo, big As BigGameTablo, directory As String)
+        main.Show()
+        big.Show()
+        Dim state As New MatchState()
+        state.Main.Round = 2
+        state.Main.LeftScore = 100
+        state.Main.RightScore = 200
+        state.Main.LeftStrikes(0) = True
+        GameRules.ShowMainAnswer(state.Main, 0, "СЕМЬЯ", 40, True)
+        GameRules.ShowBigText(state.Big, 0, "СЕМЬЯ")
+        GameRules.ShowBigPoints(state.Big, 0, 50)
+        state.Big.HideFirstPlayer = False
+        For i = 0 To 5
+            Dim preset = SplashPresets.Create(i)
+            GameRules.ShowSplash(state.Main.SplashScreen, preset.Line1, preset.Line2)
+            main.Render(state.Main)
+            big.Render(state.Big)
+            big.RenderTimer(17, True)
+            Check(FindControl(main, "SplashOverlay").Visible AndAlso FindControl(main, "SplashOverlay").Text = preset.Line1 & vbLf & preset.Line2, "main overlay preset " & i)
+            Check(FindControl(big, "SplashOverlay") Is Nothing AndAlso FindControl(big, "Answer1Lbl").Visible AndAlso FindControl(big, "Answer1ScoreLbl").Text = "50", "main preset leaves big gameplay visible " & i)
+            Check(Not FindControl(main, "Answer1Lbl").Visible AndAlso Not FindControl(main, "Answer1ScoreLbl").Visible, "splash masks texts and prices " & i)
+            Check(FindControl(main, "ScoreLeftLbl").Visible AndAlso FindControl(main, "LeftStrike1Lbl").Visible AndAlso FindControl(big, "TotalLbl").Visible AndAlso FindControl(big, "TimerLbl").Visible, "scores strikes and countdown remain visible " & i)
+            If i = 2 Then SaveBitmap(main, Path.Combine(directory, "MainSplash.png"))
+            If i = 5 Then SaveBitmap(big, Path.Combine(directory, "BigGameplay.png"))
+        Next
+        GameRules.ShowSplash(state.Main.SplashScreen, New String("Ш"c, 60), New String("Я"c, 60))
+        main.Render(state.Main)
+        main.ClientSize = New Size(640, 380)
+        SaveBitmap(main, Path.Combine(directory, "LongSplash.png"))
+        main.ClientSize = New Size(1264, 681)
+        state.Main.SplashScreen.Visible = False
+        state.Big.HideFirstPlayer = True
+        main.Render(state.Main)
+        big.Render(state.Big)
+        Check(FindControl(main, "Answer1Lbl").Visible AndAlso FindControl(main, "Answer1ScoreLbl").Text = "40", "main return restores answer and base price")
+        Check(FindControl(big, "Answer1Lbl").Visible AndAlso FindControl(big, "Answer1Lbl").Text = "••••••••" AndAlso FindControl(big, "TimerLbl").Text = "17", "big return restores mask and preserves countdown")
+        SaveBitmap(main, Path.Combine(directory, "MainReturned.png"))
+        SaveBitmap(big, Path.Combine(directory, "BigReturned.png"))
+        main.Hide()
+        big.Hide()
+    End Sub
+
+    Private Sub TestStrikeScaling(main As Tablo, directory As String)
+        main.Show()
+        Dim state As New MainGameState With {.Round = 2, .LeftScore = 100, .RightScore = 200}
+        state.SplashScreen.Visible = False
+        state.LeftStrikes = {True, False, True}
+        state.RightStrikes = {False, True, False}
+        GameRules.ShowMainAnswer(state, 0, "СЕМЬЯ", 40, True)
+        Using probe As New Bitmap(156, 134)
+            Using graphics = System.Drawing.Graphics.FromImage(probe)
+                graphics.FillRectangle(Brushes.Red, 0, 0, 78, 67)
+                graphics.FillRectangle(Brushes.Lime, 78, 0, 78, 67)
+                graphics.FillRectangle(Brushes.Blue, 0, 67, 78, 67)
+                graphics.FillRectangle(Brushes.Yellow, 78, 67, 78, 67)
+            End Using
+            For Each size In New Size() {New Size(640, 360), New Size(1264, 681), New Size(1920, 1080), New Size(800, 1000)}
+                main.ClientSize = size
+                main.Render(state)
+                For Each side In New String() {"Left", "Right"}
+                    For i = 1 To 3
+                        Dim marker = DirectCast(FindControl(main, side & "Strike" & i & "Lbl"), PictureBox)
+                        Dim original = marker.Image
+                        Check(marker.SizeMode = PictureBoxSizeMode.Zoom AndAlso original.Size = New Size(156, 134), "strike uses unmodified shared image with proportional scaling")
+                        Try
+                            marker.Image = probe
+                            Using rendered As New Bitmap(marker.Width, marker.Height)
+                                marker.DrawToBitmap(rendered, New Rectangle(Point.Empty, rendered.Size))
+                                Dim quadrants = {rendered.GetPixel(rendered.Width \ 4, rendered.Height \ 4), rendered.GetPixel(rendered.Width * 3 \ 4, rendered.Height \ 4), rendered.GetPixel(rendered.Width \ 4, rendered.Height * 3 \ 4), rendered.GetPixel(rendered.Width * 3 \ 4, rendered.Height * 3 \ 4)}
+                                Dim expected = {Color.Red, Color.Lime, Color.Blue, Color.Yellow}
+                                Check(quadrants.Select(Function(color) color.ToArgb()).SequenceEqual(expected.Select(Function(color) color.ToArgb())), "all image quadrants survive resize: " & side & i & " at " & size.ToString())
+                            End Using
+                        Finally
+                            marker.Image = original
+                        End Try
+                    Next
+                Next
+                SaveBitmap(main, Path.Combine(directory, "Markers-" & size.Width & "x" & size.Height & ".png"))
+            Next
+        End Using
+        main.ClientSize = New Size(1264, 681)
+        main.Render(state)
+        main.Hide()
     End Sub
 
     Private Sub TestBigTabOrder(big As BigGameControl)

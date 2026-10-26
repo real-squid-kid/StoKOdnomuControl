@@ -2,13 +2,18 @@ Option Strict On
 ' Зрительское окно только рисует снимок. Здесь нет начислений, Undo и звуков,
 ' поэтому повторный показ окна не меняет игру и не повторяет эффекты.
 Public Class Tablo
+    Private ReadOnly _splash As SplashOverlay
     Private ReadOnly _layout As BoardLayout
     Private ReadOnly _texts As Label()
     Private ReadOnly _scores As Label()
-    Private ReadOnly _left As Label()
-    Private ReadOnly _right As Label()
+    Private ReadOnly _left As PictureBox()
+    Private ReadOnly _right As PictureBox()
 
     Public Sub New()
+        Me.New(False)
+    End Sub
+
+    Public Sub New(preview As Boolean)
         InitializeComponent()
         ' Designer сохраняет геометрию; массивы заменяют одинаковые ветви рендера.
         ' Картинки берутся из общих ресурсов, без шести копий в Tablo.resx.
@@ -16,7 +21,8 @@ Public Class Tablo
         _scores = {Answer1ScoreLbl, Answer2ScoreLbl, Answer3ScoreLbl, Answer4ScoreLbl, Answer5ScoreLbl, Answer6ScoreLbl}
         _left = {LeftStrike1Lbl, LeftStrike2Lbl, LeftStrike3Lbl}
         _right = {RightStrike1Lbl, RightStrike2Lbl, RightStrike3Lbl}
-        _layout = New BoardLayout(Me)
+        _splash = SplashOverlay.AddTo(Me, _texts.Cast(Of Control)().Concat(_scores))
+        _layout = New BoardLayout(Me, Not preview)
         AddHandler Disposed, Sub() _layout.Dispose()
         Render(New MainGameState())
     End Sub
@@ -36,8 +42,8 @@ Public Class Tablo
         RightRoundLbl.Text = roundNames(state.Round)
         For i = 0 To 5
             Dim answer = state.Answers(i)
-            _texts(i).Visible = True
-            _scores(i).Visible = True
+            _texts(i).Visible = Not state.SplashScreen.Visible
+            _scores(i).Visible = Not state.SplashScreen.Visible
             _texts(i).TextAlign = ContentAlignment.MiddleLeft
             _texts(i).Text = (i + 1).ToString() & "." & If(answer.TextVisible, " " & answer.Text, "")
             _scores(i).Text = If(answer.TextVisible, answer.Points.ToString(), "")
@@ -46,19 +52,7 @@ Public Class Tablo
             _left(i).Image = If(state.LeftStrikes(i), My.Resources._26_wrong_l, My.Resources._26_chance_l)
             _right(i).Image = If(state.RightStrikes(i), My.Resources._26_wrong_r, My.Resources._26_chance_r)
         Next
-        If state.Splash >= 0 Then
-            ' Меняем надписи окна; реальные ответы и банк в state остаются прежними.
-            For i = 0 To 5
-                _texts(i).Text = ""
-                _scores(i).Text = ""
-            Next
-            Dim top = {"СТО", "ПРОСТАЯ", "ДВОЙНАЯ", "ТРОЙНАЯ", "ИГРА", "БОЛЬШАЯ"}
-            Dim bottom = {"К ОДНОМУ", "ИГРА", "ИГРА", "ИГРА", "НАОБОРОТ", "ИГРА"}
-            _texts(2).TextAlign = ContentAlignment.MiddleCenter
-            _texts(3).TextAlign = ContentAlignment.MiddleCenter
-            _texts(2).Text = top(state.Splash)
-            _texts(3).Text = bottom(state.Splash)
-        End If
+        _splash.Render(state.SplashScreen)
         _layout.RefreshText()
     End Sub
 End Class

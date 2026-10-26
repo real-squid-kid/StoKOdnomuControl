@@ -17,9 +17,11 @@ Public NotInheritable Class BoardLayout
     ' Освобождаем только созданные нами Font, а не унаследованный/общий Font формы.
     Private ReadOnly _ownedFonts As New Dictionary(Of Control, Font)()
     Private _fullScreen As Boolean
+    Private ReadOnly _hideOnClose As Boolean
 
-    Public Sub New(form As Form)
+    Public Sub New(form As Form, Optional hideOnClose As Boolean = True)
         _form = form
+        _hideOnClose = hideOnClose
         form.AutoScaleMode = AutoScaleMode.None
         form.KeyPreview = True
         form.BackColor = Color.Black
@@ -77,6 +79,9 @@ Public NotInheritable Class BoardLayout
                 Dim control = pair.Key
                 Dim design = pair.Value
                 control.Bounds = New Rectangle(CInt(design.X * scale), CInt(design.Y * scale), CInt(design.Width * scale), CInt(design.Height * scale))
+                ' PictureBox.Zoom масштабирует всю картинку вместе с её областью,
+                ' сохраняя пропорции. Font для маркера не используется.
+                If TypeOf control Is PictureBox Then Continue For
                 Dim family = If(_fonts.Families.Length > 0, _fonts.Families(0), FontFamily.GenericMonospace)
                 Dim size = Math.Max(8.0F, _fontSizes(control) * scale)
                 Dim font As New Font(family, size, _fontStyles(control))
@@ -111,7 +116,7 @@ Public NotInheritable Class BoardLayout
     Private Sub OnClosing(sender As Object, e As FormClosingEventArgs)
         ' Крестик скрывает зрительское окно, а не теряет его состояние/экземпляр.
         ' При завершении приложения владелец вызывает Dispose явно.
-        If e.CloseReason = CloseReason.UserClosing Then
+        If _hideOnClose AndAlso e.CloseReason = CloseReason.UserClosing Then
             e.Cancel = True
             _form.Hide()
         End If
