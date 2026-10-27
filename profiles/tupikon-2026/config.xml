@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<AppearanceProfile>
+  <Version>1</Version>
+  <Name>Тупикон 2026</Name>
+  <Main>
+    <Background>26_main.jpg</Background>
+    <LeftClear>26_chance_l.png</LeftClear>
+    <LeftStrike>26_wrong_l.png</LeftStrike>
+    <RightClear>26_chance_r.png</RightClear>
+    <RightStrike>26_wrong_r.png</RightStrike>
+    <TextColor>#000000</TextColor>
+  </Main>
+  <Big>
+    <Background>26_big.jpg</Background>
+    <LeftClear />
+    <LeftStrike />
+    <RightClear />
+    <RightStrike />
+    <TextColor>#000000</TextColor>
+  </Big>
+</AppearanceProfile>

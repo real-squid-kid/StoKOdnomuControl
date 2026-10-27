@@ -18,7 +18,7 @@ Public NotInheritable Class ConsoleLayout
         form.ClientSize = New Size(1280, 720)
         form.MinimumSize = New Size(1080, 640)
         form.MaximizeBox = False
-        form.StartPosition = FormStartPosition.CenterScreen
+        OperatorWindows.Install(form)
         form.BackColor = Color.FromArgb(220, 226, 231)
         Dim frame As New TableLayoutPanel With {.Dock = DockStyle.Fill, .ColumnCount = 1, .RowCount = 3, .Padding = New Padding(8)}
         frame.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100))
@@ -159,7 +159,7 @@ Public Module OperatorUi
         If layout IsNot Nothing Then
             layout.ShowError(message)
         Else
-            MessageBox.Show(owner, message, "Действие не выполнено", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            OperatorWindows.Message(owner, message, "Действие не выполнено", MessageBoxButtons.OK, MessageBoxIcon.Information)
         End If
     End Sub
 
@@ -211,12 +211,12 @@ Public Module OperatorUi
             dialog.CancelButton = cancel
             dialog.Controls.Add(body)
             ' До OK числовое поле не связано с игровой моделью или историей отмены.
-            If dialog.ShowDialog(owner) = DialogResult.OK Then apply(CInt(number.Value))
+            If OperatorWindows.ShowModal(dialog, owner) = DialogResult.OK Then apply(CInt(number.Value))
         End Using
     End Sub
 
     Public Function Confirm(owner As Form, text As String) As Boolean
-        Return MessageBox.Show(owner, text, "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) = DialogResult.Yes
+        Return OperatorWindows.Message(owner, text, "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) = DialogResult.Yes
     End Function
 
     Public Function ConfirmExit(owner As Form) As Boolean
@@ -237,7 +237,7 @@ Public Module OperatorUi
             dialog.CancelButton = no
             dialog.Controls.Add(body)
             dialog.ActiveControl = no
-            Return dialog.ShowDialog(owner) = DialogResult.Yes
+            Return OperatorWindows.ShowModal(dialog, owner) = DialogResult.Yes
         End Using
     End Function
 

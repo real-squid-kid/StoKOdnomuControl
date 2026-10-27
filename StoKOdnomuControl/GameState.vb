@@ -73,7 +73,7 @@ Public Class MainGameState
     <XmlIgnore>
     Public ReadOnly Property Multiplier As Integer
         Get
-            Return If(Round = 2 OrElse Round = 3, Round, 1)
+            Return RoundRules.Multiplier(Round)
         End Get
     End Property
 

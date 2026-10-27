@@ -73,7 +73,7 @@ Public Class BigGameControl
         BuildScorePanel()
         BuildTimerPanel()
         Dim screen = OperatorUi.Group(_surface.Right, "Экран и звук", "BigScreenPanel")
-        If displaySettings IsNot Nothing Then OperatorUi.Button(screen, "Выбрать экран…", displaySettings)
+        If displaySettings IsNot Nothing Then OperatorUi.Button(screen, "Настройки…", displaySettings)
         OperatorUi.Button(screen, "Показать табло", showBoard)
         If hideBoards IsNot Nothing Then OperatorUi.Button(screen, "Скрыть оба табло", hideBoards)
         OperatorUi.Button(screen, "Звук повтора ответа", Sub() AudioService.Instance.Play(SoundCue.SameAnswer))

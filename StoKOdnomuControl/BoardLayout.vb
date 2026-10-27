@@ -27,7 +27,8 @@ Public NotInheritable Class BoardLayout
         form.BackColor = Color.Black
         form.MinimumSize = New Size(640, 380)
         _canvas.BackgroundImage = form.BackgroundImage
-        _canvas.BackgroundImageLayout = ImageLayout.Stretch
+        _canvas.BackColor = Color.Black
+        _canvas.BackgroundImageLayout = ImageLayout.Zoom
         form.BackgroundImage = Nothing
         For Each control As Control In form.Controls.Cast(Of Control)().ToArray()
             ' Геометрия Designer запоминается один раз. Повторный resize всегда считает
@@ -66,8 +67,23 @@ Public NotInheritable Class BoardLayout
         _form.BringToFront()
     End Sub
 
+    Public Sub ApplyAppearance(background As Image, textColor As Color)
+        _canvas.BackgroundImage = background
+        For Each control In _bounds.Keys
+            If Not TypeOf control Is PictureBox Then control.ForeColor = textColor
+        Next
+        _canvas.Invalidate(True)
+    End Sub
+
     Public Sub RefreshText()
         ResizeCanvas(Nothing, EventArgs.Empty)
+    End Sub
+
+    ' Подвижные подписи задают положение в исходном холсте, а не в текущих
+    ' пикселях окна. Следующий рендер/resize масштабирует его без накопления сдвига.
+    Public Sub SetDesignBounds(control As Control, bounds As Rectangle)
+        If Not _bounds.ContainsKey(control) Then Throw New ArgumentException("Элемент не принадлежит холсту.", NameOf(control))
+        _bounds(control) = bounds
     End Sub
 
     Private Sub ResizeCanvas(sender As Object, e As EventArgs)

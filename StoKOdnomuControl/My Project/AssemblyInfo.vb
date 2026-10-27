@@ -1,4 +1,4 @@
-﻿Imports System
+Imports System
 Imports System.Reflection
 Imports System.Runtime.InteropServices
 
@@ -8,10 +8,10 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("StoKOdnomuControl")>
-<Assembly: AssemblyDescription("git clone real-squid-kid/StoKOdnomuControl Программа-контроль для создание своей игры типа Сто к одному. Оригинальная идея: StereoMaster @ Gameshows.ru Образец для базы: http://continue.su/base.txt")>
-<Assembly: AssemblyCompany("Распространяется под лицензией GPL3.")>
-<Assembly: AssemblyProduct("StoKOdnomuControl")>
+<Assembly: AssemblyTitle("Сто к одному — пульт оператора")>
+<Assembly: AssemblyDescription("Пульт оператора и зрительские табло игры «Сто к одному»: основная и большая игра, Buzz!, профили оформления и редактор баз.")>
+<Assembly: AssemblyCompany("")>
+<Assembly: AssemblyProduct("Сто к одному")>
 <Assembly: AssemblyCopyright("real-squid-kid")>
 <Assembly: AssemblyTrademark("")>
 

@@ -117,6 +117,12 @@
     <Compile Include="GameState.vb" />
     <Compile Include="GameSession.vb" />
     <Compile Include="QuestionBankReader.vb" />
+    <Compile Include="BankDocument.vb" />
+    <Compile Include="AppearanceProfile.vb" />
+    <Compile Include="ProfileCatalog.vb" />
+    <Compile Include="OperatorWindows.vb" />
+    <Compile Include="AppearanceSettings.vb" />
+    <Compile Include="BankEditor.vb" />
     <Compile Include="OperatorUi.vb" />
     <Compile Include="BoardLayout.vb" />
     <Compile Include="SplashEditor.vb" />
@@ -201,6 +207,10 @@
     <None Include="Resources\bing.wav" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\profiles\**\*">
+      <Link>profiles\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="*.txt">
       <!-- Поставляем все четыре базы, не только исторический base.txt. -->
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -21,13 +21,13 @@ Public Class Form1
     Private ReadOnly _strikes(1, 2) As Button
     Private ReadOnly _scores(2) As Label
     Private ReadOnly _roundButtons As New List(Of Button)()
-    Private ReadOnly _screens As New ComboBox With {.DropDownStyle = ComboBoxStyle.DropDownList, .Width = 270}
-    Private ReadOnly _fullscreen As New CheckBox With {.Text = "На весь экран", .Checked = True, .AutoSize = True}
     Private ReadOnly _award As New CheckBox With {.Text = "Начислять при открытии", .Checked = True, .AutoSize = True}
     Private ReadOnly _bankName As Label = OperatorUi.Label("Ручной ввод", 270)
     Private ReadOnly _buzzStatus As Label = OperatorUi.Label("Не подключён", 270)
     Private ReadOnly _matchMenu As New ContextMenuStrip()
-    Private _displaySettings As Form
+    Private _displaySettings As AppearanceSettings
+    Private _bankEditor As BankEditor
+    Private ReadOnly _appearance As AppearanceService
     Private _undo As Button
     Private _restore As ToolStripMenuItem
     Private _connectBuzz As Button
@@ -51,6 +51,8 @@ Public Class Form1
         Dim dataDirectory = Environment.GetEnvironmentVariable("STOKODNOMU_DATA_DIR")
         If String.IsNullOrWhiteSpace(dataDirectory) Then dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "StoKOdnomuControl")
         _session = New GameSession(dataDirectory)
+        _appearance = New AppearanceService(Path.Combine(dataDirectory, "appearance"), If(Screen.AllScreens.Length > 1, 1, 0))
+        If File.Exists(AppearanceStorage.ConfigPath(_appearance.Folder)) Then AudioService.Instance.Enabled = _appearance.Current.Profile.SoundEnabled
         BuildUi()
         AddHandler _session.Changed, AddressOf SessionChanged
         AddHandler _session.StorageError, AddressOf SetStatus
@@ -68,6 +70,8 @@ Public Class Form1
         OperatorUi.InstallUndo(Me, AddressOf UndoAction)
         SessionChanged(Me, EventArgs.Empty)
         RenderBuzz()
+        AddHandler _appearance.Changed, AddressOf AppearanceChanged
+        If _appearance.StartupError <> "" Then SetStatus(_appearance.StartupError)
     End Sub
 
     Private Sub BuildUi()
@@ -92,6 +96,8 @@ Public Class Form1
         _surface.Toolbar.Controls.Add(OperatorUi.Label("Основная игра", 145))
         OperatorUi.Button(_surface.Toolbar, "Большая игра", AddressOf OpenBigGame, 155)
         OperatorUi.Button(_surface.Toolbar, "Загрузить базу…", AddressOf LoadBank, 165)
+        Dim editor = OperatorUi.Button(_surface.Toolbar, "Редактор базы…", AddressOf OpenBankEditor, 165)
+        editor.Name = "OpenBankEditor"
         Dim service = OperatorUi.Button(_surface.Toolbar, "Матч и сбросы…", Sub() Return, 165)
         _restore = MenuAction("Восстановить игру…", AddressOf RestoreGame)
         _matchMenu.Items.Add(New ToolStripSeparator())
@@ -100,7 +106,7 @@ Public Class Form1
         _matchMenu.Items.Add(New ToolStripSeparator())
         MenuAction("О программе…", Sub()
                                         Using about As New AboutBox1()
-                                            about.ShowDialog(Me)
+                                            OperatorWindows.ShowModal(about, Me)
                                         End Using
                                     End Sub)
         AddHandler service.Click, Sub() _matchMenu.Show(service, New Point(0, service.Height))
@@ -233,10 +239,10 @@ Public Class Form1
             preview.Text = "Предпросмотр заставки"
             preview.Name = "SplashPreview"
             preview.ShowInTaskbar = False
-            preview.StartPosition = FormStartPosition.CenterParent
             preview.ClientSize = New Size(900, 485)
+            preview.ApplyAppearance(_appearance.Current, state.Round)
             preview.Render(state)
-            preview.ShowDialog(Me)
+            OperatorWindows.ShowModal(preview, Me)
         End Using
     End Sub
 
@@ -272,43 +278,42 @@ Public Class Form1
 
     Private Sub BuildScreenPanel()
         Dim panel = OperatorUi.Group(_surface.Right, "Экран и звук", "ScreenPanel")
-        OperatorUi.Button(panel, "Выбрать экран…", AddressOf ShowDisplaySettings)
+        Dim settings = OperatorUi.Button(panel, "Настройки…", AddressOf ShowDisplaySettings)
+        settings.Name = "OpenSettings"
         OperatorUi.Button(panel, "Показать табло", AddressOf ShowMainBoard)
         OperatorUi.Button(panel, "Скрыть оба табло", AddressOf HideBoards)
         OperatorUi.Button(panel, "Звук промаха", Sub() AudioService.Instance.Play(SoundCue.WrongAnswer))
     End Sub
 
     Private Sub ShowDisplaySettings()
-        ' Экран и звук принадлежат общему владельцу обоих пультов.
-        If _displaySettings Is Nothing Then
-            _displaySettings = New Form With {.Text = "Экран и звук", .Font = Font, .ClientSize = New Size(360, 170), .FormBorderStyle = FormBorderStyle.FixedDialog, .MaximizeBox = False, .MinimizeBox = False, .ShowInTaskbar = False, .StartPosition = FormStartPosition.CenterParent}
-            Dim fields = OperatorUi.Stack()
-            fields.Dock = DockStyle.Fill
-            fields.Padding = New Padding(12)
-            For i = 0 To Screen.AllScreens.Length - 1
-                Dim displayScreen = Screen.AllScreens(i)
-                _screens.Items.Add("Экран " & (i + 1) & " · " & displayScreen.Bounds.Width & "×" & displayScreen.Bounds.Height)
-            Next
-            _screens.SelectedIndex = If(Screen.AllScreens.Length > 1, 1, 0)
-            OperatorUi.Append(fields, _screens)
-            OperatorUi.Append(fields, _fullscreen)
-            Dim sound As New CheckBox With {.Text = "Звук включён", .Checked = AudioService.Instance.Enabled, .AutoSize = True}
-            AddHandler sound.CheckedChanged, Sub()
-                                                AudioService.Instance.Enabled = sound.Checked
-                                                If Not sound.Checked Then StopAllAudio()
-                                            End Sub
-            OperatorUi.Append(fields, sound)
-            OperatorUi.Button(fields, "Закрыть", Sub() _displaySettings.Hide())
-            _displaySettings.Controls.Add(fields)
-            AddHandler _displaySettings.FormClosing, Sub(sender, e)
-                                                         If e.CloseReason = CloseReason.UserClosing Then
-                                                             e.Cancel = True
-                                                             _displaySettings.Hide()
-                                                         End If
-                                                     End Sub
-        End If
-        _displaySettings.Show(Me)
+        If _displaySettings Is Nothing OrElse _displaySettings.IsDisposed Then _displaySettings = New AppearanceSettings(_appearance)
+        OperatorWindows.CenterOnPrimary(_displaySettings)
+        If Not _displaySettings.Visible Then _displaySettings.Show(Me)
         _displaySettings.BringToFront()
+    End Sub
+
+    Private Sub OpenBankEditor()
+        If _bankEditor Is Nothing OrElse _bankEditor.IsDisposed Then _bankEditor = New BankEditor(AddressOf LoadBankFile)
+        OperatorWindows.CenterOnPrimary(_bankEditor)
+        If Not _bankEditor.Visible Then _bankEditor.Show(Me)
+        _bankEditor.BringToFront()
+    End Sub
+
+    Private Sub AppearanceChanged(sender As Object, e As EventArgs)
+        Dim profile = _appearance.Current.Profile
+        AudioService.Instance.Enabled = profile.SoundEnabled
+        If Not profile.SoundEnabled Then AudioService.Instance.StopAll()
+        If _board IsNot Nothing Then
+            _board.ApplyAppearance(_appearance.Current, _session.State.Main.Round)
+            _board.Render(_session.State.Main)
+            If _board.Visible Then _board.ShowOn(SelectedScreen(), profile.FullScreen)
+        End If
+        If _bigBoard IsNot Nothing Then
+            _bigBoard.ApplyAppearance(_appearance.Current)
+            _bigBoard.Render(_session.State.Big)
+            If _bigBoard.Visible Then _bigBoard.ShowOn(SelectedScreen(), profile.FullScreen)
+        End If
+        RenderCountdown()
     End Sub
 
     Private Sub StopAllAudio()
@@ -318,13 +323,16 @@ Public Class Form1
 
     Private Sub LoadBank()
         Using dialog As New OpenFileDialog With {.Title = "Выберите базу из 24 ответов", .Filter = "Базы ответов (*.txt)|*.txt|Все файлы (*.*)|*.*"}
-            If dialog.ShowDialog(Me) <> DialogResult.OK Then Return
-            Dim loaded = QuestionBankReader.ReadFile(dialog.FileName)
-            ' Только полностью проверенная база заменяет предыдущую. До этого момента
-            ' отмена диалога/ошибка разбора не меняют ни базу, ни игровую сессию.
-            _bank = loaded
-            _bankName.Text = Path.GetFileName(dialog.FileName)
+            If OperatorWindows.ShowFileDialog(dialog, Me) <> DialogResult.OK Then Return
+            LoadBankFile(dialog.FileName)
         End Using
+    End Sub
+
+    Private Sub LoadBankFile(path As String)
+        Dim loaded = QuestionBankReader.ReadFile(path)
+        ' Ни сохранение редактора, ни загрузка новой базы не меняют текущий матч.
+        _bank = loaded
+        _bankName.Text = IO.Path.GetFileName(path)
     End Sub
 
     Private Sub StartRound(number As Integer)
@@ -337,7 +345,7 @@ Public Class Form1
                                                              If _bank IsNot Nothing Then
                                                                  state.Main.Answers = _bank.Rounds(number - 1).Select(Function(a) New AnswerState With {.Text = a.Text, .Points = a.Points}).ToArray()
                                                              ElseIf number = 4 Then
-                                                                 Dim values = {15, 30, 45, 60, 120, 240}
+                                                                 Dim values = RoundRules.ReversePrices()
                                                                  For i = 0 To 5
                                                                      state.Main.Answers(i).Points = values(i)
                                                                  Next
@@ -410,7 +418,7 @@ Public Class Form1
     Private Sub RestoreGame()
         ' Явное восстановление заменяет и черновики. Runtime-таймер и допуск Buzz!
         ' в сохранение не входят: после загрузки оборудование остаётся остановленным.
-        If MessageBox.Show(Me, "Восстановить последнее автосохранение вместе с историей отмены? Текущие несохранённые черновики будут заменены.", "Восстановление", MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then Return
+        If OperatorWindows.Message(Me, "Восстановить последнее автосохранение вместе с историей отмены? Текущие несохранённые черновики будут заменены.", "Восстановление", MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then Return
         _last = Nothing
         _splashEditor.ReloadDrafts()
         If _bigControl IsNot Nothing Then _bigControl.ReloadDrafts()
@@ -474,10 +482,9 @@ Public Class Form1
     End Sub
 
     Private Function SelectedScreen() As Screen
-        ' Состав мониторов мог измениться после запуска; ограничиваем устаревший индекс.
+        ' Номер из профиля ограничивается фактическим составом мониторов.
         Dim screens = Screen.AllScreens
-        Dim index = If(_screens.SelectedIndex < 0, If(screens.Length > 1, 1, 0), _screens.SelectedIndex)
-        Return screens(Math.Max(0, Math.Min(index, screens.Length - 1)))
+        Return screens(Math.Min(_appearance.Current.Profile.ScreenIndex, screens.Length - 1))
     End Function
 
     Private Sub ShowMainBoard()
@@ -485,16 +492,18 @@ Public Class Form1
         ' На экране показывается один режим; состояние второго продолжает жить в сессии.
         If _bigBoard IsNot Nothing Then _bigBoard.Hide()
         If _board Is Nothing OrElse _board.IsDisposed Then _board = New Tablo()
+        _board.ApplyAppearance(_appearance.Current, _session.State.Main.Round)
         _board.Render(_session.State.Main)
-        _board.ShowOn(SelectedScreen(), _fullscreen.Checked)
+        _board.ShowOn(SelectedScreen(), _appearance.Current.Profile.FullScreen)
     End Sub
 
     Private Sub ShowBigBoard()
         If _board IsNot Nothing Then _board.Hide()
         If _bigBoard Is Nothing OrElse _bigBoard.IsDisposed Then _bigBoard = New BigGameTablo()
+        _bigBoard.ApplyAppearance(_appearance.Current)
         _bigBoard.Render(_session.State.Big)
         RenderCountdown()
-        _bigBoard.ShowOn(SelectedScreen(), _fullscreen.Checked)
+        _bigBoard.ShowOn(SelectedScreen(), _appearance.Current.Profile.FullScreen)
     End Sub
 
     Private Sub HideBoards()
@@ -506,6 +515,7 @@ Public Class Form1
         ' Скрытый пульт переиспользуется с черновиками; общие сервисы не создаются повторно.
         _buzz.Disarm()
         If _bigControl Is Nothing OrElse _bigControl.IsDisposed Then _bigControl = New BigGameControl(_session, _countdown, AddressOf ShowBigBoard, AddressOf UndoAction, AddressOf HideBoards, AddressOf ShowDisplaySettings, AddressOf ReturnToMain)
+        OperatorWindows.CenterOnPrimary(_bigControl)
         _bigControl.Show(Me)
         _bigControl.BringToFront()
         ShowBigBoard()
@@ -517,6 +527,7 @@ Public Class Form1
 
     Private Sub ReturnToMain()
         If _bigControl IsNot Nothing Then _bigControl.Hide()
+        OperatorWindows.CenterOnPrimary(Me)
         Activate()
         ShowMainBoard()
     End Sub
@@ -539,10 +550,13 @@ Public Class Form1
         End If
         ' До ответа «Да» ничего не останавливаем. Повторный Close после await
         ' пропускается по _closed и не открывает второе подтверждение.
+        If _displaySettings IsNot Nothing AndAlso Not _displaySettings.IsDisposed AndAlso Not _displaySettings.ConfirmPending() Then Return
+        If _bankEditor IsNot Nothing AndAlso Not _bankEditor.IsDisposed AndAlso Not _bankEditor.ConfirmPending() Then Return
         _closing = True
         Enabled = False
         If _bigControl IsNot Nothing Then _bigControl.Enabled = False
         If _displaySettings IsNot Nothing Then _displaySettings.Enabled = False
+        If _bankEditor IsNot Nothing Then _bankEditor.Enabled = False
         StopAllAudio()
         HideBoards()
         ' Продолжаем обрабатывать Windows-сообщения, пока worker освобождает USB.
@@ -566,7 +580,7 @@ Public Class Form1
             RemoveHandler AudioService.Instance.AudioError, AddressOf SetStatus
             ' Ошибка одного драйвера при выходе не должна оставлять остальные
             ' сервисы и окна неосвобождёнными. Аудиовыход закрываем последним.
-            For Each resource As IDisposable In New IDisposable() {_buzz, _countdown, _bigControl, _displaySettings, _board, _bigBoard, _matchMenu, AudioService.Instance}
+            For Each resource As IDisposable In New IDisposable() {_buzz, _countdown, _bigControl, _displaySettings, _bankEditor, _board, _bigBoard, _appearance, _matchMenu, AudioService.Instance}
                 If resource Is Nothing Then Continue For
                 Try
                     resource.Dispose()

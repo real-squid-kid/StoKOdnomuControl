@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<AppearanceProfile>
+  <Version>1</Version>
+  <Name>Тупикон 2025</Name>
+  <Main>
+    <Background>Осн игра new.jpg</Background>
+    <LeftClear>life_left.png</LeftClear>
+    <LeftStrike>strike_left.png</LeftStrike>
+    <RightClear>life_right.png</RightClear>
+    <RightStrike>strike_right.png</RightStrike>
+    <TextColor>#FFFFFF</TextColor>
+  </Main>
+  <Big>
+    <Background>Блиц new.jpg</Background>
+    <LeftClear />
+    <LeftStrike />
+    <RightClear />
+    <RightStrike />
+    <TextColor>#FFFFFF</TextColor>
+  </Big>
+</AppearanceProfile>

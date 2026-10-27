@@ -26,7 +26,7 @@ Public Module QuestionBankReader
         If lines.Count <> 24 Then Throw New InvalidDataException("В базе должно быть 24 непустые строки; найдено " & lines.Count & ".")
         Dim rounds(3)() As AnswerState
         ' В последнем раунде в файле только тексты; цены задаются правилами «наоборот».
-        Dim reversePoints = {15, 30, 45, 60, 120, 240}
+        Dim reversePoints = RoundRules.ReversePrices()
         For roundIndex = 0 To 3
             rounds(roundIndex) = MainGameState.CreateAnswers(6)
             For index = 0 To 5

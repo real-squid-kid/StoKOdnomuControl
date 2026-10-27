@@ -8,6 +8,8 @@ Public Class Tablo
     Private ReadOnly _scores As Label()
     Private ReadOnly _left As PictureBox()
     Private ReadOnly _right As PictureBox()
+    Private _appearance As LoadedAppearance
+    Private _style As New BoardStyle()
 
     Public Sub New()
         Me.New(False)
@@ -31,9 +33,16 @@ Public Class Tablo
         _layout.ShowOn(screen, fullscreen)
     End Sub
 
+    Public Sub ApplyAppearance(appearance As LoadedAppearance, round As Integer)
+        _appearance = appearance
+        _style = appearance.Profile.MainStyle(round)
+        _layout.ApplyAppearance(appearance.Picture(_style.Background, My.Resources._26_main), Color.FromArgb(_style.TextArgb))
+    End Sub
+
     Public Sub Render(state As MainGameState)
         ' Полностью восстанавливаем картину из модели, затем накладываем заставку.
         ' Возврат к игре не требует считывания значений с пульта.
+        If _appearance IsNot Nothing Then ApplyAppearance(_appearance, state.Round)
         ScoreLeftLbl.Text = state.LeftScore.ToString()
         ScoreRightLbl.Text = state.RightScore.ToString()
         RoundScoreLbl.Text = state.Bank.ToString()
@@ -49,10 +58,16 @@ Public Class Tablo
             _scores(i).Text = If(answer.TextVisible, answer.Points.ToString(), "")
         Next
         For i = 0 To 2
-            _left(i).Image = If(state.LeftStrikes(i), My.Resources._26_wrong_l, My.Resources._26_chance_l)
-            _right(i).Image = If(state.RightStrikes(i), My.Resources._26_wrong_r, My.Resources._26_chance_r)
+            _left(i).Image = Marker(state.LeftStrikes(i), _style.LeftClear, _style.LeftStrike,
+                                    My.Resources._26_chance_l, My.Resources._26_wrong_l)
+            _right(i).Image = Marker(state.RightStrikes(i), _style.RightClear, _style.RightStrike,
+                                     My.Resources._26_chance_r, My.Resources._26_wrong_r)
         Next
         _splash.Render(state.SplashScreen)
         _layout.RefreshText()
     End Sub
+    Private Function Marker(active As Boolean, clearPath As String, strikePath As String, clearImage As Image, strikeImage As Image) As Image
+        Dim fallback = If(active, strikeImage, clearImage)
+        Return If(_appearance Is Nothing, fallback, _appearance.Picture(If(active, strikePath, clearPath), fallback))
+    End Function
 End Class

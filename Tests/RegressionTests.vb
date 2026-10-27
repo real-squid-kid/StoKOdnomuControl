@@ -6,6 +6,7 @@ Imports System.Windows.Forms
 Imports System.Collections.Concurrent
 Imports System.Threading
 Imports System.Threading.Tasks
+Imports System.Runtime.InteropServices
 Imports StoKOdnomuControl
 
 Module Checks
@@ -17,10 +18,15 @@ Module Checks
     <STAThread>
     Public Sub Main(args As String())
         Try
+            ' Ошибки UI-тестов доходят до консольного отчёта, а не до JIT-диалога
+            ' на рабочем столе владельца. Это политика только тестового процесса.
+            Application.SetUnhandledExceptionMode(UnhandledExceptionMode.ThrowException)
             ' Снимки/логи тестов отделены от сохранения реального матча оператора.
             Dim temporary = Path.Combine(Path.GetTempPath(), "StoKOdnomu-tests-" & Guid.NewGuid().ToString("N"))
             Directory.CreateDirectory(temporary)
             TestParser()
+            TestBankDocuments(temporary)
+            TestAppearanceProfiles(temporary)
             TestMainGame(temporary)
             TestBigGame(temporary)
             TestSplashes(temporary)
@@ -59,6 +65,532 @@ Module Checks
         AddHandler game.StorageError, Sub(message) _storageErrors.Add(message)
         Return game
     End Function
+
+    Private Sub TestBankDocuments(directory As String)
+        Dim folder = Path.Combine(directory, "banks")
+        IO.Directory.CreateDirectory(folder)
+        Dim shipped = IO.Path.GetFullPath(IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../StoKOdnomuControl"))
+        For Each source In IO.Directory.GetFiles(shipped, "*.txt")
+            Dim document = BankDocument.Open(source)
+            Dim before = BankDocument.Serialize(document.Bank)
+            Dim target = Path.Combine(folder, Path.GetFileName(source))
+            document.Save(target, document.Bank)
+            Check(BankDocument.Serialize(BankDocument.Open(target).Bank) = before, "bank roundtrip " & Path.GetFileName(source))
+            Dim bytes = File.ReadAllBytes(target)
+            Check(Not bytes.Take(3).SequenceEqual(New Byte() {239, 187, 191}) AndAlso File.ReadAllText(target).Contains(vbCrLf), "bank writes UTF8 no BOM and CRLF")
+            document.Bank.Rounds(0)(0).Text = "НОВЫЙ ОТВЕТ"
+            document.Save(target, document.Bank)
+            Check(File.Exists(target & ".bak") AndAlso BankDocument.Serialize(BankDocument.Open(target & ".bak").Bank) = before, "bank backup retains previous valid data")
+            File.AppendAllText(target, vbCrLf)
+            Dim changed = File.ReadAllBytes(target)
+            Dim conflict As Boolean
+            Try
+                document.Save(target, document.Bank)
+            Catch ex As BankConflictException
+                conflict = True
+            End Try
+            Check(conflict AndAlso changed.SequenceEqual(File.ReadAllBytes(target)), "external bank edit is never overwritten")
+            document.Save(target & ".copy.txt", document.Bank)
+            Check(document.FilePath.EndsWith(".copy.txt"), "conflicted draft can Save As")
+        Next
+        Dim valid = BankDocument.Open(IO.Directory.GetFiles(shipped, "*.txt")(0)).Bank
+        valid.Rounds(0)(0).Text = "Нельзя&так"
+        Reject(Sub() BankDocument.Serialize(valid), "writer rejects ambiguous delimiter")
+        valid.Rounds(0)(0).Text = "Две" & vbLf & "строки"
+        Reject(Sub() BankDocument.Serialize(valid), "writer rejects embedded newline")
+        valid.Rounds(0)(0).Text = ""
+        Reject(Sub() BankDocument.Serialize(valid), "writer rejects blank required answer")
+        valid.Rounds(0)(0).Text = New String("я"c, 121)
+        Reject(Sub() BankDocument.Serialize(valid), "writer rejects overlong answer")
+        valid.Rounds(0)(0).Text = "Текст"
+        valid.Rounds(0)(0).Points = 1000
+        Reject(Sub() BankDocument.Serialize(valid), "writer rejects excessive people count")
+        valid.Rounds(0)(0).Points = 10
+        valid.Rounds(3)(0).Points = 99
+        Reject(Sub() BankDocument.Serialize(valid), "reverse prices cannot be edited in TXT writer")
+        valid.Rounds(3)(0).Points = 15
+        Dim blocked = Path.Combine(folder, "blocked.txt")
+        IO.Directory.CreateDirectory(blocked)
+        Dim unsaved As New BankDocument()
+        Dim failed As Boolean
+        Try
+            unsaved.Save(blocked, valid)
+        Catch ex As IOException
+            failed = True
+        End Try
+        Check(failed AndAlso unsaved.FilePath = "" AndAlso Not File.Exists(blocked), "failed bank save does not publish document path")
+        Dim bom = Path.Combine(folder, "bom.txt")
+        File.WriteAllText(bom, BankDocument.Serialize(valid).Replace(vbCrLf, vbLf), New System.Text.UTF8Encoding(True))
+        Check(BankDocument.Open(bom).Bank.Rounds(0)(0).Text = "Текст", "document opens BOM and LF")
+    End Sub
+
+    Private Sub TestAppearanceProfiles(directory As String)
+        Dim folder = Path.Combine(directory, "appearance")
+        IO.Directory.CreateDirectory(folder)
+        Dim image = Path.Combine(folder, "source.png")
+        Using bitmap As New Bitmap(240, 140)
+            Using graphics = System.Drawing.Graphics.FromImage(bitmap)
+                graphics.Clear(Color.Navy)
+                graphics.FillRectangle(Brushes.Gold, 0, 0, 120, 70)
+            End Using
+            bitmap.Save(image, Imaging.ImageFormat.Png)
+        End Using
+        Dim profile As New AppearanceProfile With {.Name = "Тест мероприятия", .SoundEnabled = False}
+        profile.Main.Background = image
+        profile.Main.LeftStrike = image
+        profile.Main.LeftClear = image
+        profile.Main.RightStrike = image
+        profile.Main.RightClear = image
+        profile.Main.TextArgb = Color.White.ToArgb()
+        profile.Big.Background = image
+        profile.Big.TextArgb = Color.Gold.ToArgb()
+        profile.Rounds(1).Inherit = False
+        profile.Rounds(1).TextArgb = Color.Crimson.ToArgb()
+        Check(profile.MainStyle(1).TextArgb = Color.White.ToArgb() AndAlso profile.MainStyle(2).TextArgb = Color.Crimson.ToArgb(), "round styles inherit with explicit override")
+        Dim storage = Path.Combine(folder, "installed")
+        Using service As New AppearanceService(storage)
+            Dim changes As Integer
+            AddHandler service.Changed, Sub() changes += 1
+            service.Apply(profile)
+            Check(changes = 1 AndAlso service.Current.Profile.Name = profile.Name, "profile apply publishes once after storage")
+            Check(Not service.Current.Profile.Main.Background.Equals(image), "profile copies media into owned storage")
+            Dim snapshot = service.Current.Profile
+            snapshot.Name = "посторонняя правка"
+            Check(service.Current.Profile.Name = profile.Name, "profile consumers cannot mutate active model")
+            Using exclusive As New FileStream(image, FileMode.Open, FileAccess.ReadWrite, FileShare.None)
+                Check(exclusive.Length > 0, "decoded image never locks source")
+            End Using
+            Dim broken = service.Current.Profile
+            broken.Main.Background = Path.Combine(folder, "absent.png")
+            Reject(Sub() service.Apply(broken), "missing media rejects entire apply")
+            Check(changes = 1 AndAlso service.Current.Profile.Name = profile.Name, "failed apply leaves active profile")
+            Dim portable = Path.Combine(folder, "portable")
+            Using exported = AppearanceStorage.Save(service.Current.Profile, portable)
+            End Using
+            Dim moved = Path.Combine(folder, "moved")
+            IO.Directory.Move(portable, moved)
+            Dim opened = AppearanceStorage.Open(Path.Combine(moved, "config.xml"))
+            Using decoded As New LoadedAppearance(opened)
+                Check(decoded.Picture(opened.Main.Background, Nothing).Width = 240, "portable folder opens after move")
+                Check(opened.Big.TextArgb = Color.Gold.ToArgb(), "big style remains independent")
+            End Using
+            Dim updated = service.Current.Profile
+            updated.Name = "Второй профиль"
+            Dim mediaCount = IO.Directory.GetFiles(Path.Combine(storage, "media"), "*.png", SearchOption.AllDirectories).Length
+            service.Apply(updated)
+            Check(IO.Directory.GetFiles(Path.Combine(storage, "media"), "*.png", SearchOption.AllDirectories).Length = mediaCount, "reapplying profile does not duplicate installed images")
+            Check(File.Exists(Path.Combine(storage, "config.xml.bak")), "profile has backup manifest")
+            Dim previous = AppearanceStorage.Open(Path.Combine(storage, "config.xml.bak"))
+            Check(previous.Name = profile.Name AndAlso File.Exists(previous.Main.Background), "old media remain usable by backup")
+            Using restarted As New AppearanceService(storage)
+                Check(restarted.StartupError = "" AndAlso restarted.Current.Profile.Name = updated.Name, "selected profile survives restart")
+            End Using
+            Dim blocked = Path.Combine(folder, "blocked")
+            IO.Directory.CreateDirectory(Path.Combine(blocked, "config.xml"))
+            Using denied As New AppearanceService(blocked)
+                Dim failed As Boolean
+                Try
+                    denied.Apply(updated)
+                Catch ex As IOException
+                    failed = True
+                End Try
+                Check(failed AndAlso denied.Current.Profile.Name = "Тупикон 2026", "profile disk failure keeps active defaults")
+            End Using
+            Dim xml = File.ReadAllText(Path.Combine(storage, "config.xml"))
+            Dim parsed = System.Xml.Linq.XDocument.Parse(xml)
+            parsed.Root.Element("Main").Element("Background").Value = "../source.png"
+            Dim unsafePath = Path.Combine(storage, "unsafe.xml")
+            parsed.Save(unsafePath)
+            Reject(Sub() AppearanceStorage.Open(unsafePath), "portable profile cannot escape folder")
+            parsed.Root.Element("Main").Element("Background").Value = image
+            parsed.Save(unsafePath)
+            Reject(Sub() AppearanceStorage.Open(unsafePath), "portable profile rejects absolute media path")
+            parsed.Root.Element("Version").Value = "999"
+            parsed.Save(unsafePath)
+            Reject(Sub() AppearanceStorage.Open(unsafePath), "future profile version rejected")
+        End Using
+        File.WriteAllText(Path.Combine(storage, "config.xml"), "<broken>")
+        Using recovered As New AppearanceService(storage)
+            Check(recovered.StartupError <> "" AndAlso recovered.Current.Profile.Main.Background = "", "bad startup profile uses built-in fallback with error")
+        End Using
+        Dim corrupt = Path.Combine(folder, "bad.png")
+        File.WriteAllText(corrupt, "not an image")
+        profile.Main.Background = corrupt
+        Dim badImage As Boolean
+        Try
+            Using loaded As New LoadedAppearance(profile)
+            End Using
+        Catch ex As Exception
+            badImage = True
+        End Try
+        Check(badImage, "corrupt image rejected before publication")
+        Dim legacyFolder = Path.Combine(folder, "legacy")
+        IO.Directory.CreateDirectory(legacyFolder)
+        File.WriteAllText(Path.Combine(legacyFolder, "profile.xml"), "<AppearanceProfile><Name>Встроенное оформление</Name><Main><TextArgb>-1</TextArgb></Main></AppearanceProfile>")
+        Using legacy As New AppearanceService(legacyFolder)
+            Check(legacy.StartupError = "" AndAlso legacy.Current.Profile.Name = "Тупикон 2026" AndAlso legacy.Current.Profile.Main.TextArgb = Color.White.ToArgb(), "legacy filename and decimal color stay compatible")
+        End Using
+        Console.WriteLine("Preparation storage: " & folder)
+    End Sub
+
+    Private Function FieldValue(Of T)(owner As Object, name As String) As T
+        Return DirectCast(owner.GetType().GetField(name, Reflection.BindingFlags.Instance Or Reflection.BindingFlags.NonPublic).GetValue(owner), T)
+    End Function
+
+    Private Function StateXml(state As MatchState) As String
+        Using writer As New StringWriter(Globalization.CultureInfo.InvariantCulture)
+            Dim serializer As New Xml.Serialization.XmlSerializer(GetType(MatchState))
+            serializer.Serialize(writer, state)
+            Return writer.ToString()
+        End Using
+    End Function
+
+    Private Sub TestRootPendingCancel(main As Form1)
+        Dim stage As Integer
+        Dim started = Diagnostics.Stopwatch.StartNew()
+        Using driver As New System.Windows.Forms.Timer With {.Interval = 20}
+            AddHandler driver.Tick, Sub()
+                                        If started.ElapsedMilliseconds > 5000 Then Throw New Exception("Timed out waiting for exit/pending dialog at stage " & stage)
+                                        Dim expected = If(stage = 0, "ExitConfirmation", "UnsavedChanges")
+                                        Dim dialog = Application.OpenForms.Cast(Of Form)().SingleOrDefault(Function(f) f.Name = expected AndAlso f.Visible)
+                                        If dialog Is Nothing Then Return
+                                        dialog.Opacity = 0
+                                        If stage = 0 Then
+                                            stage = 1
+                                            DirectCast(FindControl(dialog, "ConfirmExitYes"), Button).PerformClick()
+                                        Else
+                                            driver.Stop()
+                                            stage = 2
+                                            DirectCast(FindControl(dialog, "ReviewChanges"), Button).PerformClick()
+                                        End If
+                                    End Sub
+            driver.Start()
+            main.Close()
+        End Using
+        Check(stage = 2, "application exit consults settings draft before stopping services")
+    End Sub
+
+    Private Sub PendingAnswer(owner As Form, button As String, action As Action)
+        Dim answered As Boolean
+        Dim started = Diagnostics.Stopwatch.StartNew()
+        Using driver As New System.Windows.Forms.Timer With {.Interval = 20}
+            AddHandler driver.Tick, Sub()
+                                        If started.ElapsedMilliseconds > 5000 Then Throw New Exception("Timed out waiting for pending-changes dialog")
+                                        Dim dialog = Application.OpenForms.Cast(Of Form)().SingleOrDefault(Function(f) f.Name = "UnsavedChanges" AndAlso f.Visible)
+                                        If dialog Is Nothing Then Return
+                                        driver.Stop()
+                                        dialog.Opacity = 0
+                                        Check(DirectCast(dialog.AcceptButton, Button).Name = "ReviewChanges", "pending dialog defaults to retaining draft")
+                                        Check(dialog.Text = "Есть несохраненные изменения" AndAlso AllControls(dialog).OfType(Of Button)().Count() = 2, "discard dialog has exact title and two choices")
+                                        Check(Screen.FromControl(dialog).Primary, "discard dialog opens on primary screen")
+                                        SaveBitmap(dialog, Path.Combine(Path.GetTempPath(), "StoKOdnomu-unsaved-preview.png"))
+                                        DirectCast(FindControl(dialog, button), Button).PerformClick()
+                                        answered = True
+                                    End Sub
+            driver.Start()
+            action()
+        End Using
+        Check(answered, "pending change dialog handled " & button)
+    End Sub
+
+    Private Sub TestPreparationUi(main As Form1, directory As String)
+        main.Show()
+        DirectCast(FindControl(main, "OpenBankEditor"), Button).PerformClick()
+        Dim editor = main.OwnedForms.OfType(Of BankEditor)().Single()
+        editor.Opacity = 0
+        editor.ShowInTaskbar = False
+        DirectCast(FindControl(main, "OpenBankEditor"), Button).PerformClick()
+        Check(main.OwnedForms.OfType(Of BankEditor)().Count() = 1, "editor button reuses window")
+        Dim shipped = IO.Path.GetFullPath(IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../StoKOdnomuControl"))
+        editor.OpenDocument(IO.Directory.GetFiles(shipped, "*.txt")(0))
+        Dim game = FieldValue(Of GameSession)(main, "_session")
+        game.Execute("prepare big game", Sub(state)
+                                            GameRules.ShowBigText(state.Big, 0, "СЕМЬЯ")
+                                            GameRules.ShowBigPoints(state.Big, 0, 50)
+                                            state.Big.HideFirstPlayer = True
+                                        End Sub)
+        Dim before = GameRules.Clone(game.State)
+        Dim originalAnswer = FindControl(editor, "BankAnswer0_0").Text
+        FindControl(editor, "BankAnswer0_0").Text = "ВРЕМЕННЫЙ ЧЕРНОВИК"
+        Check(editor.Text.StartsWith("● ") AndAlso FindControl(editor, "ApplyBankEditor").Enabled, "bank draft marks title and enables Apply")
+        FindControl(editor, "BankAnswer0_0").Text = originalAnswer
+        Check(Not editor.Dirty AndAlso Not FindControl(editor, "ApplyBankEditor").Enabled, "bank reverted values clear marker and disable Apply")
+        DirectCast(FindControl(editor, "BankPeople1_0"), NumericUpDown).Value = 10
+        FindControl(editor, "BankAnswer1_0").Text = "ОТВЕТ ДВОЙНОЙ ИГРЫ"
+        Check(FindControl(editor, "BankAward1_0").Text = "20" AndAlso editor.Dirty, "editor uses raw people and shows multiplied award")
+        Check(Not FindControl(editor, "LoadBankToConsole").Enabled, "unsaved bank cannot load into console")
+        Check(Not FindControl(editor, "BankPeople3_0").Enabled, "reverse prices are read only")
+        Dim path = IO.Path.Combine(directory, "edited.txt")
+        editor.SaveDocument(path)
+        Check(Not editor.Dirty AndAlso FindControl(editor, "LoadBankToConsole").Enabled, "successful save enables explicit load")
+        DirectCast(FindControl(editor, "LoadBankToConsole"), Button).PerformClick()
+        Check(FindControl(main, "LoadedBank").Text = "edited.txt", "loaded bank name visible")
+        Check(GameRules.Clone(game.State).Main.Bank = before.Main.Bank AndAlso game.State.Main.Answers(0).Text = before.Main.Answers(0).Text, "saving and loading library do not alter match")
+        editor.PerformLayout()
+        Application.DoEvents()
+        SaveBitmap(editor, IO.Path.Combine(directory, "BankEditor.png"))
+        FindControl(editor, "BankAnswer0_0").Text = ""
+        Reject(Sub() editor.SaveDocument(path), "UI validation preserves invalid draft")
+        Check(editor.Dirty AndAlso FindControl(editor, "BankAnswer0_0").Text = "", "validation leaves editor input intact")
+        PendingAnswer(editor, "ReviewChanges", Sub() editor.Close())
+        Check(Not editor.IsDisposed AndAlso editor.Dirty, "closing editor can return to dirty draft")
+        FindControl(editor, "BankAnswer0_0").Text = "СОХРАНИТЬ ПРИ ЗАКРЫТИИ"
+        DirectCast(FindControl(editor, "OkBankEditor"), Button).PerformClick()
+        Check(editor.IsDisposed AndAlso BankDocument.Open(path).Bank.Rounds(0)(0).Text = "СОХРАНИТЬ ПРИ ЗАКРЫТИИ", "closing editor can save draft")
+        DirectCast(FindControl(main, "OpenBankEditor"), Button).PerformClick()
+        editor = main.OwnedForms.OfType(Of BankEditor)().Single()
+        editor.Opacity = 0
+        editor.OpenDocument(path)
+        FindControl(editor, "BankAnswer0_0").Text = "НЕ СОХРАНЯТЬ"
+        PendingAnswer(editor, "DiscardChanges", Sub() editor.Close())
+        Check(editor.IsDisposed AndAlso BankDocument.Open(path).Bank.Rounds(0)(0).Text = "СОХРАНИТЬ ПРИ ЗАКРЫТИИ", "closing editor can discard draft")
+        DirectCast(FindControl(main, "OpenSettings"), Button).PerformClick()
+        Dim settings = main.OwnedForms.OfType(Of AppearanceSettings)().Single()
+        settings.Opacity = 0
+        settings.ShowInTaskbar = False
+        Dim secondaryScreen = Screen.AllScreens.FirstOrDefault(Function(screen) Not screen.Primary)
+        If secondaryScreen IsNot Nothing Then settings.Location = secondaryScreen.WorkingArea.Location
+        DirectCast(FindControl(main, "OpenSettings"), Button).PerformClick()
+        Check(Screen.FromControl(settings).Primary, "reopening settings returns existing window to primary")
+        Check(main.OwnedForms.OfType(Of AppearanceSettings)().Count() = 1, "settings button reuses window")
+        Dim service = FieldValue(Of AppearanceService)(main, "_appearance")
+        Dim rootTimer = FieldValue(Of Countdown)(main, "_countdown")
+        Using board As New Tablo(), bigBoard As New BigGameTablo()
+            board.Opacity = 0
+            bigBoard.Opacity = 0
+            board.Show()
+            bigBoard.Show()
+            GetType(Form1).GetField("_board", Reflection.BindingFlags.Instance Or Reflection.BindingFlags.NonPublic).SetValue(main, board)
+            GetType(Form1).GetField("_bigBoard", Reflection.BindingFlags.Instance Or Reflection.BindingFlags.NonPublic).SetValue(main, bigBoard)
+            board.Hide()
+            bigBoard.Hide()
+            FindControl(settings, "ProfileName").Text = "ПРОФИЛЬ МЕРОПРИЯТИЯ"
+            DirectCast(FindControl(settings, "SettingsSound"), CheckBox).Checked = False
+            Dim image = IO.Path.Combine(shipped, "Resources", "2026", "26_main.jpg")
+            settings.SetAsset(0, image)
+            settings.SetTextColor(Color.Navy)
+            For i = 1 To 4
+                settings.SetAsset(i, IO.Path.Combine(shipped, "Resources", "2026", New String() {"", "26_chance_l.png", "26_wrong_l.png", "26_chance_r.png", "26_wrong_r.png"}(i)))
+            Next
+            Check(service.Current.Profile.Main.Background = "", "draft image does not change active profile")
+            Dim scope = DirectCast(FindControl(settings, "AppearanceScope"), ComboBox)
+            scope.SelectedIndex = 2
+            Check(Not FindControl(settings, "ChooseAsset0").Enabled, "inherited round locks override fields")
+            DirectCast(FindControl(settings, "InheritAppearance"), CheckBox).Checked = False
+            Check(FindControl(settings, "ChooseAsset0").Enabled, "explicit override unlocks round")
+            settings.SetTextColor(Color.DarkRed)
+            scope.SelectedIndex = 5
+            settings.SetAsset(0, IO.Path.Combine(shipped, "Resources", "2026", "26_big.jpg"))
+            settings.SetTextColor(Color.DarkGreen)
+            Check(Not FindControl(settings, "ChooseAsset1").Enabled, "big settings cannot configure strikes")
+            scope.SelectedIndex = 0
+            Dim undo = game.UndoDescription
+            rootTimer.Start(25)
+            settings.ApplyDraft()
+            Dim sample = game.State.Main
+            sample.LeftScore = 999999
+            sample.RightScore = 999999
+            sample.LeftStrikes(0) = True
+            sample.RightStrikes(0) = True
+            board.Render(sample)
+            Dim activeStyle = service.Current.Profile.MainStyle(sample.Round)
+            Check(Object.ReferenceEquals(DirectCast(FindControl(board, "LeftStrike1Lbl"), PictureBox).Image, service.Current.Picture(activeStyle.LeftStrike, Nothing)), "left strike uses configured image")
+            Check(Object.ReferenceEquals(DirectCast(FindControl(board, "LeftStrike2Lbl"), PictureBox).Image, service.Current.Picture(activeStyle.LeftClear, Nothing)), "left clear uses configured image")
+            Check(Object.ReferenceEquals(DirectCast(FindControl(board, "RightStrike1Lbl"), PictureBox).Image, service.Current.Picture(activeStyle.RightStrike, Nothing)), "right strike uses configured image")
+            Check(Object.ReferenceEquals(DirectCast(FindControl(board, "RightStrike2Lbl"), PictureBox).Image, service.Current.Picture(activeStyle.RightClear, Nothing)), "right clear uses configured image")
+            Using graphics = board.CreateGraphics()
+                For Each scoreName In New String() {"ScoreLeftLbl", "ScoreRightLbl"}
+                    Dim label = FindControl(board, scoreName)
+                    Check(graphics.MeasureString(label.Text, label.Font).Width <= label.Width, "six digit score fits spectator label " & scoreName)
+                Next
+            End Using
+            Check(rootTimer.Running AndAlso game.UndoDescription = undo AndAlso StateXml(game.State) = StateXml(before), "apply preserves entire match history mask and running timer")
+            Check(Not settings.Dirty AndAlso service.Current.Profile.Name = "ПРОФИЛЬ МЕРОПРИЯТИЯ", "apply resets settings dirty flag")
+            Check(FindControl(board, "Answer1Lbl").ForeColor.ToArgb() = Color.Navy.ToArgb(), "main profile text color applied")
+            Check(FindControl(bigBoard, "TimerLbl").ForeColor.ToArgb() = Color.DarkGreen.ToArgb(), "big timer receives independent profile color")
+            game.Execute("double round appearance", Sub(state) state.Main.Round = 2)
+            Check(FindControl(board, "Answer1Lbl").ForeColor.ToArgb() = Color.DarkRed.ToArgb(), "round switch applies override")
+            game.Undo()
+            Check(FindControl(board, "Answer1Lbl").ForeColor.ToArgb() = Color.Navy.ToArgb() AndAlso game.UndoDescription = undo, "round undo uses selected profile and inherited color")
+            FindControl(settings, "ProfileName").Text = "ЧЕРНОВИК"
+            PendingAnswer(settings, "ReviewChanges", Sub() DirectCast(FindControl(settings, "CancelSettings"), Button).PerformClick())
+            Check(Not settings.IsDisposed AndAlso settings.Dirty AndAlso FindControl(settings, "ProfileName").Text = "ЧЕРНОВИК", "cancel can return to unchanged draft")
+            FindControl(settings, "ProfileName").Text = "ПРОФИЛЬ МЕРОПРИЯТИЯ"
+            Check(Not settings.Dirty AndAlso Not FindControl(settings, "ApplySettings").Enabled, "reverting values clears dirty marker")
+            settings.PerformLayout()
+            Application.DoEvents()
+            SaveBitmap(settings, IO.Path.Combine(directory, "AppearanceSettings.png"))
+            DirectCast(FindControl(settings, "SettingsTabs"), TabControl).SelectedIndex = 1
+            Application.DoEvents()
+            For Each commandName As String In New String() {"ApplySettings", "CancelSettings", "OkSettings"}
+                Dim button = FindControl(settings, commandName)
+                Dim bottom = settings.PointToClient(button.PointToScreen(New Point(0, button.Height))).Y
+                Check(button.Visible AndAlso bottom <= settings.ClientSize.Height, "settings action stays visible on screen tab " & commandName)
+            Next
+            SaveBitmap(settings, IO.Path.Combine(directory, "DisplaySettings.png"))
+            DirectCast(FindControl(settings, "SettingsTabs"), TabControl).SelectedIndex = 0
+            For Each name In New String() {"PreviewAppearanceMain", "PreviewAppearanceSplash", "PreviewAppearanceBig"}
+                Dim captured As Boolean
+                main.BeginInvoke(New Action(Sub()
+                                                Dim preview = Application.OpenForms.Cast(Of Form)().Single(Function(f) f.Name.StartsWith("AppearancePreview"))
+                                                preview.Opacity = 0
+                                                SaveBitmap(preview, IO.Path.Combine(directory, name & ".png"))
+                                                preview.Close()
+                                                captured = True
+                                            End Sub))
+                DirectCast(FindControl(settings, name), Button).PerformClick()
+                Check(captured AndAlso rootTimer.Running AndAlso game.UndoDescription = undo, "preview isolated " & name)
+            Next
+            FindControl(settings, "ProfileName").Text = ""
+            TestRootPendingCancel(main)
+            Check(Not main.IsDisposed AndAlso main.Enabled AndAlso rootTimer.Running AndAlso settings.Dirty, "cancel pending settings retains whole application and timer")
+            DirectCast(FindControl(settings, "ApplySettings"), Button).PerformClick()
+            Check(Not settings.IsDisposed AndAlso settings.Dirty AndAlso service.Current.Profile.Name = "ПРОФИЛЬ МЕРОПРИЯТИЯ", "failed apply preserves dirty settings and current profile")
+            DirectCast(FindControl(settings, "OkSettings"), Button).PerformClick()
+            Check(Not settings.IsDisposed AndAlso settings.Dirty, "failed OK does not close settings")
+            PendingAnswer(settings, "ReviewChanges", Sub() settings.Close())
+            Check(Not settings.IsDisposed AndAlso rootTimer.Running, "cancel settings close leaves countdown running")
+            PendingAnswer(settings, "DiscardChanges", Sub() settings.Close())
+            Check(settings.IsDisposed AndAlso rootTimer.Running, "discard settings close preserves game timer")
+            rootTimer.Stop()
+            ' Ссылки на тестовые окна очищаются до последующей проверки graceful exit.
+            GetType(Form1).GetField("_board", Reflection.BindingFlags.Instance Or Reflection.BindingFlags.NonPublic).SetValue(main, Nothing)
+            GetType(Form1).GetField("_bigBoard", Reflection.BindingFlags.Instance Or Reflection.BindingFlags.NonPublic).SetValue(main, Nothing)
+        End Using
+        TestCatalogAndAbout(main, directory)
+        main.Hide()
+    End Sub
+
+    Private Sub CaptureAppearance(settings As AppearanceSettings, commandName As String, path As String)
+        Dim captured As Boolean
+        Dim started = Diagnostics.Stopwatch.StartNew()
+        Using driver As New System.Windows.Forms.Timer With {.Interval = 20}
+            AddHandler driver.Tick, Sub()
+                                        If started.ElapsedMilliseconds > 5000 Then Throw New Exception("Appearance preview timeout")
+                                        Dim preview = Application.OpenForms.Cast(Of Form)().SingleOrDefault(Function(f) f.Name.StartsWith("AppearancePreview") AndAlso f.Visible)
+                                        If preview Is Nothing Then Return
+                                        driver.Stop()
+                                        preview.Opacity = 0
+                                        Check(Screen.FromControl(preview).Primary, "appearance preview opens on primary screen")
+                                        SaveBitmap(preview, path)
+                                        preview.Close()
+                                        captured = True
+                                    End Sub
+            driver.Start()
+            DirectCast(FindControl(settings, commandName), Button).PerformClick()
+        End Using
+        Check(captured, "profile preview captured " & commandName)
+    End Sub
+
+    <StructLayout(LayoutKind.Sequential)>
+    Private Structure DialogRect
+        Public Left As Integer
+        Public Top As Integer
+        Public Right As Integer
+        Public Bottom As Integer
+    End Structure
+    <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+    Private Function FindWindow(className As String, caption As String) As IntPtr
+    End Function
+    <DllImport("user32.dll", EntryPoint:="GetWindowRect")>
+    Private Function NativeBounds(window As IntPtr, ByRef rect As DialogRect) As Boolean
+    End Function
+    <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+    Private Function PostMessage(window As IntPtr, message As UInteger, wParam As IntPtr, lParam As IntPtr) As Boolean
+    End Function
+
+    Private Sub TestNativePrimary(owner As Form)
+        Dim title = "StoKOdnomu-primary-" & Guid.NewGuid().ToString("N")
+        Dim checked As Boolean
+        Dim onPrimary As Boolean
+        Using driver As New System.Windows.Forms.Timer With {.Interval = 20}
+            AddHandler driver.Tick, Sub()
+                                        ' Уникальный заголовок адресует только диалог этого прогона.
+                                        Dim window = FindWindow("#32770", title)
+                                        If window = IntPtr.Zero Then Return
+                                        Dim rect As DialogRect
+                                        If Not NativeBounds(window, rect) Then Return
+                                        driver.Stop()
+                                        onPrimary = Screen.PrimaryScreen.WorkingArea.Contains(Rectangle.FromLTRB(rect.Left, rect.Top, rect.Right, rect.Bottom))
+                                        checked = True
+                                        PostMessage(window, &H111UI, New IntPtr(1), IntPtr.Zero)
+                                    End Sub
+            driver.Start()
+            Dim result = OperatorWindows.Message(owner, "Проверка размещения системного диалога", title, MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Check(checked AndAlso result = DialogResult.OK AndAlso onPrimary, "native dialog centers on primary even with secondary owner")
+        End Using
+    End Sub
+
+    Private Sub TestCatalogAndAbout(main As Form1, directory As String)
+        Dim errors As New List(Of String)()
+        Dim choices = ProfileCatalog.Discover(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "profiles"), errors)
+        Check(errors.Count = 0 AndAlso choices.Count = 2, "both complete bundled profiles discoverable next to binary")
+        For Each choice In choices
+            Dim profile = AppearanceStorage.Open(choice.ConfigFile)
+            Check(profile.Main.Background <> "" AndAlso profile.Big.Background <> "" AndAlso profile.Main.Assets().All(Function(p) File.Exists(p)), "bundled profile owns six image files " & profile.Name)
+            Check(profile.Main.TextArgb = If(profile.Name.EndsWith("2025"), Color.White.ToArgb(), Color.Black.ToArgb()), "bundled profile color " & profile.Name)
+        Next
+        Dim oldLocation = main.Location
+        Dim secondary = Screen.AllScreens.FirstOrDefault(Function(screen) Not screen.Primary)
+        If secondary IsNot Nothing Then main.Location = secondary.WorkingArea.Location
+        Try
+            Using service As New AppearanceService(Path.Combine(directory, "catalog-ui")), settings As New AppearanceSettings(service)
+                Dim changes As Integer
+                AddHandler service.Changed, Sub() changes += 1
+                settings.Opacity = 0
+                settings.ShowInTaskbar = False
+                settings.Show(main)
+                Application.DoEvents()
+                Check(Screen.FromControl(settings).Primary, "settings opens on primary even with secondary owner")
+                Check(Not settings.Dirty AndAlso Not FindControl(settings, "ApplySettings").Enabled, "clean Apply disabled")
+                Dim cancel = FindControl(settings, "CancelSettings")
+                Dim apply = FindControl(settings, "ApplySettings")
+                Dim ok = FindControl(settings, "OkSettings")
+                Check(cancel.Left < apply.Left AndAlso apply.Left < ok.Left, "footer has cancel left and apply OK right")
+                SaveBitmap(settings, Path.Combine(directory, "SettingsClean.png"))
+                Dim list = DirectCast(FindControl(settings, "ProfileList"), ComboBox)
+                Dim index = Enumerable.Range(0, list.Items.Count).Single(Function(i) list.Items(i).ToString() = "Тупикон 2025")
+                list.SelectedIndex = index
+                Check(settings.Dirty AndAlso settings.Text.StartsWith("● ") AndAlso apply.Enabled, "selected profile marks draft with filled circle")
+                Check(service.Current.Profile.Name = "Тупикон 2026", "selecting profile does not publish")
+                SaveBitmap(settings, Path.Combine(directory, "SettingsDirty.png"))
+                DirectCast(apply, Button).PerformClick()
+                Check(changes = 1 AndAlso settings.Visible AndAlso Not settings.Dirty AndAlso Not apply.Enabled, "Apply publishes once without closing or confirmation")
+                Check(service.Current.Profile.Name = "Тупикон 2025" AndAlso service.Current.Profile.Main.TextArgb = Color.White.ToArgb(), "2025 profile applied with white text")
+                SaveBitmap(settings, Path.Combine(directory, "Settings2025.png"))
+                CaptureAppearance(settings, "PreviewAppearanceMain", Path.Combine(directory, "Profile2025Main.png"))
+                CaptureAppearance(settings, "PreviewAppearanceBig", Path.Combine(directory, "Profile2025Big.png"))
+                list.SelectedIndex = Enumerable.Range(0, list.Items.Count).Single(Function(i) list.Items(i).ToString() = "Тупикон 2026")
+                CaptureAppearance(settings, "PreviewAppearanceMain", Path.Combine(directory, "Profile2026Main.png"))
+                DirectCast(ok, Button).PerformClick()
+                Check(changes = 2 AndAlso settings.IsDisposed AndAlso service.Current.Profile.Name = "Тупикон 2026", "OK applies then closes")
+                Using restarted As New AppearanceService(service.Folder)
+                    Check(restarted.StartupError = "" AndAlso restarted.Current.Profile.Name = "Тупикон 2026", "catalog selection persists as self contained config")
+                End Using
+                Using clean As New AppearanceSettings(service)
+                    clean.Opacity = 0
+                    clean.Show(main)
+                    DirectCast(FindControl(clean, "CancelSettings"), Button).PerformClick()
+                    Check(clean.IsDisposed AndAlso changes = 2, "clean Cancel closes without dialog or applying")
+                End Using
+            End Using
+            TestNativePrimary(main)
+            Using about As New AboutBox1()
+                about.Opacity = 0
+                about.ShowInTaskbar = False
+                about.Show(main)
+                Application.DoEvents()
+                Check(Screen.FromControl(about).Primary AndAlso about.Text = "О программе", "about opens on primary")
+                Check(FindControl(about, "LabelProductName").Text = "Сто к одному" AndAlso FindControl(about, "LabelVersion").Text.Contains("0.2.0"), "about uses actual product and assembly version")
+                Check(Not FindControl(about, "TextBoxDescription").Text.Contains("git clone"), "about description matches product")
+                Dim run = FindControl(about, "RunLbl")
+                Check(run.Text = "Run..." AndAlso run.Width >= 100 AndAlso run.Height >= 40, "Run label and larger hit area preserved")
+                SaveBitmap(about, Path.Combine(directory, "About.png"))
+            End Using
+        Finally
+            main.Location = oldLocation
+        End Try
+    End Sub
 
     Private Sub TestParser()
         Dim lines = Enumerable.Range(1, 18).Select(Function(i) "Ответ " & i & "&10").Concat(Enumerable.Range(1, 6).Select(Function(i) "Наоборот " & i)).ToArray()
@@ -484,6 +1016,7 @@ Module Checks
                     form.Opacity = 0
                     form.Show()
                     Application.DoEvents()
+                    If form Is main OrElse form Is big Then Check(Screen.FromControl(form).Primary, "operator opens on primary screen " & form.Name)
                     If form Is main Then
                         Check(FindControl(main, "ConnectBuzz").Enabled AndAlso Not FindControl(main, "ArmBuzz").Enabled AndAlso Not FindControl(main, "BlockBuzz").Enabled, "missing receiver disables only hardware commands")
                         uiReceiver = New FakeReceiver()
@@ -599,7 +1132,9 @@ Module Checks
                 Check(FindControl(big, "BigPoints9") IsNot Nothing, "per-question editor exists for second player")
                 TestSplashRendering(board, bigBoard, directory)
                 TestStrikeScaling(board, directory)
+                TestBigTotalPosition(bigBoard, directory)
             End Using
+            TestPreparationUi(main, directory)
             main.Show()
             Using entered As New ManualResetEventSlim(), release As New ManualResetEventSlim()
                 uiReceiver = New FakeReceiver With {.BeforeRead = Sub()
@@ -644,6 +1179,7 @@ Module Checks
         main.BeginInvoke(New Action(Sub()
                                         Dim dialog = Application.OpenForms.Cast(Of Form)().Single(Function(form) form.Name = "ExitConfirmation")
                                         dialog.Opacity = 0
+                                        Check(Screen.FromControl(dialog).Primary, "exit dialog opens on primary screen")
                                         Check(FindControl(dialog, "ExitQuestion").Text = "Закрыть приложение?", "exit confirmation question")
                                         Check(DirectCast(dialog.AcceptButton, Button).Text = "Нет", "exit defaults to keeping app open")
                                         Check(dialog.ActiveControl Is FindControl(dialog, "ConfirmExitNo"), "exit keyboard focus starts on No")
@@ -748,6 +1284,87 @@ Module Checks
         SaveBitmap(big, Path.Combine(directory, "BigReturned.png"))
         main.Hide()
         big.Hide()
+    End Sub
+
+    Private Sub TestBigTotalPosition(board As BigGameTablo, directory As String)
+        Dim game = Session(directory, "moving-big-total")
+        Dim render As EventHandler = Sub() board.Render(game.State.Big)
+        AddHandler game.Changed, render
+        Try
+            board.ClientSize = New Size(1264, 681)
+            board.Show()
+            board.RenderTimer(17, True)
+            game.Execute("first participant", Sub(state)
+                                                  For i = 0 To 4
+                                                      GameRules.ShowBigText(state.Big, i, New String() {"СЕМЬЯ", "ДРУЗЬЯ", "ДОМ", "РАБОТА", "ОТДЫХ"}(i))
+                                                      GameRules.ShowBigPoints(state.Big, i, (i + 1) * 10)
+                                                  Next
+                                              End Sub)
+            Dim caption = FindControl(board, "TotalTxt")
+            Dim total = FindControl(board, "TotalLbl")
+            Dim leftCaption = caption.Bounds
+            Dim leftTotal = total.Bounds
+            Dim header = FindControl(board, "RoundScoreLbl").Bounds
+            Check(total.Text = "150" AndAlso total.Right = FindControl(board, "Answer1ScoreLbl").Right, "first participant total is beneath left list")
+            SaveBitmap(board, Path.Combine(directory, "BigTotalLeft.png"))
+            game.Execute("second draft and first mask", Sub(state)
+                                                           state.Big.Answers(5).Text = "ЧЕРНОВИК"
+                                                           state.Big.HideFirstPlayer = True
+                                                       End Sub)
+            Check(caption.Bounds = leftCaption AndAlso total.Bounds = leftTotal, "draft and mask do not move total")
+            game.Execute("first text of second participant", Sub(state) GameRules.ShowBigText(state.Big, 5, "ПРАЗДНИК"))
+            Dim rightCaption = caption.Bounds
+            Dim rightTotal = total.Bounds
+            Check(total.Left > leftTotal.Left AndAlso total.Right = FindControl(board, "Answer6ScoreLbl").Right, "first published second-player text moves total to right list")
+            Check(rightCaption.X - leftCaption.X = rightTotal.X - leftTotal.X AndAlso rightTotal.Y = leftTotal.Y, "caption and value move together horizontally")
+            Check(total.Text = "150" AndAlso FindControl(board, "RoundScoreLbl").Bounds = header, "moving total does not award points or move central score")
+            Check(FindControl(board, "Answer6Lbl").Visible AndAlso Not FindControl(board, "Answer6ScoreLbl").Visible, "move happens on text before score reveal")
+            SaveBitmap(board, Path.Combine(directory, "BigTotalRight.png"))
+            Dim restored = Session(directory, "moving-big-total")
+            restored.Restore()
+            board.Render(restored.State.Big)
+            Check(caption.Bounds = rightCaption AndAlso total.Bounds = rightTotal, "restored match derives right total position from answers")
+            game.Execute("unmask first participant", Sub(state) state.Big.HideFirstPlayer = False)
+            Check(caption.Bounds = rightCaption AndAlso total.Bounds = rightTotal, "unmasking first participant does not return total")
+            game.Undo()
+            game.Execute("second score", Sub(state) GameRules.ShowBigPoints(state.Big, 5, 40))
+            Check(total.Text = "190" AndAlso total.Bounds = rightTotal, "second-player score updates existing right total")
+            game.Undo()
+            Check(total.Text = "150" AndAlso total.Bounds = rightTotal, "undo points keeps total right while text remains")
+            game.Undo()
+            Check(caption.Bounds = leftCaption AndAlso total.Bounds = leftTotal, "undo first second-player text returns total left")
+            game.Execute("out of order second text", Sub(state) GameRules.ShowBigText(state.Big, 8, "МУЗЫКА"))
+            Check(total.Bounds = rightTotal, "direct reveal of another second-player row also moves total")
+            Dim rightState = game.State.Big
+            Dim leftState As New BigGameState()
+            For Each size In New Size() {New Size(640, 380), New Size(1264, 681), New Size(1920, 1080), New Size(800, 1000)}
+                board.ClientSize = size
+                For Each state In New BigGameState() {leftState, rightState}
+                    Dim snapshot As New MatchState With {.Big = state}
+                    Dim before = StateXml(snapshot)
+                    board.Render(state)
+                    board.RenderTimer(16, True)
+                    Dim price = FindControl(board, If(state Is rightState, "Answer6ScoreLbl", "Answer1ScoreLbl"))
+                    Check(Math.Abs(total.Right - price.Right) <= 1 AndAlso caption.Top = total.Top, "moving total scales and stays aligned at " & size.ToString())
+                    Check(caption.Top >= FindControl(board, "Answer10Lbl").Bottom, "total stays below answers at " & size.ToString())
+                    Check(StateXml(snapshot) = before, "position render has no model side effects at " & size.ToString())
+                Next
+            Next
+            board.ClientSize = New Size(1264, 681)
+            board.Render(rightState)
+            Using appearance As New LoadedAppearance(New AppearanceProfile())
+                board.ApplyAppearance(appearance)
+                board.RenderTimer(15, True)
+                Check(total.Bounds = rightTotal, "appearance and timer refresh retain moving total position")
+            End Using
+            game.Execute("new big game", Sub(state) state.Big = New BigGameState())
+            Check(total.Bounds = leftTotal AndAlso total.Text = "0", "new big game resets total left")
+            game.Undo()
+            Check(total.Bounds = rightTotal, "undo new big game restores total right")
+        Finally
+            RemoveHandler game.Changed, render
+            board.Hide()
+        End Try
     End Sub
 
     Private Sub TestStrikeScaling(main As Tablo, directory As String)
