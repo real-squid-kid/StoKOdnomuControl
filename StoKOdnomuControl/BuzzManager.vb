@@ -99,6 +99,24 @@ Public NotInheritable Class BuzzManager
     Private _ledDirty As Boolean
     Private _lastLed As Boolean
     Private ReadOnly _blink As New Stopwatch()
+    Public Const DefaultLampDelayMilliseconds As Integer = 250
+    Public Const MaxLampDelayMilliseconds As Integer = 5000
+    Private _lampDelayMilliseconds As Integer = DefaultLampDelayMilliseconds
+    Private _winningLampDelayMilliseconds As Integer
+
+    Public Property LampDelayMilliseconds As Integer
+        Get
+            SyncLock _gate
+                Return _lampDelayMilliseconds
+            End SyncLock
+        End Get
+        Set(value As Integer)
+            If value < 0 OrElse value > MaxLampDelayMilliseconds Then Throw New ArgumentOutOfRangeException(NameOf(value))
+            SyncLock _gate
+                _lampDelayMilliseconds = value
+            End SyncLock
+        End Set
+    End Property
 
     Public Sub New(Optional openReceiver As Func(Of IBuzzReceiver) = Nothing)
         _openReceiver = If(openReceiver, AddressOf HidBuzzReceiver.Open)
@@ -178,6 +196,9 @@ Public NotInheritable Class BuzzManager
                         winner = _input.Accept(mask.Value)
                         If winner >= 0 Then
                             _activePad = winner
+                            ' Настройку фиксируем для этого победителя: применение настроек
+                            ' во время мигания не сдвигает уже начавшуюся последовательность.
+                            _winningLampDelayMilliseconds = _lampDelayMilliseconds
                             _blink.Restart()
                             _ledDirty = True
                             _status = New BuzzStatus(BuzzState.Winner, "Первым нажал пульт " & (winner + 1), winner, _status.Warning)
@@ -222,7 +243,7 @@ Public NotInheritable Class BuzzManager
         Dim pad As Integer, lit As Boolean
         SyncLock _gate
             pad = _activePad
-            lit = pad >= 0 AndAlso _blink.Elapsed.TotalSeconds < 15 AndAlso (CLng(_blink.ElapsedMilliseconds) \ 125) Mod 2 = 0
+            lit = pad >= 0 AndAlso LampIsLit(_blink.ElapsedMilliseconds, _winningLampDelayMilliseconds)
             If Not _ledDirty AndAlso lit = _lastLed Then Return
             _lastLed = lit
             _ledDirty = False
@@ -241,6 +262,13 @@ Public NotInheritable Class BuzzManager
         ' Отказ ламп не блокирует рабочее чтение кнопок и не изображает потерю USB.
         NotifyStatus()
     End Sub
+
+    ' Не задерживаем чтение USB и определение победителя. До срока лампа погашена;
+    ' все 15 секунд мигания отсчитываются от конца задержки, а не от нажатия.
+    Friend Shared Function LampIsLit(elapsedMilliseconds As Long, delayMilliseconds As Integer) As Boolean
+        Dim blinkingFor = elapsedMilliseconds - delayMilliseconds
+        Return blinkingFor >= 0 AndAlso blinkingFor < 15000 AndAlso (blinkingFor \ 125) Mod 2 = 0
+    End Function
 
     Private Sub NotifyStatus()
         ' Событие не содержит устаревающий снимок: UI читает актуальный Status,

@@ -54,6 +54,7 @@ Public Class Form1
         dataDirectory = Path.GetFullPath(dataDirectory)
         _session = New GameSession(dataDirectory)
         _appearance = New AppearanceService(Path.Combine(dataDirectory, "appearance"), If(Screen.AllScreens.Length > 1, 1, 0))
+        _buzz.LampDelayMilliseconds = _appearance.Current.Profile.BuzzLampDelayMilliseconds
         If File.Exists(AppearanceStorage.ConfigPath(_appearance.Folder)) Then AudioService.Instance.Enabled = _appearance.Current.Profile.SoundEnabled
         BuildUi()
         AddHandler _session.Changed, AddressOf SessionChanged
@@ -65,6 +66,7 @@ Public Class Form1
                                                                       If Not _closing Then AudioService.Instance.Play(SoundCue.Buzzer, AudioChannel.Buzzer)
                                                                   End Sub)
         AddHandler Shown, Async Sub()
+                              DisplayScaleWarning.ShowIfNeeded(Me)
                               ResolveStartupChoice()
                               If _closing OrElse IsDisposed Then Return
                               Await _buzz.ConnectAsync()
@@ -308,6 +310,7 @@ Public Class Form1
 
     Private Sub AppearanceChanged(sender As Object, e As EventArgs)
         Dim profile = _appearance.Current.Profile
+        _buzz.LampDelayMilliseconds = profile.BuzzLampDelayMilliseconds
         AudioService.Instance.Enabled = profile.SoundEnabled
         If Not profile.SoundEnabled Then AudioService.Instance.StopAll()
         If _board IsNot Nothing Then

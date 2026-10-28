@@ -148,6 +148,11 @@ Public Class BigGameControl
                     Dim target = _answerTabOrder(index)
                     If target.CanSelect AndAlso target.TabStop Then
                         target.Select()
+                        ' Наш порядок Tab обходит штатную навигацию NumericUpDown.
+                        ' После передачи фокуса выделяем всё число: ввод заменяет 0
+                        ' или прежние очки, а не дописывает цифры к ним.
+                        Dim points = TryCast(target, NumericUpDown)
+                        If points IsNot Nothing Then points.Select(0, points.Text.Length)
                         Return True
                     End If
                     index += direction

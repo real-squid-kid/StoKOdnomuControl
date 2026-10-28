@@ -34,3 +34,5 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyVersion("0.2.0.0")>
 ' 0.2 обозначает рефакторинг операторских команд; формат сохранения версионируется отдельно.
 <Assembly: AssemblyFileVersion("0.2.0.0")>
+
+<Assembly: System.Runtime.CompilerServices.InternalsVisibleTo("RegressionTests")>

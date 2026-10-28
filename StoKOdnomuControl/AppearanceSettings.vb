@@ -15,6 +15,7 @@ Public NotInheritable Class AppearanceSettings
     Private ReadOnly _screens As New ComboBox With {.Name = "SettingsScreen", .DropDownStyle = ComboBoxStyle.DropDownList}
     Private ReadOnly _fullscreen As New CheckBox With {.Name = "SettingsFullscreen", .Text = "На весь экран", .AutoSize = True}
     Private ReadOnly _sound As New CheckBox With {.Name = "SettingsSound", .Text = "Звук включён", .AutoSize = True}
+    Private ReadOnly _buzzDelay As New NumericUpDown With {.Name = "SettingsBuzzLampDelay", .Minimum = 0, .Maximum = BuzzManager.MaxLampDelayMilliseconds, .Increment = 25, .Width = 120}
     Private ReadOnly _error As Label = OperatorUi.Label("")
     Private ReadOnly _profiles As New ComboBox With {.Name = "ProfileList", .DropDownStyle = ComboBoxStyle.DropDownList}
     Private ReadOnly _apply As Button
@@ -106,6 +107,10 @@ Public NotInheritable Class AppearanceSettings
         OperatorUi.Append(fields, _screens)
         OperatorUi.Append(fields, _fullscreen)
         OperatorUi.Append(fields, _sound)
+        Dim buzzTiming = OperatorUi.Grid(fields, 340, 120, 0)
+        OperatorUi.Cell(buzzTiming, OperatorUi.Label("Задержка мигания кнопки Buzz!, мс", 340), 0, 0)
+        OperatorUi.Cell(buzzTiming, _buzzDelay, 1, 0)
+        OperatorUi.Cell(buzzTiming, OperatorUi.Label("0 — без задержки"), 2, 0)
         display.Controls.Add(fields)
         tabs.TabPages.Add(display)
         frame.Controls.Add(New DialogHeading("Настройки"), 0, 0)
@@ -156,6 +161,11 @@ Public NotInheritable Class AppearanceSettings
                                                  MarkDirty()
                                              End If
                                          End Sub
+        AddHandler _buzzDelay.ValueChanged, Sub()
+                                                 If _filling Then Return
+                                                 _draft.BuzzLampDelayMilliseconds = CInt(_buzzDelay.Value)
+                                                 MarkDirty()
+                                             End Sub
         AddHandler FormClosing, Sub(sender, e)
                                     If e.CloseReason = CloseReason.UserClosing Then e.Cancel = Not ConfirmPending()
                                 End Sub
@@ -203,6 +213,7 @@ Public NotInheritable Class AppearanceSettings
         _screens.SelectedIndex = Math.Min(_draft.ScreenIndex, _screens.Items.Count - 1)
         _fullscreen.Checked = _draft.FullScreen
         _sound.Checked = _draft.SoundEnabled
+        _buzzDelay.Value = _draft.BuzzLampDelayMilliseconds
         _filling = False
         MarkDirty()
         FillStyle()
@@ -324,6 +335,7 @@ Public NotInheritable Class AppearanceSettings
         loaded.ScreenIndex = _draft.ScreenIndex
         loaded.FullScreen = _draft.FullScreen
         loaded.SoundEnabled = _draft.SoundEnabled
+        loaded.BuzzLampDelayMilliseconds = _draft.BuzzLampDelayMilliseconds
         _draft = loaded
         Fill()
         _error.Text = ""

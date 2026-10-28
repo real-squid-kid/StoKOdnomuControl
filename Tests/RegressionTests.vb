@@ -47,6 +47,33 @@ Module Checks
                 Console.WriteLine("PASS: " & _assertions & " audit assertions")
                 Return
             End If
+            If args.Contains("--big-input") Then
+                Application.EnableVisualStyles()
+                AudioService.Instance.Enabled = False
+                Dim game = Session(temporary, "big-input")
+                Using timer As New Countdown(), big As New BigGameControl(game, timer, Sub() Return, Sub() game.Undo(), Sub() Return, Sub() Return, Sub() Return)
+                    big.ShowInTaskbar = False
+                    big.Show()
+                    TestBigTabOrder(big)
+                    FindControl(big, "BigAnswer0").Focus()
+                    GetType(BigGameControl).GetMethod("ProcessDialogKey", Reflection.BindingFlags.NonPublic Or Reflection.BindingFlags.Instance).Invoke(big, New Object() {Keys.Tab})
+                    SaveBitmap(big, Path.Combine(temporary, "big-game-input.png"))
+                End Using
+                Console.WriteLine("Input preview: " & temporary)
+                Console.WriteLine("PASS: " & _assertions & " big-input assertions")
+                Return
+            End If
+            If args.Contains("--scale-warning") Then
+                Application.EnableVisualStyles()
+                DisplayScaleChecks.Run(temporary, AddressOf Check, True)
+                Console.WriteLine("PASS: " & _assertions & " display-scale assertions")
+                Return
+            End If
+            If args.Contains("--usb-io") Then
+                UsbIoChecks.Run(AddressOf Check)
+                Console.WriteLine("PASS: " & _assertions & " USB I/O assertions")
+                Return
+            End If
             TestParser()
             TestBankDocuments(temporary)
             TestAppearanceProfiles(temporary)
@@ -57,8 +84,10 @@ Module Checks
             TestRetiredBigSplash(temporary)
             TestBuzzer()
             TestBuzzConnection()
+            UsbIoChecks.Run(AddressOf Check)
             TestPersistence(temporary)
             TestCountdown()
+            DisplayScaleChecks.Run(Path.Combine(temporary, "display-scale"), AddressOf Check, args.Contains("--ui"))
             AuditRegression.Run(Path.Combine(temporary, "audit"), AddressOf Check, args.Contains("--ui"))
             If args.Contains("--stability") Then StabilityChecks.Run(Path.Combine(temporary, "stability"), AddressOf Check)
             If args.Contains("--ui") Then TestUi(temporary)
@@ -161,7 +190,24 @@ Module Checks
             End Using
             bitmap.Save(image, Imaging.ImageFormat.Png)
         End Using
-        Dim profile As New AppearanceProfile With {.Name = "Тест мероприятия", .SoundEnabled = False}
+        Dim defaults As New AppearanceProfile()
+        Check(defaults.BuzzLampDelayMilliseconds = 250, "default Buzz lamp delay is 250ms")
+        Dim oldXml As New System.Xml.Linq.XDocument()
+        Using stream As New MemoryStream()
+            Dim profileSerializer As New System.Xml.Serialization.XmlSerializer(GetType(AppearanceProfile))
+            profileSerializer.Serialize(stream, defaults)
+            stream.Position = 0
+            oldXml = System.Xml.Linq.XDocument.Load(stream)
+        End Using
+        oldXml.Root.Element("BuzzLampDelayMilliseconds").Remove()
+        Dim oldProfile = Path.Combine(folder, "legacy-config.xml")
+        oldXml.Save(oldProfile)
+        Check(AppearanceStorage.Open(oldProfile).BuzzLampDelayMilliseconds = 250, "old profile without delay keeps default")
+        defaults.BuzzLampDelayMilliseconds = -1
+        Reject(Sub() AppearanceStorage.Validate(defaults), "negative lamp delay rejected")
+        defaults.BuzzLampDelayMilliseconds = 5001
+        Reject(Sub() AppearanceStorage.Validate(defaults), "excessive lamp delay rejected")
+        Dim profile As New AppearanceProfile With {.Name = "Тест мероприятия", .SoundEnabled = False, .BuzzLampDelayMilliseconds = 750}
         profile.Main.Background = image
         profile.Main.LeftStrike = image
         profile.Main.LeftClear = image
@@ -179,6 +225,7 @@ Module Checks
             AddHandler service.Changed, Sub() changes += 1
             service.Apply(profile)
             Check(changes = 1 AndAlso service.Current.Profile.Name = profile.Name, "profile apply publishes once after storage")
+            Check(service.Current.Profile.BuzzLampDelayMilliseconds = 750 AndAlso AppearanceStorage.Open(Path.Combine(storage, "config.xml")).BuzzLampDelayMilliseconds = 750, "lamp delay cloned and persisted")
             Check(Not service.Current.Profile.Main.Background.Equals(image), "profile copies media into owned storage")
             Dim snapshot = service.Current.Profile
             snapshot.Name = "посторонняя правка"
@@ -409,10 +456,14 @@ Module Checks
             settings.SetAsset(0, IO.Path.Combine(shipped, "Resources", "2026", "26_big.jpg"))
             settings.SetTextColor(Color.DarkGreen)
             Check(Not FindControl(settings, "ChooseAsset1").Enabled, "big settings cannot configure strikes")
+            Dim lampDelay = DirectCast(FindControl(settings, "SettingsBuzzLampDelay"), NumericUpDown)
+            lampDelay.Value = 750
+            Check(FieldValue(Of BuzzManager)(main, "_buzz").LampDelayMilliseconds = 250, "lamp delay draft does not affect live receiver")
             scope.SelectedIndex = 0
             Dim undo = game.UndoDescription
             rootTimer.Start(25)
             settings.ApplyDraft()
+            Check(service.Current.Profile.BuzzLampDelayMilliseconds = 750 AndAlso FieldValue(Of BuzzManager)(main, "_buzz").LampDelayMilliseconds = 750, "settings apply updates receiver lamp delay")
             Dim sample = game.State.Main
             sample.LeftScore = 999999
             sample.RightScore = 999999
@@ -443,6 +494,8 @@ Module Checks
             Check(Not settings.IsDisposed AndAlso settings.Dirty AndAlso FindControl(settings, "ProfileName").Text = "ЧЕРНОВИК", "cancel can return to unchanged draft")
             FindControl(settings, "ProfileName").Text = "ПРОФИЛЬ МЕРОПРИЯТИЯ"
             Check(Not settings.Dirty AndAlso Not FindControl(settings, "ApplySettings").Enabled, "reverting values clears dirty marker")
+            lampDelay.Value = 250
+            settings.ApplyDraft()
             settings.PerformLayout()
             Application.DoEvents()
             SaveBitmap(settings, IO.Path.Combine(directory, "AppearanceSettings.png"))
@@ -933,6 +986,12 @@ Module Checks
         Check(gate.Accept(3) = -2 AndAlso Not gate.Armed, "same-report tie has no index bias")
         gate.Accept(0) : gate.Arm() : gate.Disarm()
         Check(gate.Accept(1) = -1, "explicit disarm")
+        Check(Not BuzzManager.LampIsLit(0, 250) AndAlso Not BuzzManager.LampIsLit(249, 250), "lamp remains off before delay")
+        Check(BuzzManager.LampIsLit(250, 250) AndAlso BuzzManager.LampIsLit(374, 250), "first flash starts after full delay")
+        Check(Not BuzzManager.LampIsLit(375, 250) AndAlso BuzzManager.LampIsLit(500, 250), "flash phase is relative to delayed start")
+        Check(Not BuzzManager.LampIsLit(15249, 250) AndAlso Not BuzzManager.LampIsLit(15250, 250), "blink ends 15 seconds after delayed start")
+        Check(BuzzManager.LampIsLit(0, 0) AndAlso Not BuzzManager.LampIsLit(15000, 0), "zero delay starts immediately and still expires")
+        Check(Not BuzzManager.LampIsLit(4999, 5000) AndAlso BuzzManager.LampIsLit(5000, 5000), "maximum configured delay")
     End Sub
 
     Private NotInheritable Class FakeReceiver
@@ -941,6 +1000,7 @@ Module Checks
         Public Failure As Exception
         Public LampWorks As Boolean = True
         Public DisposedCount As Integer
+        Public ReadOnly LitPads As New ConcurrentQueue(Of Integer)()
         Public BeforeRead As Action
 
         Public Function ReadButtons() As Integer? Implements IBuzzReceiver.ReadButtons
@@ -951,6 +1011,7 @@ Module Checks
             Return Nothing
         End Function
         Public Function SetLamp(pad As Integer, lit As Boolean) As Boolean Implements IBuzzReceiver.SetLamp
+            If lit Then LitPads.Enqueue(pad)
             Return LampWorks
         End Function
         Public Sub Dispose() Implements IDisposable.Dispose
@@ -1023,6 +1084,25 @@ Module Checks
                 manager.ShutdownAsync().GetAwaiter().GetResult()
                 Check(second.DisposedCount = 1 AndAlso manager.Status.State = BuzzState.Disposed, "shutdown releases current receiver")
             End Using
+        End Using
+        Dim delayedReceiver As New FakeReceiver()
+        Using manager As New BuzzManager(Function() delayedReceiver)
+            manager.LampDelayMilliseconds = 5000
+            manager.ConnectAsync().GetAwaiter().GetResult()
+            manager.Arm()
+            delayedReceiver.Inputs.Add(1)
+            WaitFor(Function() manager.Status.State = BuzzState.Winner, "delay does not postpone winner")
+            manager.LampDelayMilliseconds = 0
+            Thread.Sleep(40)
+            Check(delayedReceiver.LitPads.IsEmpty, "changing setting does not move pending winner lamp")
+            manager.Disarm()
+            delayedReceiver.Inputs.Add(0)
+            Thread.Sleep(40)
+            Check(delayedReceiver.LitPads.IsEmpty, "disarm cancels pending lamp")
+            manager.Arm()
+            delayedReceiver.Inputs.Add(2)
+            WaitFor(Function() delayedReceiver.LitPads.Contains(1), "next winner uses zero delay")
+            manager.ShutdownAsync().GetAwaiter().GetResult()
         End Using
         Using release As New ManualResetEventSlim(), entered As New ManualResetEventSlim()
             Dim receiver As New FakeReceiver()
@@ -1498,15 +1578,39 @@ Module Checks
         main.Hide()
     End Sub
 
+    ' WM_CHAR направлен конкретному редактору NumericUpDown, а не активному
+    ' окну рабочего стола: проверяем настоящий ввод, не перехватывая клавиатуру.
+    <DllImport("user32.dll", EntryPoint:="SendMessageW", CharSet:=CharSet.Unicode, ExactSpelling:=True)>
+    Private Function SendWindowMessage(window As IntPtr, message As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
+    End Function
+
     Private Sub TestBigTabOrder(big As BigGameControl)
         big.Activate()
         Dim processKey = GetType(BigGameControl).GetMethod("ProcessDialogKey", Reflection.BindingFlags.NonPublic Or Reflection.BindingFlags.Instance)
         For i = 0 To 9
             Dim answer = FindControl(big, "BigAnswer" & i)
-            Dim points = FindControl(big, "BigPoints" & i)
+            Dim points = DirectCast(FindControl(big, "BigPoints" & i), NumericUpDown)
+            Dim original = points.Value
+            points.Value = 0
             answer.Focus()
             processKey.Invoke(big, New Object() {Keys.Tab})
             Check(points.ContainsFocus, "Tab moves answer to its points: " & i)
+            Dim edit = points.Controls.OfType(Of TextBox)().Single()
+            Check(edit.SelectionStart = 0 AndAlso edit.SelectionLength = edit.Text.Length, "Tab selects entire zero: " & i)
+            SendWindowMessage(edit.Handle, &H102, New IntPtr(AscW("7"c)), IntPtr.Zero)
+            processKey.Invoke(big, New Object() {Keys.Tab})
+            Check(points.Value = 7, "typing 7 replaces zero rather than producing 70: " & i)
+            processKey.Invoke(big, New Object() {Keys.Tab Or Keys.Shift})
+            Check(points.ContainsFocus AndAlso edit.SelectionLength = edit.Text.Length, "Shift+Tab selects entire score: " & i)
+            points.Value = 125
+            answer.Focus()
+            processKey.Invoke(big, New Object() {Keys.Tab})
+            SendWindowMessage(edit.Handle, &H102, New IntPtr(AscW("4"c)), IntPtr.Zero)
+            SendWindowMessage(edit.Handle, &H102, New IntPtr(AscW("2"c)), IntPtr.Zero)
+            processKey.Invoke(big, New Object() {Keys.Tab})
+            Check(points.Value = 42, "typing 42 replaces an existing three-digit score: " & i)
+            processKey.Invoke(big, New Object() {Keys.Tab Or Keys.Shift})
+            points.Value = original
             processKey.Invoke(big, New Object() {Keys.Tab Or Keys.Shift})
             Check(answer.ContainsFocus, "Shift+Tab moves points back to answer: " & i)
             If i < 9 Then

@@ -123,6 +123,7 @@
     <Compile Include="AppearanceProfile.vb" />
     <Compile Include="ProfileCatalog.vb" />
     <Compile Include="OperatorWindows.vb" />
+    <Compile Include="DisplayScaleWarning.vb" />
     <Compile Include="AppearanceSettings.vb" />
     <Compile Include="BankEditor.vb" />
     <Compile Include="OperatorUi.vb" />
@@ -141,6 +142,7 @@
     </Compile>
     <Compile Include="BuzzManager.vb" />
     <Compile Include="BuzzReceiver.vb" />
+    <Compile Include="OverlappedIo.vb" />
     <Compile Include="Form1.vb">
       <SubType>Form</SubType>
     </Compile>

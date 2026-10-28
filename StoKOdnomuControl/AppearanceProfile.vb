@@ -65,6 +65,8 @@ Public Class AppearanceProfile
     Public Property ScreenIndex As Integer = 0
     Public Property FullScreen As Boolean = True
     Public Property SoundEnabled As Boolean = True
+    ' Отсутствие поля в прежних config.xml оставляет стандартные 250 мс.
+    Public Property BuzzLampDelayMilliseconds As Integer = BuzzManager.DefaultLampDelayMilliseconds
 
     Public Function Styles() As BoardStyle()
         Return New BoardStyle() {Main}.Concat(Rounds).Concat({Big}).ToArray()
@@ -168,7 +170,7 @@ Public Module AppearanceStorage
             .Main = CopyStyle(profile.Main), .Big = CopyStyle(profile.Big),
             .Rounds = profile.Rounds.Select(Function(style) CopyStyle(style)).ToArray(),
             .ScreenIndex = profile.ScreenIndex, .FullScreen = profile.FullScreen,
-            .SoundEnabled = profile.SoundEnabled}
+            .SoundEnabled = profile.SoundEnabled, .BuzzLampDelayMilliseconds = profile.BuzzLampDelayMilliseconds}
     End Function
 
     Private Function CopyStyle(style As BoardStyle) As BoardStyle
@@ -182,6 +184,7 @@ Public Module AppearanceStorage
         If profile Is Nothing OrElse profile.Version <> 1 Then Throw New InvalidDataException("Неподдерживаемая версия профиля оформления.")
         If String.IsNullOrWhiteSpace(profile.Name) OrElse profile.Name.Length > 80 Then Throw New InvalidDataException("Введите имя профиля от 1 до 80 символов.")
         If profile.Main Is Nothing OrElse profile.Big Is Nothing OrElse profile.Rounds Is Nothing OrElse profile.Rounds.Length <> 4 OrElse profile.Rounds.Any(Function(s) s Is Nothing) Then Throw New InvalidDataException("Неполный профиль оформления.")
+        If profile.BuzzLampDelayMilliseconds < 0 OrElse profile.BuzzLampDelayMilliseconds > BuzzManager.MaxLampDelayMilliseconds Then Throw New InvalidDataException("Задержка лампы Buzz! должна быть от 0 до 5000 мс.")
         If profile.ScreenIndex < 0 Then Throw New InvalidDataException("Неверный номер экрана.")
         For Each style In profile.Styles()
             If style.Assets().Any(Function(p) p Is Nothing) Then Throw New InvalidDataException("Не задан путь изображения.")
