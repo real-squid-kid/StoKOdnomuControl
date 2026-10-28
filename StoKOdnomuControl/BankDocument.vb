@@ -14,29 +14,6 @@ Public Module RoundRules
     End Function
 End Module
 
-Public Module AtomicFile
-    ' Замена выполняется в том же каталоге. Ошибка оставляет прежний файл и .bak;
-    ' временный файл никогда не становится выбранным документом раньше проверки.
-    Public Sub Write(path As String, bytes As Byte())
-        Dim target = IO.Path.GetFullPath(path)
-        Dim temporary = target & "." & Guid.NewGuid().ToString("N") & ".tmp"
-        Try
-            Using stream As New FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None)
-                stream.Write(bytes, 0, bytes.Length)
-                stream.Flush(True)
-            End Using
-            If Not bytes.SequenceEqual(File.ReadAllBytes(temporary)) Then Throw New IOException("Не удалось проверить записанный файл.")
-            If File.Exists(target) Then
-                File.Replace(temporary, target, target & ".bak", True)
-            Else
-                File.Move(temporary, target)
-            End If
-        Finally
-            If File.Exists(temporary) Then File.Delete(temporary)
-        End Try
-    End Sub
-End Module
-
 Public Class BankConflictException
     Inherits IOException
     Public Sub New()

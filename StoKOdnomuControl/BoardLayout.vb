@@ -1,6 +1,7 @@
 Option Strict On
 Imports System.Drawing
 Imports System.Drawing.Text
+Imports System.Drawing.Drawing2D
 Imports System.IO
 Imports System.Windows.Forms
 
@@ -16,6 +17,16 @@ Public NotInheritable Class BoardLayout
     Private ReadOnly _fonts As New PrivateFontCollection()
     ' Освобождаем только созданные нами Font, а не унаследованный/общий Font формы.
     Private ReadOnly _ownedFonts As New Dictionary(Of Control, Font)()
+    Private Structure TextFit
+        Public Text As String
+        Public Size As Size
+        Public Scale As Single
+        Public Dpi As Single
+    End Structure
+    Private ReadOnly _fits As New Dictionary(Of Control, TextFit)()
+    Private _backgroundSource As Image
+    Private _backgroundCache As Bitmap
+    Private _backgroundDirty As Boolean = True
     Private _fullScreen As Boolean
     Private ReadOnly _hideOnClose As Boolean
 
@@ -26,9 +37,9 @@ Public NotInheritable Class BoardLayout
         form.KeyPreview = True
         form.BackColor = Color.Black
         form.MinimumSize = New Size(640, 380)
-        _canvas.BackgroundImage = form.BackgroundImage
+        _backgroundSource = form.BackgroundImage
         _canvas.BackColor = Color.Black
-        _canvas.BackgroundImageLayout = ImageLayout.Zoom
+        _canvas.BackgroundImageLayout = ImageLayout.None
         form.BackgroundImage = Nothing
         For Each control As Control In form.Controls.Cast(Of Control)().ToArray()
             ' Геометрия Designer запоминается один раз. Повторный resize всегда считает
@@ -68,7 +79,11 @@ Public NotInheritable Class BoardLayout
     End Sub
 
     Public Sub ApplyAppearance(background As Image, textColor As Color)
-        _canvas.BackgroundImage = background
+        If Not Object.ReferenceEquals(_backgroundSource, background) Then
+            _backgroundSource = background
+            _backgroundDirty = True
+        End If
+        RefreshBackground()
         For Each control In _bounds.Keys
             If Not TypeOf control Is PictureBox Then control.ForeColor = textColor
         Next
@@ -86,10 +101,41 @@ Public NotInheritable Class BoardLayout
         _bounds(control) = bounds
     End Sub
 
+    ' Прозрачные Label перерисовывают фон родителя. Сохраняем уже вписанный
+    ' фон в пикселях холста: каждой подписи не нужно снова уменьшать большой JPEG.
+    ' Исходная Image заимствована у профиля, а этим Bitmap владеет только layout.
+    Private Sub RefreshBackground()
+        If _canvas.Width < 1 OrElse _canvas.Height < 1 Then Return
+        If Not _backgroundDirty AndAlso _backgroundCache IsNot Nothing AndAlso _backgroundCache.Size = _canvas.Size Then Return
+        Dim replacement As New Bitmap(_canvas.Width, _canvas.Height)
+        Try
+            Using graphics = System.Drawing.Graphics.FromImage(replacement)
+                graphics.Clear(Color.Black)
+                If _backgroundSource IsNot Nothing Then
+                    Dim ratio = Math.Min(_canvas.Width / CDbl(_backgroundSource.Width), _canvas.Height / CDbl(_backgroundSource.Height))
+                    Dim width = CInt(_backgroundSource.Width * ratio)
+                    Dim height = CInt(_backgroundSource.Height * ratio)
+                    Dim area As New Rectangle((_canvas.Width - width) \ 2, (_canvas.Height - height) \ 2, width, height)
+                    graphics.InterpolationMode = InterpolationMode.HighQualityBicubic
+                    graphics.DrawImage(_backgroundSource, area)
+                End If
+            End Using
+            Dim previous = _backgroundCache
+            _canvas.BackgroundImage = replacement
+            _backgroundCache = replacement
+            _backgroundDirty = False
+            If previous IsNot Nothing Then previous.Dispose()
+        Catch
+            replacement.Dispose()
+            Throw
+        End Try
+    End Sub
+
     Private Sub ResizeCanvas(sender As Object, e As EventArgs)
         Dim scale = Math.Min(_form.ClientSize.Width / 1264.0F, _form.ClientSize.Height / 681.0F)
         If scale <= 0 Then Return
         _canvas.Bounds = New Rectangle(CInt((_form.ClientSize.Width - 1264 * scale) / 2), CInt((_form.ClientSize.Height - 681 * scale) / 2), CInt(1264 * scale), CInt(681 * scale))
+        RefreshBackground()
         Using graphics = _canvas.CreateGraphics()
             For Each pair In _bounds
                 Dim control = pair.Key
@@ -98,6 +144,8 @@ Public NotInheritable Class BoardLayout
                 ' PictureBox.Zoom масштабирует всю картинку вместе с её областью,
                 ' сохраняя пропорции. Font для маркера не используется.
                 If TypeOf control Is PictureBox Then Continue For
+                Dim previousFit As New TextFit()
+                If _fits.TryGetValue(control, previousFit) AndAlso previousFit.Text = control.Text AndAlso previousFit.Size = control.Size AndAlso previousFit.Scale = scale AndAlso previousFit.Dpi = graphics.DpiX Then Continue For
                 Dim family = If(_fonts.Families.Length > 0, _fonts.Families(0), FontFamily.GenericMonospace)
                 Dim size = Math.Max(8.0F, _fontSizes(control) * scale)
                 Dim font As New Font(family, size, _fontStyles(control))
@@ -118,6 +166,7 @@ Public NotInheritable Class BoardLayout
                     _ownedFonts(control) = font
                     If oldFont IsNot Nothing Then oldFont.Dispose()
                 End If
+                _fits(control) = New TextFit With {.Text = control.Text, .Size = control.Size, .Scale = scale, .Dpi = graphics.DpiX}
             Next
         End Using
     End Sub
@@ -146,6 +195,11 @@ Public NotInheritable Class BoardLayout
             font.Dispose()
         Next
         _ownedFonts.Clear()
+        _fits.Clear()
+        _canvas.BackgroundImage = Nothing
+        If _backgroundCache IsNot Nothing Then _backgroundCache.Dispose()
+        _backgroundCache = Nothing
+        _backgroundSource = Nothing
         _fonts.Dispose()
     End Sub
 End Class

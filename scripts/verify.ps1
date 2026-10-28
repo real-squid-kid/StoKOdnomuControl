@@ -1,4 +1,4 @@
-﻿param([switch]$Ui)
+﻿param([switch]$Ui, [switch]$Stability)
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path $PSScriptRoot -Parent
 # Ошибка компиляции останавливает запуск старого тестового EXE.
@@ -8,5 +8,6 @@ if ($LASTEXITCODE -ne 0) { throw "Сборка завершилась с код�
 $testArguments = @()
 # UI-проверки включаются явно: они создают формы и сохраняют снимки в тестовый каталог.
 if ($Ui) { $testArguments += '--ui' }
+if ($Stability) { $testArguments += '--stability' }
 & (Join-Path $projectRoot 'Tests/bin/Release/RegressionTests.exe') @testArguments
 if ($LASTEXITCODE -ne 0) { throw "Проверки завершились с кодом $LASTEXITCODE." }

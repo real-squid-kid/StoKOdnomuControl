@@ -10,6 +10,7 @@ Public Class Tablo
     Private ReadOnly _right As PictureBox()
     Private _appearance As LoadedAppearance
     Private _style As New BoardStyle()
+    Private _appearanceRound As Integer = -1
 
     Public Sub New()
         Me.New(False)
@@ -34,7 +35,9 @@ Public Class Tablo
     End Sub
 
     Public Sub ApplyAppearance(appearance As LoadedAppearance, round As Integer)
+        If Object.ReferenceEquals(_appearance, appearance) AndAlso _appearanceRound = round Then Return
         _appearance = appearance
+        _appearanceRound = round
         _style = appearance.Profile.MainStyle(round)
         _layout.ApplyAppearance(appearance.Picture(_style.Background, My.Resources._26_main), Color.FromArgb(_style.TextArgb))
     End Sub

@@ -116,8 +116,10 @@
     <!-- Пульты Form1/BigGameControl используют BuildUi; прежних Designer-файлов у них нет. -->
     <Compile Include="GameState.vb" />
     <Compile Include="GameSession.vb" />
+    <Compile Include="SavedMatchReader.vb" />
     <Compile Include="QuestionBankReader.vb" />
     <Compile Include="BankDocument.vb" />
+    <Compile Include="AtomicFile.vb" />
     <Compile Include="AppearanceProfile.vb" />
     <Compile Include="ProfileCatalog.vb" />
     <Compile Include="OperatorWindows.vb" />

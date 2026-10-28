@@ -202,7 +202,7 @@ Public NotInheritable Class BankEditor
 
     Private Sub OpenDialog()
         If Not ConfirmPending() Then Return
-        Using dialog As New OpenFileDialog With {.Filter = "База ответов (*.txt)|*.txt"}
+        Using dialog As New OpenFileDialog With {.Filter = "База и резервная копия (*.txt;*.bak)|*.txt;*.bak|Все файлы (*.*)|*.*"}
             If OperatorWindows.ShowFileDialog(dialog, Me) = DialogResult.OK Then OpenDocument(dialog.FileName)
         End Using
     End Sub

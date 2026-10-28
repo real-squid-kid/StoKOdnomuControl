@@ -18,6 +18,8 @@ Public NotInheritable Class AppearanceSettings
     Private ReadOnly _error As Label = OperatorUi.Label("")
     Private ReadOnly _profiles As New ComboBox With {.Name = "ProfileList", .DropDownStyle = ComboBoxStyle.DropDownList}
     Private ReadOnly _apply As Button
+    Private _selectedProfileIndex As Integer
+    Private _selectingProfile As Boolean
     Private _filling As Boolean
     Public ReadOnly Property Dirty As Boolean
 
@@ -267,46 +269,72 @@ Public NotInheritable Class AppearanceSettings
         If Not Dirty Then Return
         _service.Apply(_draft)
         _draft = _service.Current.Profile
-        _profiles.Items(0) = New ProfileChoice With {.Name = "Текущее: " & _draft.Name}
-        _profiles.SelectedIndex = 0
+        _selectingProfile = True
+        Try
+            _profiles.Items(0) = New ProfileChoice With {.Name = "Текущее: " & _draft.Name}
+            _profiles.SelectedIndex = 0
+            _selectedProfileIndex = 0
+        Finally
+            _selectingProfile = False
+        End Try
         Fill()
     End Sub
 
     Public Function ConfirmPending() As Boolean
-        If Not Dirty Then Return True
-        If Not DialogStyle.ConfirmDiscard(Me) Then Return False
+        If Not CanDiscardDraft() Then Return False
         _draft = _service.Current.Profile
         Fill()
         Return True
     End Function
 
+    Private Function CanDiscardDraft() As Boolean
+        Return Not Dirty OrElse DialogStyle.ConfirmDiscard(Me)
+    End Function
+
+    Private Sub RestoreProfileSelection()
+        _selectingProfile = True
+        Try
+            _profiles.SelectedIndex = _selectedProfileIndex
+        Finally
+            _selectingProfile = False
+        End Try
+    End Sub
+
     Private Sub SelectProfile()
-        If _profiles.SelectedIndex < 0 Then Return
+        If _selectingProfile OrElse _profiles.SelectedIndex < 0 Then Return
+        Dim index = _profiles.SelectedIndex
         Try
             Dim choice = DirectCast(_profiles.SelectedItem, ProfileChoice)
+            ' Читаем кандидат до решения об отказе от черновика. Даже согласие
+            ' на смену не должно стирать поля, если новый профиль повреждён.
             Dim loaded = If(choice.ConfigFile = "", _service.Current.Profile, AppearanceStorage.Open(choice.ConfigFile))
-            ' Выбор оформления не переключает монитор и не меняет звук текущей игры.
-            loaded.ScreenIndex = _draft.ScreenIndex
-            loaded.FullScreen = _draft.FullScreen
-            loaded.SoundEnabled = _draft.SoundEnabled
-            _draft = loaded
-            Fill()
-            _error.Text = ""
+            If Not CanDiscardDraft() Then
+                RestoreProfileSelection()
+                Return
+            End If
+            AdoptProfile(loaded)
+            _selectedProfileIndex = index
         Catch ex As Exception
+            RestoreProfileSelection()
             _error.Text = ex.Message
         End Try
     End Sub
 
+    Private Sub AdoptProfile(loaded As AppearanceProfile)
+        loaded.ScreenIndex = _draft.ScreenIndex
+        loaded.FullScreen = _draft.FullScreen
+        loaded.SoundEnabled = _draft.SoundEnabled
+        _draft = loaded
+        Fill()
+        _error.Text = ""
+    End Sub
+
     Private Sub OpenProfileDialog()
-        If Not ConfirmPending() Then Return
-        Using dialog As New OpenFileDialog With {.Title = "Открыть config.xml вместе с папкой медиа", .Filter = "Профиль оформления (*.xml)|*.xml"}
+        Using dialog As New OpenFileDialog With {.Title = "Открыть config.xml вместе с папкой медиа", .Filter = "Профиль и резервная копия (*.xml;*.bak)|*.xml;*.bak|Все файлы (*.*)|*.*", .InitialDirectory = _service.Folder}
             If OperatorWindows.ShowFileDialog(dialog, Me) <> DialogResult.OK Then Return
             Dim loaded = AppearanceStorage.Open(dialog.FileName)
-            loaded.ScreenIndex = _draft.ScreenIndex
-            loaded.FullScreen = _draft.FullScreen
-            loaded.SoundEnabled = _draft.SoundEnabled
-            _draft = loaded
-            Fill()
+            If Not CanDiscardDraft() Then Return
+            AdoptProfile(loaded)
         End Using
     End Sub
 

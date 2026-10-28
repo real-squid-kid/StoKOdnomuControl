@@ -181,15 +181,35 @@ Public Module GameRules
         If state.Big.TargetScore < 1 OrElse state.Big.TargetScore > MaximumScore Then Throw New InvalidDataException("Неверная цель большой игры.")
     End Sub
 
+    ' Снимки в памяти не проходят XML: это горячий путь каждого нажатия и рендера.
+    ' Все вложенные объекты копируются. XML остаётся только форматом файлов на диске.
     Public Function Clone(state As MatchState) As MatchState
-        ' XML-копирование отделяет вложенные массивы и ответы от живой игры и истории Undo.
-        ' Это простой вариант для небольшой модели, совместимый с форматом автосохранения.
-        Using stream As New MemoryStream()
-            Dim serializer As New XmlSerializer(GetType(MatchState))
-            serializer.Serialize(stream, state)
-            stream.Position = 0
-            Return DirectCast(serializer.Deserialize(stream), MatchState)
-        End Using
+        If state Is Nothing Then Return Nothing
+        Dim main = state.Main
+        Dim big = state.Big
+        Dim copy As New MatchState With {.FormatVersion = state.FormatVersion}
+        copy.Main = If(main Is Nothing, Nothing, New MainGameState With {
+            .LeftScore = main.LeftScore, .RightScore = main.RightScore,
+            .Bank = main.Bank, .BankId = main.BankId, .Round = main.Round,
+            .LegacySplash = main.LegacySplash, .Answers = CopyAnswers(main.Answers),
+            .LeftStrikes = If(main.LeftStrikes Is Nothing, Nothing, DirectCast(main.LeftStrikes.Clone(), Boolean())),
+            .RightStrikes = If(main.RightStrikes Is Nothing, Nothing, DirectCast(main.RightStrikes.Clone(), Boolean()))})
+        If main IsNot Nothing Then
+            Dim splash = main.SplashScreen
+            copy.Main.SplashScreen = If(splash Is Nothing, Nothing, New SplashState With {.Visible = splash.Visible, .Line1 = splash.Line1, .Line2 = splash.Line2})
+        End If
+        copy.Big = If(big Is Nothing, Nothing, New BigGameState With {
+            .Answers = CopyAnswers(big.Answers), .ScoreAdjustment = big.ScoreAdjustment,
+            .HideFirstPlayer = big.HideFirstPlayer, .TargetScore = big.TargetScore})
+        Return copy
+    End Function
+
+    Private Function CopyAnswers(answers As AnswerState()) As AnswerState()
+        If answers Is Nothing Then Return Nothing
+        Return answers.Select(Function(answer) If(answer Is Nothing, Nothing, New AnswerState With {
+            .Text = answer.Text, .Points = answer.Points, .TextVisible = answer.TextVisible,
+            .ScoreVisible = answer.ScoreVisible, .AwardedPoints = answer.AwardedPoints,
+            .AwardedBank = answer.AwardedBank})).ToArray()
     End Function
 
     Public Sub EditMainAnswer(state As MainGameState, index As Integer, text As String, points As Integer)

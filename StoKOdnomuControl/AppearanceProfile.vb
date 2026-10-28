@@ -2,6 +2,7 @@ Option Strict On
 Imports System.Drawing
 Imports System.Drawing.Imaging
 Imports System.IO
+Imports System.Security.Cryptography
 Imports System.Xml
 Imports System.Xml.Serialization
 
@@ -79,6 +80,8 @@ End Class
 Public NotInheritable Class LoadedAppearance
     Implements IDisposable
     Private ReadOnly _images As New Dictionary(Of String, Bitmap)(StringComparer.OrdinalIgnoreCase)
+    Private ReadOnly _encoded As New Dictionary(Of String, Byte())(StringComparer.OrdinalIgnoreCase)
+    Private ReadOnly _extensions As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
     Private ReadOnly _profile As AppearanceProfile
     Public ReadOnly Property Profile As AppearanceProfile
         Get
@@ -86,7 +89,7 @@ Public NotInheritable Class LoadedAppearance
         End Get
     End Property
 
-    Public Sub New(profile As AppearanceProfile)
+    Public Sub New(profile As AppearanceProfile, Optional keepEncoded As Boolean = False)
         AppearanceStorage.Validate(profile)
         _profile = AppearanceStorage.Clone(profile)
         Try
@@ -98,10 +101,15 @@ Public NotInheritable Class LoadedAppearance
                     Dim extension = IO.Path.GetExtension(path).ToLowerInvariant()
                     If Not {".png", ".jpg", ".jpeg"}.Contains(extension) Then Throw New InvalidDataException("Выберите PNG или JPEG: " & path)
                     Try
-                        Using stream = File.OpenRead(path), source = Image.FromStream(stream, True, True)
+                        Dim bytes = File.ReadAllBytes(path)
+                        Using stream As New MemoryStream(bytes, False), source = Image.FromStream(stream, True, True)
                             If Not source.RawFormat.Equals(ImageFormat.Png) AndAlso Not source.RawFormat.Equals(ImageFormat.Jpeg) Then Throw New InvalidDataException("Файл не является PNG/JPEG: " & path)
                             If CLng(source.Width) * source.Height > 16000000 Then Throw New InvalidDataException("Картинка превышает 16 миллионов пикселей: " & path)
                             _images.Add(path, New Bitmap(source))
+                            If keepEncoded Then
+                                _encoded.Add(path, bytes)
+                                _extensions.Add(path, If(source.RawFormat.Equals(ImageFormat.Png), ".png", ".jpg"))
+                            End If
                         End Using
                     Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is OutOfMemoryException
                         Throw New InvalidDataException("Не удалось декодировать PNG/JPEG: " & path, ex)
@@ -118,7 +126,17 @@ Public NotInheritable Class LoadedAppearance
         Return If(path = "", fallback, _images(path))
     End Function
 
+    Friend Function EncodedPicture(path As String) As Byte()
+        Return _encoded(path)
+    End Function
+
+    Friend Function PictureExtension(path As String) As String
+        Return _extensions(path)
+    End Function
+
     Public Sub Dispose() Implements IDisposable.Dispose
+        _encoded.Clear()
+        _extensions.Clear()
         For Each bitmap In _images.Values
             bitmap.Dispose()
         Next
@@ -145,11 +163,19 @@ Public Module AppearanceStorage
     End Function
 
     Public Function Clone(profile As AppearanceProfile) As AppearanceProfile
-        Using stream As New MemoryStream()
-            Serializer.Serialize(stream, profile)
-            stream.Position = 0
-            Return DirectCast(Serializer.Deserialize(stream), AppearanceProfile)
-        End Using
+        Return New AppearanceProfile With {
+            .Version = profile.Version, .Name = profile.Name,
+            .Main = CopyStyle(profile.Main), .Big = CopyStyle(profile.Big),
+            .Rounds = profile.Rounds.Select(Function(style) CopyStyle(style)).ToArray(),
+            .ScreenIndex = profile.ScreenIndex, .FullScreen = profile.FullScreen,
+            .SoundEnabled = profile.SoundEnabled}
+    End Function
+
+    Private Function CopyStyle(style As BoardStyle) As BoardStyle
+        Return New BoardStyle With {.Background = style.Background,
+            .LeftClear = style.LeftClear, .LeftStrike = style.LeftStrike,
+            .RightClear = style.RightClear, .RightStrike = style.RightStrike,
+            .TextArgb = style.TextArgb, .Inherit = style.Inherit}
     End Function
 
     Public Sub Validate(profile As AppearanceProfile)
@@ -199,52 +225,42 @@ Public Module AppearanceStorage
         Return full
     End Function
 
-    Private Function ExistingMedia(source As String, folder As String) As String
-        Dim root = IO.Path.GetFullPath(folder).TrimEnd(IO.Path.DirectorySeparatorChar) & IO.Path.DirectorySeparatorChar
-        Dim full = IO.Path.GetFullPath(source)
-        If Not full.StartsWith(root, StringComparison.OrdinalIgnoreCase) Then Return ""
-        Dim relative = full.Substring(root.Length)
-        Dim parts = relative.Split(IO.Path.DirectorySeparatorChar)
-        Dim generation As Guid
-        If parts.Length <> 3 OrElse parts(0) <> "media" OrElse Not Guid.TryParseExact(parts(1), "N", generation) Then Return ""
-        ResolveMedia(folder, relative)
-        ' Смена цвета/имени не копирует те же картинки заново. Старое поколение
-        ' остаётся неизменным и пригодным для резервного XML.
-        Return relative
-    End Function
-
     Public Function Save(profile As AppearanceProfile, folder As String) As LoadedAppearance
         Validate(profile)
         Dim candidate = Clone(profile)
-        Using prepared As New LoadedAppearance(candidate)
-            Directory.CreateDirectory(folder)
-            Dim generation = IO.Path.Combine("media", Guid.NewGuid().ToString("N"))
-            Dim destination = IO.Path.Combine(folder, generation)
-            Directory.CreateDirectory(destination)
-            Dim copies As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
-            Dim written As New List(Of String)()
-            Dim committed As Boolean
+        Using prepared As New LoadedAppearance(candidate, keepEncoded:=True)
+            Dim media = IO.Path.Combine(folder, "media")
+            Directory.CreateDirectory(media)
+            Dim paths As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
+            Dim created As New List(Of String)()
             Dim ready As LoadedAppearance = Nothing
+            Dim committed As Boolean
             Try
                 For Each style In candidate.Styles()
                     Dim assets = style.Assets()
                     For i = 0 To assets.Length - 1
                         Dim source = assets(i)
                         If source = "" Then Continue For
-                        If Not copies.ContainsKey(source) Then
-                            Dim relative = ExistingMedia(source, folder)
-                            If relative = "" Then
-                                Dim originalName = IO.Path.GetFileNameWithoutExtension(source)
-                                originalName = originalName.Substring(0, Math.Min(40, originalName.Length))
-                                relative = IO.Path.Combine(generation, copies.Count.ToString() & "-" & originalName & ".png")
-                                Dim target = IO.Path.Combine(folder, relative)
-                                ' Пишем проверенные пиксели, не перечитываем изменяемый оригинал.
-                                written.Add(target)
-                                prepared.Picture(source, Nothing).Save(target, ImageFormat.Png)
+                        If Not paths.ContainsKey(source) Then
+                            ' Адрес по содержимому исключает новые копии при переключении
+                            ' профилей. Исходный JPEG/PNG сохраняется побайтно, без перекодирования.
+                            Dim bytes = prepared.EncodedPicture(source)
+                            Dim digest As String
+                            Using hash = SHA256.Create()
+                                digest = BitConverter.ToString(hash.ComputeHash(bytes)).Replace("-", "").ToLowerInvariant()
+                            End Using
+                            Dim relative = IO.Path.Combine("media", digest & prepared.PictureExtension(source))
+                            Dim target = IO.Path.Combine(folder, relative)
+                            If Not File.Exists(target) Then
+                                created.Add(target)
+                                AtomicFile.Write(target, bytes)
+                            ElseIf Not bytes.SequenceEqual(File.ReadAllBytes(target)) Then
+                                ' Испорченный файл с тем же именем не принимаем за проверенный.
+                                AtomicFile.Write(target, Sub(stream) stream.Write(bytes, 0, bytes.Length), backupPath:=AtomicFile.RejectedPath(target))
                             End If
-                            copies.Add(source, relative)
+                            paths.Add(source, relative)
                         End If
-                        style.SetAsset(i, copies(source))
+                        style.SetAsset(i, paths(source))
                     Next
                 Next
                 Dim absolute = Clone(candidate)
@@ -255,22 +271,28 @@ Public Module AppearanceStorage
                     Next
                 Next
                 ready = New LoadedAppearance(absolute)
-                If written.Count = 0 Then Directory.Delete(destination, False)
-                Using stream As New MemoryStream()
-                    Serializer.Serialize(stream, candidate)
-                    ' Новое поколение медиа готово целиком. Единственная точка публикации — XML.
-                    ' Старые файлы остаются доступны для предыдущего XML и его .bak.
-                    AtomicFile.Write(IO.Path.Combine(folder, "config.xml"), stream.ToArray())
-                End Using
+                Dim config = IO.Path.Combine(folder, "config.xml")
+                Dim previous = config & ".bak"
+                If File.Exists(config) Then
+                    Try
+                        Open(config)
+                    Catch ex As Exception
+                        previous = AtomicFile.RejectedPath(config)
+                    End Try
+                End If
+                AtomicFile.Write(config, Sub(stream) Serializer.Serialize(stream, candidate), backupPath:=previous)
                 committed = True
                 Return ready
             Finally
                 If Not committed Then
                     If ready IsNot Nothing Then ready.Dispose()
-                    For Each item In written
-                        If File.Exists(item) Then File.Delete(item)
+                    For Each item In created
+                        Try
+                            If File.Exists(item) Then File.Delete(item)
+                        Catch ex As Exception When TypeOf ex Is IOException OrElse TypeOf ex Is UnauthorizedAccessException
+                            Diagnostics.Debug.WriteLine(ex.Message)
+                        End Try
                     Next
-                    If Directory.Exists(destination) Then Directory.Delete(destination, False)
                 End If
             End Try
         End Using
@@ -285,10 +307,10 @@ Public NotInheritable Class AppearanceService
     Public ReadOnly Property StartupError As String = ""
 
     Public Sub New(folder As String, Optional defaultScreen As Integer = 0)
-        Me.Folder = folder
+        Me.Folder = IO.Path.GetFullPath(folder)
         Dim defaults As New AppearanceProfile With {.ScreenIndex = defaultScreen}
         Try
-            Dim path = AppearanceStorage.ConfigPath(folder)
+            Dim path = AppearanceStorage.ConfigPath(Me.Folder)
             _Current = New LoadedAppearance(If(File.Exists(path), AppearanceStorage.Open(path), defaults))
         Catch ex As Exception
             _Current = New LoadedAppearance(defaults)

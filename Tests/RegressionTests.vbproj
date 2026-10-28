@@ -24,6 +24,9 @@
     <Import Include="System.Linq" />
     <Import Include="System.Collections.Generic" />
     <Compile Include="RegressionTests.vb" />
+    <Compile Include="StabilityChecks.vb" />
+    <Compile Include="PackageChecks.vb" />
+    <Compile Include="AuditRegression.vb" />
     <ProjectReference Include="..\StoKOdnomuControl\StoKOdnomuControl.vbproj">
       <Project>{129FAE66-E39D-4B2F-A8A8-B63D5833702E}</Project>
       <Name>StoKOdnomuControl</Name>

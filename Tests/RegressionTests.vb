@@ -18,12 +18,35 @@ Module Checks
     <STAThread>
     Public Sub Main(args As String())
         Try
+            If args.Length > 0 AndAlso args(0) = "--package-smoke" Then
+                PackageChecks.Run(args(1))
+                Return
+            End If
+            If args.Length > 0 AndAlso args(0) = "--interrupt-write" Then
+                StabilityChecks.InterruptedWriter(args(1), args(2))
+                Return
+            End If
             ' Ошибки UI-тестов доходят до консольного отчёта, а не до JIT-диалога
             ' на рабочем столе владельца. Это политика только тестового процесса.
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.ThrowException)
             ' Снимки/логи тестов отделены от сохранения реального матча оператора.
             Dim temporary = Path.Combine(Path.GetTempPath(), "StoKOdnomu-tests-" & Guid.NewGuid().ToString("N"))
             Directory.CreateDirectory(temporary)
+            If args.Contains("--native-dialog") Then
+                Application.EnableVisualStyles()
+                Using owner As New Form With {.Text = "Native dialog test", .Opacity = 0, .ShowInTaskbar = False}
+                    owner.Show()
+                    TestNativePrimary(owner)
+                End Using
+                Console.WriteLine("PASS: native dialog")
+                Return
+            End If
+            If args.Contains("--audit-fixes") Then
+                Application.EnableVisualStyles()
+                AuditRegression.Run(temporary, AddressOf Check, True)
+                Console.WriteLine("PASS: " & _assertions & " audit assertions")
+                Return
+            End If
             TestParser()
             TestBankDocuments(temporary)
             TestAppearanceProfiles(temporary)
@@ -36,7 +59,10 @@ Module Checks
             TestBuzzConnection()
             TestPersistence(temporary)
             TestCountdown()
+            AuditRegression.Run(Path.Combine(temporary, "audit"), AddressOf Check, args.Contains("--ui"))
+            If args.Contains("--stability") Then StabilityChecks.Run(Path.Combine(temporary, "stability"), AddressOf Check)
             If args.Contains("--ui") Then TestUi(temporary)
+            If args.Contains("--stability") AndAlso args.Contains("--ui") Then PackageChecks.SoakUi(temporary, AddressOf Check)
             Check(_storageErrors.Count = 0, "no autosave failures: " & String.Join("; ", _storageErrors))
             Console.WriteLine("PASS: " & _assertions & " assertions")
         Catch ex As Exception
@@ -70,7 +96,7 @@ Module Checks
         Dim folder = Path.Combine(directory, "banks")
         IO.Directory.CreateDirectory(folder)
         Dim shipped = IO.Path.GetFullPath(IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../StoKOdnomuControl"))
-        For Each source In IO.Directory.GetFiles(shipped, "*.txt")
+        For Each source In StabilityChecks.BankNames.Select(Function(name) IO.Path.Combine(shipped, name))
             Dim document = BankDocument.Open(source)
             Dim before = BankDocument.Serialize(document.Bank)
             Dim target = Path.Combine(folder, Path.GetFileName(source))
@@ -93,7 +119,7 @@ Module Checks
             document.Save(target & ".copy.txt", document.Bank)
             Check(document.FilePath.EndsWith(".copy.txt"), "conflicted draft can Save As")
         Next
-        Dim valid = BankDocument.Open(IO.Directory.GetFiles(shipped, "*.txt")(0)).Bank
+        Dim valid = BankDocument.Open(IO.Path.Combine(shipped, "base.txt")).Bank
         valid.Rounds(0)(0).Text = "Нельзя&так"
         Reject(Sub() BankDocument.Serialize(valid), "writer rejects ambiguous delimiter")
         valid.Rounds(0)(0).Text = "Две" & vbLf & "строки"
@@ -302,7 +328,7 @@ Module Checks
         DirectCast(FindControl(main, "OpenBankEditor"), Button).PerformClick()
         Check(main.OwnedForms.OfType(Of BankEditor)().Count() = 1, "editor button reuses window")
         Dim shipped = IO.Path.GetFullPath(IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../StoKOdnomuControl"))
-        editor.OpenDocument(IO.Directory.GetFiles(shipped, "*.txt")(0))
+        editor.OpenDocument(IO.Path.Combine(shipped, "base.txt"))
         Dim game = FieldValue(Of GameSession)(main, "_session")
         game.Execute("prepare big game", Sub(state)
                                             GameRules.ShowBigText(state.Big, 0, "СЕМЬЯ")
@@ -495,29 +521,90 @@ Module Checks
     <DllImport("user32.dll", EntryPoint:="GetWindowRect")>
     Private Function NativeBounds(window As IntPtr, ByRef rect As DialogRect) As Boolean
     End Function
-    <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
-    Private Function PostMessage(window As IntPtr, message As UInteger, wParam As IntPtr, lParam As IntPtr) As Boolean
+
+    <DllImport("kernel32.dll")>
+    Private Function GetCurrentThreadId() As UInteger
+    End Function
+    <DllImport("user32.dll")>
+    Private Function PostThreadMessage(thread As UInteger, message As UInteger, wParam As IntPtr, lParam As IntPtr) As Boolean
     End Function
 
+    <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+    Private Function SendMessage(window As IntPtr, message As UInteger, wParam As IntPtr, lParam As IntPtr) As IntPtr
+    End Function
+
+    Private Delegate Function ChildWindowCallback(window As IntPtr, data As IntPtr) As Boolean
+    <DllImport("user32.dll")>
+    Private Function EnumChildWindows(window As IntPtr, callback As ChildWindowCallback, data As IntPtr) As Boolean
+    End Function
+    <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+    Private Function GetWindowText(window As IntPtr, text As System.Text.StringBuilder, capacity As Integer) As Integer
+    End Function
+    <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+    Private Function GetClassName(window As IntPtr, text As System.Text.StringBuilder, capacity As Integer) As Integer
+    End Function
+    <DllImport("user32.dll")>
+    Private Function GetDlgCtrlID(window As IntPtr) As Integer
+    End Function
+
+    Private Sub TraceNativeDialog(window As IntPtr)
+        Dim kind As New System.Text.StringBuilder(256)
+        GetClassName(window, kind, kind.Capacity)
+        Console.WriteLine("Dialog class: " & kind.ToString())
+        EnumChildWindows(window, Function(child, data)
+                                     Dim text As New System.Text.StringBuilder(512)
+                                     Dim childKind As New System.Text.StringBuilder(256)
+                                     GetWindowText(child, text, text.Capacity)
+                                     GetClassName(child, childKind, childKind.Capacity)
+                                     Console.WriteLine("Child: " & GetDlgCtrlID(child) & " | " & childKind.ToString() & " | " & text.ToString())
+                                     Return True
+                                 End Function, IntPtr.Zero)
+    End Sub
+
     Private Sub TestNativePrimary(owner As Form)
+        Dim started = Diagnostics.Stopwatch.StartNew()
+        Dim timedOut As Boolean
         Dim title = "StoKOdnomu-primary-" & Guid.NewGuid().ToString("N")
         Dim checked As Boolean
         Dim onPrimary As Boolean
         Using driver As New System.Windows.Forms.Timer With {.Interval = 20}
             AddHandler driver.Tick, Sub()
                                         ' Уникальный заголовок адресует только диалог этого прогона.
-                                        Dim window = FindWindow("#32770", title)
+                                        Dim window = FindWindow(Nothing, title)
+                                        If started.ElapsedMilliseconds > 5000 Then
+                                            Console.WriteLine("Native dialog timeout: title=" & title & "; handle=" & window.ToString())
+                                            If window <> IntPtr.Zero Then TraceNativeDialog(window)
+                                            timedOut = True
+                                            driver.Stop()
+                                            PostThreadMessage(GetCurrentThreadId(), &H12UI, IntPtr.Zero, IntPtr.Zero)
+                                            Return
+                                        End If
                                         If window = IntPtr.Zero Then Return
                                         Dim rect As DialogRect
                                         If Not NativeBounds(window, rect) Then Return
-                                        driver.Stop()
+                                        ' Окно может существовать до завершения его инициализации.
+                                        ' Ждём появления настоящей кнопки, затем вызываем её обработчик.
                                         onPrimary = Screen.PrimaryScreen.WorkingArea.Contains(Rectangle.FromLTRB(rect.Left, rect.Top, rect.Right, rect.Bottom))
+                                        Dim okButton As IntPtr
+                                        ' У диалога одна кнопка. Внутренний control ID зависит
+                                        ' от реализации Windows; выбираем реальный Button.
+                                        EnumChildWindows(window, Function(child, data)
+                                                                     Dim kind As New System.Text.StringBuilder(64)
+                                                                     GetClassName(child, kind, kind.Capacity)
+                                                                     If kind.ToString() = "Button" Then
+                                                                         okButton = child
+                                                                         Return False
+                                                                     End If
+                                                                     Return True
+                                                                 End Function, IntPtr.Zero)
+                                        If okButton = IntPtr.Zero Then Return
                                         checked = True
-                                        PostMessage(window, &H111UI, New IntPtr(1), IntPtr.Zero)
+                                        SendMessage(okButton, &HF5UI, IntPtr.Zero, IntPtr.Zero)
                                     End Sub
             driver.Start()
+            Console.WriteLine("UI: native primary-screen dialog")
             Dim result = OperatorWindows.Message(owner, "Проверка размещения системного диалога", title, MessageBoxButtons.OK, MessageBoxIcon.Information)
-            Check(checked AndAlso result = DialogResult.OK AndAlso onPrimary, "native dialog centers on primary even with secondary owner")
+            Check(Not timedOut AndAlso checked AndAlso result = DialogResult.OK AndAlso onPrimary, "native dialog centers on primary even with secondary owner; found=" & checked & ", result=" & result.ToString() & ", primary=" & onPrimary & ", timeout=" & timedOut)
         End Using
     End Sub
 
@@ -607,7 +694,7 @@ Module Checks
         Reject(Sub() QuestionBankReader.Parse(valid.Replace("Ответ 1&10", " &10")), "reject empty answer")
         Reject(Sub() QuestionBankReader.Parse(valid.Replace("Ответ 1&10", "Ответ&10&20")), "reject ambiguous separator")
         Dim source = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../StoKOdnomuControl"))
-        For Each file In Directory.GetFiles(source, "*.txt")
+        For Each file In StabilityChecks.BankNames.Select(Function(name) IO.Path.Combine(source, name))
             Check(QuestionBankReader.ReadFile(file).Rounds.Length = 4, "read shipped bank " & Path.GetFileName(file))
         Next
     End Sub
@@ -1164,6 +1251,7 @@ Module Checks
                 End Try
             End Using
         End Using
+        Environment.SetEnvironmentVariable("STOKODNOMU_DATA_DIR", Path.Combine(directory, "ui-fast"))
         Using fastBuzz As New BuzzManager(Function() Nothing), fast As New Form1(fastBuzz)
             fast.ShowInTaskbar = False
             fast.Opacity = 0

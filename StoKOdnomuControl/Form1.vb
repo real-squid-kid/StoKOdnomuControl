@@ -30,6 +30,7 @@ Public Class Form1
     Private ReadOnly _appearance As AppearanceService
     Private _undo As Button
     Private _restore As ToolStripMenuItem
+    Private _restoreBackup As ToolStripMenuItem
     Private _connectBuzz As Button
     Private _armBuzz As Button
     Private _blockBuzz As Button
@@ -50,6 +51,7 @@ Public Class Form1
         _buzz = buzz
         Dim dataDirectory = Environment.GetEnvironmentVariable("STOKODNOMU_DATA_DIR")
         If String.IsNullOrWhiteSpace(dataDirectory) Then dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "StoKOdnomuControl")
+        dataDirectory = Path.GetFullPath(dataDirectory)
         _session = New GameSession(dataDirectory)
         _appearance = New AppearanceService(Path.Combine(dataDirectory, "appearance"), If(Screen.AllScreens.Length > 1, 1, 0))
         If File.Exists(AppearanceStorage.ConfigPath(_appearance.Folder)) Then AudioService.Instance.Enabled = _appearance.Current.Profile.SoundEnabled
@@ -63,6 +65,8 @@ Public Class Form1
                                                                       If Not _closing Then AudioService.Instance.Play(SoundCue.Buzzer, AudioChannel.Buzzer)
                                                                   End Sub)
         AddHandler Shown, Async Sub()
+                              ResolveStartupChoice()
+                              If _closing OrElse IsDisposed Then Return
                               Await _buzz.ConnectAsync()
                               If Not IsDisposed AndAlso Not _closing Then _restore.Enabled = _session.HasSavedGame
                           End Sub
@@ -71,7 +75,9 @@ Public Class Form1
         SessionChanged(Me, EventArgs.Empty)
         RenderBuzz()
         AddHandler _appearance.Changed, AddressOf AppearanceChanged
-        If _appearance.StartupError <> "" Then SetStatus(_appearance.StartupError)
+        ' Конструктор уже выполняется в UI-потоке, но HWND ещё может отсутствовать.
+        ' Здесь заполняем сам элемент; OnUi остаётся защитой для фоновых событий.
+        If _appearance.StartupError <> "" Then _surface.ShowError(_appearance.StartupError)
     End Sub
 
     Private Sub BuildUi()
@@ -100,6 +106,7 @@ Public Class Form1
         editor.Name = "OpenBankEditor"
         Dim service = OperatorUi.Button(_surface.Toolbar, "Матч и сбросы…", Sub() Return, 165)
         _restore = MenuAction("Восстановить игру…", AddressOf RestoreGame)
+        _restoreBackup = MenuAction("Восстановить резервную копию…", Sub() RestoreMatch(True))
         _matchMenu.Items.Add(New ToolStripSeparator())
         MenuAction("Сбросить текущий раунд…", AddressOf ResetCurrentRound)
         MenuAction("Новый матч…", AddressOf NewMatch)
@@ -416,35 +423,113 @@ Public Class Form1
     End Sub
 
     Private Sub RestoreGame()
-        ' Явное восстановление заменяет и черновики. Runtime-таймер и допуск Buzz!
-        ' в сохранение не входят: после загрузки оборудование остаётся остановленным.
-        If OperatorWindows.Message(Me, "Восстановить последнее автосохранение вместе с историей отмены? Текущие несохранённые черновики будут заменены.", "Восстановление", MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then Return
+        RestoreMatch(False)
+    End Sub
+
+    Private Sub RestoreMatch(useBackup As Boolean)
+        Dim source = If(useBackup, "предыдущую резервную копию", "последнее автосохранение")
+        If OperatorWindows.Message(Me, "Восстановить " & source & " вместе с историей отмены? Текущие несохранённые черновики будут заменены.", "Восстановление", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) <> DialogResult.Yes Then Return
+        ' Ошибка чтения не должна сбрасывать даже несохранённые поля пульта.
+        ' Сначала сервис проверяет файл целиком; только успех заменяет черновики.
+        _session.Restore(useBackup)
+        ReloadMatchDrafts()
+    End Sub
+
+    Private Sub NewMatch()
+        If Not OperatorUi.Confirm(Me, "Начать новый матч? Прежние сохранения будут помещены в отдельный архив; все счета и ответы будут сброшены.") Then Return
+        _session.StartNewMatch()
+        ReloadMatchDrafts()
+    End Sub
+
+    Private Sub ReloadMatchDrafts()
         _last = Nothing
         _splashEditor.ReloadDrafts()
         If _bigControl IsNot Nothing Then _bigControl.ReloadDrafts()
-        _session.Restore()
+        SessionChanged(Me, EventArgs.Empty)
         _countdown.Stop()
         _buzz.Disarm()
     End Sub
 
-    Private Sub NewMatch()
-        ' Снимок до сброса остаётся в истории, поэтому новый матч тоже можно отменить.
-        If Not OperatorUi.Confirm(Me, "Начать новый матч? Все счета, ответы и большая игра будут сброшены.") Then Return
-        _last = Nothing
-        _splashEditor.ReloadDrafts()
-        If _bigControl IsNot Nothing Then _bigControl.ReloadDrafts()
-        _session.Execute("Новый матч", Sub(state)
-                                          state.Main = New MainGameState()
-                                          state.Big = New BigGameState()
-                                      End Sub)
-        _countdown.Stop()
-        _buzz.Disarm()
-    End Sub
+    Private Function PendingStartupMessage() As String
+        Return String.Join(Environment.NewLine, New String() {_appearance.StartupError, "Найден сохранённый матч. Восстановите его или выберите «Новый матч…» в меню «Матч и сбросы…»."}.Where(Function(line) line <> ""))
+    End Function
+
+    Private Function ResolveStartupChoice() As Boolean
+        If Not _session.RequiresStartupChoice Then Return True
+        Using dialog As New Form With {.Name = "StartupMatchChoice", .Text = "Найден сохранённый матч", .Font = Font, .ClientSize = New Size(680, 310), .FormBorderStyle = FormBorderStyle.FixedDialog, .MaximizeBox = False, .MinimizeBox = False, .ShowInTaskbar = False}
+            Dim body = OperatorUi.Stack()
+            body.Dock = DockStyle.Fill
+            body.Padding = New Padding(14)
+            OperatorUi.Append(body, New DialogHeading("Продолжить матч или начать новый?"))
+            Dim note = OperatorUi.Label("Новый матч сохранит прежние файлы отдельно от вращающегося резерва.")
+            note.Height = 38
+            OperatorUi.Append(body, note)
+            Dim files As New ComboBox With {.Name = "StartupSaveSource", .DropDownStyle = ComboBoxStyle.DropDownList}
+            Dim backups As New List(Of Boolean)()
+            If _session.HasSavedGame Then
+                files.Items.Add("Последнее автосохранение")
+                backups.Add(False)
+            End If
+            If _session.HasSavedBackup Then
+                files.Items.Add("Предыдущая резервная копия")
+                backups.Add(True)
+            End If
+            If backups.Count = 0 Then Return True
+            files.SelectedIndex = 0
+            OperatorUi.Append(body, files)
+            Dim errorLabel = OperatorUi.Label("")
+            errorLabel.Name = "StartupMatchError"
+            errorLabel.ForeColor = Color.DarkRed
+            errorLabel.AutoSize = True
+            errorLabel.MaximumSize = New Size(640, 0)
+            OperatorUi.Append(body, errorLabel)
+            Dim actions = OperatorUi.Grid(body, -1, -1, -1)
+            Dim restore = OperatorUi.Button(Nothing, "Восстановить", Sub()
+                                                                         Try
+                                                                             _session.Restore(backups(files.SelectedIndex))
+                                                                             ReloadMatchDrafts()
+                                                                             dialog.DialogResult = DialogResult.OK
+                                                                         Catch ex As Exception
+                                                                             errorLabel.Text = ex.Message
+                                                                         End Try
+                                                                     End Sub)
+            restore.Name = "StartupRestore"
+            Dim fresh = OperatorUi.Button(Nothing, "Начать новый матч", Sub()
+                                                                               Try
+                                                                                   _session.StartNewMatch()
+                                                                                   ReloadMatchDrafts()
+                                                                                   dialog.DialogResult = DialogResult.OK
+                                                                               Catch ex As Exception
+                                                                                   errorLabel.Text = ex.Message
+                                                                               End Try
+                                                                           End Sub)
+            fresh.Name = "StartupNewMatch"
+            Dim cancel = OperatorUi.Button(Nothing, "Отмена", Sub() dialog.DialogResult = DialogResult.Cancel)
+            cancel.Name = "StartupCancel"
+            OperatorUi.Cell(actions, restore, 0, 0)
+            OperatorUi.Cell(actions, fresh, 1, 0)
+            OperatorUi.Cell(actions, cancel, 2, 0)
+            dialog.Controls.Add(body)
+            dialog.AcceptButton = cancel
+            dialog.CancelButton = cancel
+            dialog.ActiveControl = cancel
+            OperatorWindows.ShowModal(dialog, Me)
+        End Using
+        If _session.RequiresStartupChoice Then _surface.ShowError(PendingStartupMessage())
+        Return Not _session.RequiresStartupChoice
+    End Function
 
     Private Sub SessionChanged(sender As Object, e As EventArgs)
         ' Не трогаем несвязанные черновики и не заменяем сообщение об ошибке
         ' очередным успешным действием. Обычного журнала событий у пульта нет.
         Dim state = _session.State.Main
+        Dim ready = Not _session.RequiresStartupChoice
+        For Each panelName As String In {"RoundPanel", "ScoresPanel", "AnswersPanel", "SplashPanel"}
+            For Each gameGroup As Control In Controls.Find(panelName, True)
+                gameGroup.Enabled = ready
+            Next
+        Next
+        If ready AndAlso _surface.ErrorLabel.Text = PendingStartupMessage() Then _surface.ShowError(_appearance.StartupError)
         For i = 0 To 5
             Dim answer = state.Answers(i)
             If _last Is Nothing OrElse _last.Answers(i).Text <> answer.Text Then _answers(i).Text = answer.Text
@@ -472,6 +557,7 @@ Public Class Form1
         _undo.Enabled = _session.UndoDescription <> ""
         _surface.Tips.SetToolTip(_undo, _session.UndoDescription)
         _restore.Enabled = _session.HasSavedGame
+        _restoreBackup.Enabled = _session.HasSavedBackup
         _splashEditor.Render(state.SplashScreen)
         If _board IsNot Nothing Then _board.Render(state)
         If _bigBoard IsNot Nothing Then _bigBoard.Render(_session.State.Big)
@@ -488,6 +574,7 @@ Public Class Form1
     End Function
 
     Private Sub ShowMainBoard()
+        If Not ResolveStartupChoice() Then Return
         ' Используем явные экземпляры окон вместо глобальных VB default instances.
         ' На экране показывается один режим; состояние второго продолжает жить в сессии.
         If _bigBoard IsNot Nothing Then _bigBoard.Hide()
@@ -498,6 +585,7 @@ Public Class Form1
     End Sub
 
     Private Sub ShowBigBoard()
+        If Not ResolveStartupChoice() Then Return
         If _board IsNot Nothing Then _board.Hide()
         If _bigBoard Is Nothing OrElse _bigBoard.IsDisposed Then _bigBoard = New BigGameTablo()
         _bigBoard.ApplyAppearance(_appearance.Current)
@@ -512,6 +600,7 @@ Public Class Form1
     End Sub
 
     Private Sub OpenBigGame()
+        If Not ResolveStartupChoice() Then Return
         ' Скрытый пульт переиспользуется с черновиками; общие сервисы не создаются повторно.
         _buzz.Disarm()
         If _bigControl Is Nothing OrElse _bigControl.IsDisposed Then _bigControl = New BigGameControl(_session, _countdown, AddressOf ShowBigBoard, AddressOf UndoAction, AddressOf HideBoards, AddressOf ShowDisplaySettings, AddressOf ReturnToMain)

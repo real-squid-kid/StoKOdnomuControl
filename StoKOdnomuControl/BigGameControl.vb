@@ -274,6 +274,7 @@ Public Class BigGameControl
     Friend Sub ReloadDrafts()
         ' Явное восстановление/новый матч требуют замены старого ввода при следующем рендере.
         _last = Nothing
+        SessionChanged(Me, EventArgs.Empty)
     End Sub
 
     Private Sub SessionChanged(sender As Object, e As EventArgs)
