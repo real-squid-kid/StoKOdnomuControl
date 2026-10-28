@@ -332,7 +332,7 @@ Public Class Form1
     End Sub
 
     Private Sub LoadBank()
-        Using dialog As New OpenFileDialog With {.Title = "Выберите базу из 24 ответов", .Filter = "Базы ответов (*.txt)|*.txt|Все файлы (*.*)|*.*"}
+        Using dialog As New OpenFileDialog With {.Title = "Выберите базу из 24 ответов", .InitialDirectory = ApplicationFiles.BanksDirectory, .Filter = "Базы ответов (*.txt)|*.txt|Все файлы (*.*)|*.*"}
             If OperatorWindows.ShowFileDialog(dialog, Me) <> DialogResult.OK Then Return
             LoadBankFile(dialog.FileName)
         End Using

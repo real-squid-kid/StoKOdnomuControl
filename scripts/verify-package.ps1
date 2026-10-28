@@ -5,8 +5,12 @@ $appPath = (Resolve-Path -LiteralPath $AppDirectory).Path
 $msbuild = & (Join-Path $PSScriptRoot 'find-msbuild.ps1')
 & $msbuild (Join-Path $projectRoot 'Tests/RegressionTests.vbproj') /t:Build /p:Configuration=Release /nologo /verbosity:minimal
 if ($LASTEXITCODE -ne 0) { throw "Test runner build failed with code $LASTEXITCODE." }
+# Проверяем исходный комплект до добавления временного тестового EXE.
+foreach ($entry in Get-ChildItem -LiteralPath $appPath -Force) {
+    if ($entry.Name -notin @('StoKOdnomuControl.exe', 'StoKOdnomuControl.exe.config', 'lib')) { throw "Unexpected release root entry: $($entry.Name)" }
+}
 $listed = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
-$manifest = Join-Path $appPath 'PACKAGE_MANIFEST.txt'
+$manifest = Join-Path $appPath 'lib/PACKAGE_MANIFEST.txt'
 foreach ($line in Get-Content -LiteralPath $manifest -Encoding UTF8) {
     if ($line -notmatch '^([0-9a-f]{64})  (.+)$') { throw "Invalid manifest entry: $line" }
     $expected = $Matches[1]
@@ -18,7 +22,7 @@ foreach ($line in Get-Content -LiteralPath $manifest -Encoding UTF8) {
 }
 foreach ($file in Get-ChildItem -LiteralPath $appPath -Recurse -File) {
     $relative = $file.FullName.Substring($appPath.Length + 1).Replace('\', '/')
-    if ($relative -ne 'PACKAGE_MANIFEST.txt' -and -not $listed.Contains($relative)) { throw "Unlisted package file: $relative" }
+    if ($relative -ne 'lib/PACKAGE_MANIFEST.txt' -and -not $listed.Contains($relative)) { throw "Unlisted package file: $relative" }
 }
 # Копия комплекта живёт отдельно от исходников и рабочего bin; проверочный EXE
 # добавляется только в эту временную копию и никогда не попадает в готовый архив.

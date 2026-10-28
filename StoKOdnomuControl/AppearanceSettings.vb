@@ -171,7 +171,7 @@ Public NotInheritable Class AppearanceSettings
                                 End Sub
         _profiles.Items.Add(New ProfileChoice With {.Name = "Текущее: " & _service.Current.Profile.Name})
         Dim catalogErrors As New List(Of String)()
-        For Each root In New String() {Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "profiles"), Path.Combine(Path.GetDirectoryName(_service.Folder), "profiles")}
+        For Each root In New String() {ApplicationFiles.ProfilesDirectory, Path.Combine(Path.GetDirectoryName(_service.Folder), "profiles")}
             For Each choice In ProfileCatalog.Discover(root, catalogErrors)
                 _profiles.Items.Add(choice)
             Next

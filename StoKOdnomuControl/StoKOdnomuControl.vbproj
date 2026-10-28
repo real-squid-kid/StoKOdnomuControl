@@ -113,6 +113,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="AudioService.vb" />
+    <Compile Include="ApplicationFiles.vb" />
     <!-- Пульты Form1/BigGameControl используют BuildUi; прежних Designer-файлов у них нет. -->
     <Compile Include="GameState.vb" />
     <Compile Include="GameSession.vb" />
@@ -212,20 +213,21 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\profiles\**\*">
-      <Link>profiles\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <Link>lib\profiles\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="*.txt">
       <!-- Поставляем все четыре базы, не только исторический base.txt. -->
+      <Link>lib\bases\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Новый дизигн\static\JetBrainsMono-Regular.ttf;Новый дизигн\static\JetBrainsMono-Bold.ttf">
-      <!-- BoardLayout загружает эти шрифты из Fonts через GDI+, без установки в Windows. -->
-      <Link>Fonts\%(Filename)%(Extension)</Link>
+      <!-- BoardLayout загружает эти шрифты из lib/Fonts через GDI+, без установки в Windows. -->
+      <Link>lib\Fonts\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Новый дизигн\OFL.txt">
-      <Link>Fonts\OFL.txt</Link>
+      <Link>lib\Fonts\OFL.txt</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="Resources\2026\25sec.wav" />
@@ -252,4 +254,13 @@
     <None Include="Resources\download.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <Target Name="PlaceRuntimeLibraries" AfterTargets="CopyFilesToOutputDirectory">
+    <!-- Сначала копируем DLL из разрешённых ссылок, затем убираем только их
+         стандартные копии в корне выходной папки. Исходники пакетов не меняем. -->
+    <ItemGroup>
+      <RuntimeLibrary Include="@(ReferenceCopyLocalPaths)" Condition="'%(Extension)' == '.dll'" />
+    </ItemGroup>
+    <Copy SourceFiles="@(RuntimeLibrary)" DestinationFiles="@(RuntimeLibrary->'$(TargetDir)lib\%(DestinationSubDirectory)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Delete Files="@(RuntimeLibrary->'$(TargetDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
+  </Target>
 </Project>

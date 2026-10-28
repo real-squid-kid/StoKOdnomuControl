@@ -663,7 +663,7 @@ Module Checks
 
     Private Sub TestCatalogAndAbout(main As Form1, directory As String)
         Dim errors As New List(Of String)()
-        Dim choices = ProfileCatalog.Discover(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "profiles"), errors)
+        Dim choices = ProfileCatalog.Discover(ApplicationFiles.ProfilesDirectory, errors)
         Check(errors.Count = 0 AndAlso choices.Count = 2, "both complete bundled profiles discoverable next to binary")
         For Each choice In choices
             Dim profile = AppearanceStorage.Open(choice.ConfigFile)
@@ -721,7 +721,8 @@ Module Checks
                 about.Show(main)
                 Application.DoEvents()
                 Check(Screen.FromControl(about).Primary AndAlso about.Text = "О программе", "about opens on primary")
-                Check(FindControl(about, "LabelProductName").Text = "Сто к одному" AndAlso FindControl(about, "LabelVersion").Text.Contains("0.2.0"), "about uses actual product and assembly version")
+                Check(FindControl(about, "LabelProductName").Text = "Сто к одному" AndAlso FindControl(about, "LabelVersion").Text.Contains(GetType(AboutBox1).Assembly.GetName().Version.ToString(3)), "about uses actual product and assembly version")
+                Check(FindControl(about, "LabelCompanyName").Text.Contains("MIT") AndAlso FindControl(about, "LabelCompanyName").Text.Contains("Vasily Makrov"), "about displays MIT and copyright holder")
                 Check(Not FindControl(about, "TextBoxDescription").Text.Contains("git clone"), "about description matches product")
                 Dim run = FindControl(about, "RunLbl")
                 Check(run.Text = "Run..." AndAlso run.Width >= 100 AndAlso run.Height >= 40, "Run label and larger hit area preserved")

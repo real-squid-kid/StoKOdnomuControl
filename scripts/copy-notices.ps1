@@ -1,7 +1,7 @@
-﻿param([Parameter(Mandatory = $true)][string]$AppDirectory)
+﻿param([Parameter(Mandatory = $true)][string]$LibraryDirectory)
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path $PSScriptRoot -Parent
-$destination = Join-Path $AppDirectory 'licenses'
+$destination = Join-Path $LibraryDirectory 'licenses'
 New-Item -ItemType Directory -Path $destination -Force | Out-Null
 Copy-Item -LiteralPath (Join-Path $projectRoot 'licenses/HidLibrary.txt') -Destination $destination
 Copy-Item -LiteralPath (Join-Path $projectRoot 'licenses/NAudio.txt') -Destination $destination
@@ -36,4 +36,4 @@ foreach ($package in $packages.packages.package) {
         }
     } finally { $archive.Dispose() }
 }
-[IO.File]::WriteAllLines((Join-Path $AppDirectory 'THIRD_PARTY_NOTICES.txt'), $notices, [Text.UTF8Encoding]::new($false))
+[IO.File]::WriteAllLines((Join-Path $LibraryDirectory 'THIRD_PARTY_NOTICES.txt'), $notices, [Text.UTF8Encoding]::new($false))

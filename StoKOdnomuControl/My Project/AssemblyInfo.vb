@@ -12,7 +12,7 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyDescription("Пульт оператора и зрительские табло игры «Сто к одному»: основная и большая игра, Buzz!, профили оформления и редактор баз.")>
 <Assembly: AssemblyCompany("")>
 <Assembly: AssemblyProduct("Сто к одному")>
-<Assembly: AssemblyCopyright("real-squid-kid")>
+<Assembly: AssemblyCopyright("Copyright (c) 2026 Vasily Makrov")>
 <Assembly: AssemblyTrademark("")>
 
 <Assembly: ComVisible(False)>

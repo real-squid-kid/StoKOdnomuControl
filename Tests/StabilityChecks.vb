@@ -231,7 +231,7 @@ Public Module StabilityChecks
 
     Private Sub CheckProfileReuse(folder As String)
         Dim errors As New List(Of String)()
-        Dim choices = ProfileCatalog.Discover(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "profiles"), errors)
+        Dim choices = ProfileCatalog.Discover(ApplicationFiles.ProfilesDirectory, errors)
         _check(errors.Count = 0 AndAlso choices.Count = 2, "real bundled profiles available for persistence soak")
         Dim profiles = choices.Select(Function(choice) AppearanceStorage.Open(choice.ConfigFile)).ToArray()
         Using service As New AppearanceService(folder)

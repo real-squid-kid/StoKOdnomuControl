@@ -265,3 +265,10 @@ __pycache__/
 # Local Markdown documentation, including .md, .MD, .Md and .mD at any depth.
 # Already tracked documents remain tracked until the owner changes the index.
 *.[mM][dD]
+
+# Public project documentation. Other Markdown stays local.
+!/README.MD
+!/OPERATOR_GUIDE.MD
+!/ARCHITECTURE.MD
+!/VERIFY.md
+!/LICENSE

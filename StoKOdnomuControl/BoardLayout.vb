@@ -58,7 +58,7 @@ Public NotInheritable Class BoardLayout
         form.Controls.Add(_canvas)
         For Each name In {"JetBrainsMono-Regular.ttf", "JetBrainsMono-Bold.ttf"}
             ' Эти файлы входят в комплект; установки всего семейства в Windows не требуется.
-            Dim path = IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Fonts", name)
+            Dim path = IO.Path.Combine(ApplicationFiles.FontsDirectory, name)
             If File.Exists(path) Then _fonts.AddFontFile(path)
         Next
         AddHandler form.ClientSizeChanged, AddressOf ResizeCanvas

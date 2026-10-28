@@ -96,18 +96,25 @@ Public Module PackageChecks
         AudioService.Instance.Enabled = False
         check(String.Equals(GetType(Form1).Assembly.Location, IO.Path.Combine(root, "StoKOdnomuControl.exe"), StringComparison.OrdinalIgnoreCase), "application assembly loaded from relocated package")
         check(Not String.Equals(IO.Path.GetFullPath(Environment.CurrentDirectory).TrimEnd(IO.Path.DirectorySeparatorChar), root.TrimEnd(IO.Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase), "working directory differs from executable directory")
-        For Each file In IO.Directory.GetFiles(root, "*.dll")
-            Assembly.LoadFrom(file)
-            check(True, "load " & IO.Path.GetFileName(file))
+        For Each file In IO.Directory.GetFiles(ApplicationFiles.LibraryDirectory, "*.dll")
+            ' Загрузка по имени проверяет CLR probing из .config; LoadFrom здесь
+            ' мог бы скрыть сломанную настройку поиска зависимостей.
+            Dim dependency = Assembly.Load(AssemblyName.GetAssemblyName(file))
+            check(String.Equals(dependency.Location, file, StringComparison.OrdinalIgnoreCase), "load from lib " & IO.Path.GetFileName(file))
         Next
         For Each name In StabilityChecks.BankNames
-            Dim bank = BankDocument.Open(IO.Path.Combine(root, name))
+            Dim bank = BankDocument.Open(IO.Path.Combine(ApplicationFiles.BanksDirectory, name))
             check(QuestionBankReader.Parse(BankDocument.Serialize(bank.Bank)).Rounds.Length = 4, "packaged bank " & name)
         Next
-        check(File.Exists(IO.Path.Combine(root, "Fonts", "JetBrainsMono-Regular.ttf")) AndAlso File.Exists(IO.Path.Combine(root, "Fonts", "JetBrainsMono-Bold.ttf")) AndAlso File.Exists(IO.Path.Combine(root, "Fonts", "OFL.txt")), "both fonts and OFL supplied")
-        check(File.Exists(IO.Path.Combine(root, "THIRD_PARTY_NOTICES.txt")) AndAlso File.Exists(IO.Path.Combine(root, "licenses", "NAudio.txt")), "third-party notices supplied")
+        check(File.Exists(IO.Path.Combine(ApplicationFiles.FontsDirectory, "JetBrainsMono-Regular.ttf")) AndAlso File.Exists(IO.Path.Combine(ApplicationFiles.FontsDirectory, "JetBrainsMono-Bold.ttf")) AndAlso File.Exists(IO.Path.Combine(ApplicationFiles.FontsDirectory, "OFL.txt")), "both fonts and OFL supplied")
+        check(File.Exists(IO.Path.Combine(ApplicationFiles.LibraryDirectory, "THIRD_PARTY_NOTICES.txt")) AndAlso File.Exists(IO.Path.Combine(ApplicationFiles.LibraryDirectory, "licenses", "NAudio.txt")), "third-party notices supplied")
+        check(IO.Directory.GetFiles(root, "*.dll").Length = 0, "no runtime DLLs beside executable")
+        For Each name In {"README.MD", "OPERATOR_GUIDE.MD", "ARCHITECTURE.MD", "VERIFY.md", "LICENSE"}
+            check(File.Exists(IO.Path.Combine(ApplicationFiles.LibraryDirectory, "docs", name)), "packaged documentation " & name)
+        Next
+        check(File.ReadAllText(IO.Path.Combine(ApplicationFiles.LibraryDirectory, "docs", "LICENSE")).Contains("Vasily Makrov"), "MIT copyright included")
         Dim errors As New List(Of String)()
-        Dim themes = ProfileCatalog.Discover(IO.Path.Combine(root, "profiles"), errors)
+        Dim themes = ProfileCatalog.Discover(ApplicationFiles.ProfilesDirectory, errors)
         check(errors.Count = 0 AndAlso themes.Count = 2, "both themes load after folder relocation")
         ' Декодирование проверяет все WAV и зависимости NAudio, не открывая аудиоустройство.
         Dim decode = GetType(AudioService).GetMethod("Decode", BindingFlags.Instance Or BindingFlags.NonPublic)
