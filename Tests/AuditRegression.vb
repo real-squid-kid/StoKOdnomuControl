@@ -208,7 +208,7 @@ Public Module AuditRegression
             Dim list = DirectCast(Find(settings, "ProfileList"), ComboBox)
             name.Text = "UNSAVED CUSTOM PROFILE"
             settings.SetTextColor(Color.Coral)
-            Dim index = Enumerable.Range(0, list.Items.Count).Single(Function(i) list.Items(i).ToString() = "Тупикон 2025")
+            Dim index = Enumerable.Range(0, list.Items.Count).Single(Function(i) list.Items(i).ToString() = "По умолчанию")
             AnswerDialog("UnsavedChanges", Sub(dialog) DirectCast(Find(dialog, "ReviewChanges"), Button).PerformClick(), Sub() list.SelectedIndex = index)
             _check(list.SelectedIndex = 0 AndAlso name.Text = "UNSAVED CUSTOM PROFILE" AndAlso settings.Dirty AndAlso Find(settings, "AppearanceColor").BackColor.ToArgb() = Color.Coral.ToArgb(), "cancelled selection preserves whole draft and previous index")
             Dim broken = IO.Path.Combine(folder, "absent.xml")
@@ -216,9 +216,9 @@ Public Module AuditRegression
             list.SelectedIndex = badIndex
             _check(list.SelectedIndex = 0 AndAlso name.Text = "UNSAVED CUSTOM PROFILE" AndAlso settings.Dirty AndAlso Find(settings, "SettingsError").Text <> "", "load failure preserves draft and restores index without discard prompt")
             AnswerDialog("UnsavedChanges", Sub(dialog) DirectCast(Find(dialog, "DiscardChanges"), Button).PerformClick(), Sub() list.SelectedIndex = index)
-            _check(name.Text = "Тупикон 2025" AndAlso list.SelectedIndex = index AndAlso settings.Dirty, "confirmed profile switch replaces draft")
+            _check(name.Text = "По умолчанию" AndAlso list.SelectedIndex = index AndAlso settings.Dirty, "confirmed profile switch replaces draft")
             DirectCast(Find(settings, "ApplySettings"), Button).PerformClick()
-            _check(Not settings.Dirty AndAlso list.SelectedIndex = 0 AndAlso service.Current.Profile.Name = "Тупикон 2025", "apply resets selection without a second confirmation")
+            _check(Not settings.Dirty AndAlso list.SelectedIndex = 0 AndAlso service.Current.Profile.Name = "По умолчанию", "apply resets selection without a second confirmation")
             settings.Close()
         End Using
         Console.WriteLine("P3: discard refusal, agreement, bad profile and apply PASS")

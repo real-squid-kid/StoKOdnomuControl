@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AppearanceProfile>
+  <Version>1</Version>
+  <Name>По умолчанию</Name>
+  <Main>
+    <Background>main-background.png</Background>
+    <LeftClear>strike-left-clear.png</LeftClear>
+    <LeftStrike>strike-left-active.png</LeftStrike>
+    <RightClear>strike-right-clear.png</RightClear>
+    <RightStrike>strike-right-active.png</RightStrike>
+    <TextColor>#FFF0BE</TextColor>
+  </Main>
+  <Big>
+    <Background>big-background.png</Background>
+    <TextColor>#FFF0BE</TextColor>
+  </Big>
+</AppearanceProfile>

@@ -12,7 +12,7 @@ Imports StoKOdnomuControl
 ' Испытания транзакций и длительного использования отделены от обычных регрессий.
 ' Любая запись, блокировка и остановка процесса касается только выделенного каталога.
 Public Module StabilityChecks
-    Public ReadOnly BankNames As String() = {"base 2п24.txt", "base.txt", "base 2п26.txt"}
+    Public ReadOnly BankNames As String() = {"demo-basic.txt", "demo-unicode.txt", "demo-boundaries.txt"}
     Private _check As Action(Of Boolean, String)
 
     Public Sub Run(directory As String, check As Action(Of Boolean, String))
@@ -181,7 +181,7 @@ Public Module StabilityChecks
 
     Private Sub CheckBanksAndMatch(folder As String)
         IO.Directory.CreateDirectory(folder)
-        Dim source = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../StoKOdnomuControl"))
+        Dim source = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../StoKOdnomuControl/Bases"))
         Dim game As New GameSession(Path.Combine(folder, "match"))
         Dim failures As New List(Of String)()
         AddHandler game.StorageError, Sub(message) failures.Add(message)
@@ -192,7 +192,7 @@ Public Module StabilityChecks
             Dim baseline = BankDocument.Serialize(document.Bank)
             Dim target = Path.Combine(folder, name)
             document.Save(target, document.Bank)
-            _check(BankDocument.Serialize(BankDocument.Open(target).Bank) = baseline, "requested year bank roundtrip " & name)
+            _check(BankDocument.Serialize(BankDocument.Open(target).Bank) = baseline, "demo bank roundtrip " & name)
             For match = 1 To 8
                 For round = 1 To 4
                     Dim number = round
@@ -216,7 +216,7 @@ Public Module StabilityChecks
                     actions += 10
                 Next
             Next
-            _check(File.ReadAllBytes(Path.Combine(source, name)).SequenceEqual(original), "year bank source unchanged " & name)
+            _check(File.ReadAllBytes(Path.Combine(source, name)).SequenceEqual(original), "demo bank source unchanged " & name)
         Next
         Dim snapshot = XmlState(game.State)
         Dim restored As New GameSession(Path.Combine(folder, "match"))
@@ -232,15 +232,20 @@ Public Module StabilityChecks
     Private Sub CheckProfileReuse(folder As String)
         Dim errors As New List(Of String)()
         Dim choices = ProfileCatalog.Discover(ApplicationFiles.ProfilesDirectory, errors)
-        _check(errors.Count = 0 AndAlso choices.Count = 2, "real bundled profiles available for persistence soak")
-        Dim profiles = choices.Select(Function(choice) AppearanceStorage.Open(choice.ConfigFile)).ToArray()
+        _check(errors.Count = 0 AndAlso choices.Count = 1, "real bundled profiles available for persistence soak")
+        Dim standard = AppearanceStorage.Open(choices.Single().ConfigFile)
+        Dim alternate = AppearanceStorage.Clone(standard)
+        alternate.Name = "Проверка смены цвета"
+        alternate.Main.TextArgb = Color.White.ToArgb()
+        ' Два оформления с общими изображениями не должны дублировать медиа на диске.
+        Dim profiles = {standard, alternate}
         Using service As New AppearanceService(folder)
             For i = 0 To 9
                 service.Apply(profiles(i Mod profiles.Length))
                 _check(service.Current.Profile.Name = profiles(i Mod profiles.Length).Name, "alternating real theme persists " & i)
             Next
             Dim media = IO.Directory.GetFiles(Path.Combine(folder, "media"))
-            _check(media.Length = 12, "ten theme switches retain only twelve unique source images")
+            _check(media.Length = 6, "ten theme switches retain only six unique source images")
             Dim originalBytes = profiles.SelectMany(Function(p) p.Styles()).SelectMany(Function(s) s.Assets()).Where(Function(p) p <> "").Distinct(StringComparer.OrdinalIgnoreCase).Sum(Function(p) New FileInfo(p).Length)
             _check(media.Sum(Function(p) New FileInfo(p).Length) = originalBytes, "stored graphics retain source byte size without PNG inflation")
             Dim config = Path.Combine(folder, "config.xml")

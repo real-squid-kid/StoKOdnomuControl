@@ -1,4 +1,4 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
 Partial Class BigGameTablo
     Inherits System.Windows.Forms.Form
 
@@ -54,10 +54,10 @@ Partial Class BigGameTablo
         '
         Me.TotalTxt.BackColor = System.Drawing.Color.Transparent
         Me.TotalTxt.Font = New System.Drawing.Font("JetBrains Mono", 26.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.TotalTxt.ForeColor = System.Drawing.Color.Black
+        Me.TotalTxt.ForeColor = System.Drawing.Color.FromArgb(255, 240, 190)
         Me.TotalTxt.Location = New System.Drawing.Point(297, 544)
         Me.TotalTxt.Name = "TotalTxt"
-        Me.TotalTxt.Size = New System.Drawing.Size(234, 76)
+        Me.TotalTxt.Size = New System.Drawing.Size(211, 76)
         Me.TotalTxt.TabIndex = 19
         Me.TotalTxt.Text = "СУММА"
         Me.TotalTxt.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -67,7 +67,7 @@ Partial Class BigGameTablo
         '
         Me.Answer5Lbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer5Lbl.Font = New System.Drawing.Font("JetBrains Mono", 26.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer5Lbl.ForeColor = System.Drawing.Color.Black
+        Me.Answer5Lbl.ForeColor = System.Drawing.Color.FromArgb(255, 240, 190)
         Me.Answer5Lbl.Location = New System.Drawing.Point(250, 453)
         Me.Answer5Lbl.Name = "Answer5Lbl"
         Me.Answer5Lbl.Size = New System.Drawing.Size(300, 76)
@@ -79,7 +79,7 @@ Partial Class BigGameTablo
         '
         Me.Answer4Lbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer4Lbl.Font = New System.Drawing.Font("JetBrains Mono", 26.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer4Lbl.ForeColor = System.Drawing.Color.Black
+        Me.Answer4Lbl.ForeColor = System.Drawing.Color.FromArgb(255, 240, 190)
         Me.Answer4Lbl.Location = New System.Drawing.Point(250, 377)
         Me.Answer4Lbl.Name = "Answer4Lbl"
         Me.Answer4Lbl.Size = New System.Drawing.Size(300, 76)
@@ -91,7 +91,7 @@ Partial Class BigGameTablo
         '
         Me.Answer3Lbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer3Lbl.Font = New System.Drawing.Font("JetBrains Mono", 26.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer3Lbl.ForeColor = System.Drawing.Color.Black
+        Me.Answer3Lbl.ForeColor = System.Drawing.Color.FromArgb(255, 240, 190)
         Me.Answer3Lbl.Location = New System.Drawing.Point(250, 301)
         Me.Answer3Lbl.Name = "Answer3Lbl"
         Me.Answer3Lbl.Size = New System.Drawing.Size(300, 76)
@@ -103,7 +103,7 @@ Partial Class BigGameTablo
         '
         Me.Answer2Lbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer2Lbl.Font = New System.Drawing.Font("JetBrains Mono", 26.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer2Lbl.ForeColor = System.Drawing.Color.Black
+        Me.Answer2Lbl.ForeColor = System.Drawing.Color.FromArgb(255, 240, 190)
         Me.Answer2Lbl.Location = New System.Drawing.Point(250, 225)
         Me.Answer2Lbl.Name = "Answer2Lbl"
         Me.Answer2Lbl.Size = New System.Drawing.Size(300, 76)
@@ -115,7 +115,7 @@ Partial Class BigGameTablo
         '
         Me.TotalLbl.BackColor = System.Drawing.Color.Transparent
         Me.TotalLbl.Font = New System.Drawing.Font("JetBrains Mono", 26.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.TotalLbl.ForeColor = System.Drawing.Color.Black
+        Me.TotalLbl.ForeColor = System.Drawing.Color.FromArgb(255, 240, 190)
         Me.TotalLbl.Location = New System.Drawing.Point(520, 544)
         Me.TotalLbl.Name = "TotalLbl"
         Me.TotalLbl.Size = New System.Drawing.Size(107, 76)
@@ -128,7 +128,7 @@ Partial Class BigGameTablo
         '
         Me.Answer5ScoreLbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer5ScoreLbl.Font = New System.Drawing.Font("JetBrains Mono", 26.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer5ScoreLbl.ForeColor = System.Drawing.Color.Black
+        Me.Answer5ScoreLbl.ForeColor = System.Drawing.Color.FromArgb(255, 240, 190)
         Me.Answer5ScoreLbl.Location = New System.Drawing.Point(556, 453)
         Me.Answer5ScoreLbl.Name = "Answer5ScoreLbl"
         Me.Answer5ScoreLbl.Size = New System.Drawing.Size(71, 76)
@@ -140,7 +140,7 @@ Partial Class BigGameTablo
         '
         Me.Answer4ScoreLbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer4ScoreLbl.Font = New System.Drawing.Font("JetBrains Mono", 26.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer4ScoreLbl.ForeColor = System.Drawing.Color.Black
+        Me.Answer4ScoreLbl.ForeColor = System.Drawing.Color.FromArgb(255, 240, 190)
         Me.Answer4ScoreLbl.Location = New System.Drawing.Point(556, 377)
         Me.Answer4ScoreLbl.Name = "Answer4ScoreLbl"
         Me.Answer4ScoreLbl.Size = New System.Drawing.Size(71, 76)
@@ -152,7 +152,7 @@ Partial Class BigGameTablo
         '
         Me.Answer3ScoreLbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer3ScoreLbl.Font = New System.Drawing.Font("JetBrains Mono", 26.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer3ScoreLbl.ForeColor = System.Drawing.Color.Black
+        Me.Answer3ScoreLbl.ForeColor = System.Drawing.Color.FromArgb(255, 240, 190)
         Me.Answer3ScoreLbl.Location = New System.Drawing.Point(556, 301)
         Me.Answer3ScoreLbl.Name = "Answer3ScoreLbl"
         Me.Answer3ScoreLbl.Size = New System.Drawing.Size(71, 76)
@@ -164,7 +164,7 @@ Partial Class BigGameTablo
         '
         Me.Answer2ScoreLbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer2ScoreLbl.Font = New System.Drawing.Font("JetBrains Mono", 26.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer2ScoreLbl.ForeColor = System.Drawing.Color.Black
+        Me.Answer2ScoreLbl.ForeColor = System.Drawing.Color.FromArgb(255, 240, 190)
         Me.Answer2ScoreLbl.Location = New System.Drawing.Point(556, 225)
         Me.Answer2ScoreLbl.Name = "Answer2ScoreLbl"
         Me.Answer2ScoreLbl.Size = New System.Drawing.Size(71, 76)
@@ -176,7 +176,7 @@ Partial Class BigGameTablo
         '
         Me.Answer1ScoreLbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer1ScoreLbl.Font = New System.Drawing.Font("JetBrains Mono", 26.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer1ScoreLbl.ForeColor = System.Drawing.Color.Black
+        Me.Answer1ScoreLbl.ForeColor = System.Drawing.Color.FromArgb(255, 240, 190)
         Me.Answer1ScoreLbl.Location = New System.Drawing.Point(556, 149)
         Me.Answer1ScoreLbl.Name = "Answer1ScoreLbl"
         Me.Answer1ScoreLbl.Size = New System.Drawing.Size(71, 76)
@@ -188,7 +188,7 @@ Partial Class BigGameTablo
         '
         Me.Answer1Lbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer1Lbl.Font = New System.Drawing.Font("JetBrains Mono", 26.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer1Lbl.ForeColor = System.Drawing.Color.Black
+        Me.Answer1Lbl.ForeColor = System.Drawing.Color.FromArgb(255, 240, 190)
         Me.Answer1Lbl.Location = New System.Drawing.Point(250, 149)
         Me.Answer1Lbl.Name = "Answer1Lbl"
         Me.Answer1Lbl.Size = New System.Drawing.Size(300, 76)
@@ -200,7 +200,7 @@ Partial Class BigGameTablo
         '
         Me.RoundScoreLbl.BackColor = System.Drawing.Color.Transparent
         Me.RoundScoreLbl.Font = New System.Drawing.Font("JetBrains Mono ExtraBold", 36.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.RoundScoreLbl.ForeColor = System.Drawing.Color.Black
+        Me.RoundScoreLbl.ForeColor = System.Drawing.Color.FromArgb(255, 240, 190)
         Me.RoundScoreLbl.Location = New System.Drawing.Point(519, 29)
         Me.RoundScoreLbl.Name = "RoundScoreLbl"
         Me.RoundScoreLbl.Size = New System.Drawing.Size(225, 79)
@@ -212,10 +212,10 @@ Partial Class BigGameTablo
         '
         Me.Answer6Lbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer6Lbl.Font = New System.Drawing.Font("JetBrains Mono", 26.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer6Lbl.ForeColor = System.Drawing.Color.Black
+        Me.Answer6Lbl.ForeColor = System.Drawing.Color.FromArgb(255, 240, 190)
         Me.Answer6Lbl.Location = New System.Drawing.Point(644, 149)
         Me.Answer6Lbl.Name = "Answer6Lbl"
-        Me.Answer6Lbl.Size = New System.Drawing.Size(300, 76)
+        Me.Answer6Lbl.Size = New System.Drawing.Size(287, 76)
         Me.Answer6Lbl.TabIndex = 8
         Me.Answer6Lbl.Text = "1. ОТВЕТ"
         Me.Answer6Lbl.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -224,7 +224,7 @@ Partial Class BigGameTablo
         '
         Me.Answer6ScoreLbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer6ScoreLbl.Font = New System.Drawing.Font("JetBrains Mono", 26.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer6ScoreLbl.ForeColor = System.Drawing.Color.Black
+        Me.Answer6ScoreLbl.ForeColor = System.Drawing.Color.FromArgb(255, 240, 190)
         Me.Answer6ScoreLbl.Location = New System.Drawing.Point(937, 149)
         Me.Answer6ScoreLbl.Name = "Answer6ScoreLbl"
         Me.Answer6ScoreLbl.Size = New System.Drawing.Size(71, 76)
@@ -236,7 +236,7 @@ Partial Class BigGameTablo
         '
         Me.Answer7ScoreLbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer7ScoreLbl.Font = New System.Drawing.Font("JetBrains Mono", 26.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer7ScoreLbl.ForeColor = System.Drawing.Color.Black
+        Me.Answer7ScoreLbl.ForeColor = System.Drawing.Color.FromArgb(255, 240, 190)
         Me.Answer7ScoreLbl.Location = New System.Drawing.Point(937, 225)
         Me.Answer7ScoreLbl.Name = "Answer7ScoreLbl"
         Me.Answer7ScoreLbl.Size = New System.Drawing.Size(71, 76)
@@ -248,7 +248,7 @@ Partial Class BigGameTablo
         '
         Me.Answer8ScoreLbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer8ScoreLbl.Font = New System.Drawing.Font("JetBrains Mono", 26.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer8ScoreLbl.ForeColor = System.Drawing.Color.Black
+        Me.Answer8ScoreLbl.ForeColor = System.Drawing.Color.FromArgb(255, 240, 190)
         Me.Answer8ScoreLbl.Location = New System.Drawing.Point(937, 301)
         Me.Answer8ScoreLbl.Name = "Answer8ScoreLbl"
         Me.Answer8ScoreLbl.Size = New System.Drawing.Size(71, 76)
@@ -260,7 +260,7 @@ Partial Class BigGameTablo
         '
         Me.Answer9ScoreLbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer9ScoreLbl.Font = New System.Drawing.Font("JetBrains Mono", 26.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer9ScoreLbl.ForeColor = System.Drawing.Color.Black
+        Me.Answer9ScoreLbl.ForeColor = System.Drawing.Color.FromArgb(255, 240, 190)
         Me.Answer9ScoreLbl.Location = New System.Drawing.Point(937, 377)
         Me.Answer9ScoreLbl.Name = "Answer9ScoreLbl"
         Me.Answer9ScoreLbl.Size = New System.Drawing.Size(71, 76)
@@ -272,7 +272,7 @@ Partial Class BigGameTablo
         '
         Me.Answer10ScoreLbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer10ScoreLbl.Font = New System.Drawing.Font("JetBrains Mono", 26.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer10ScoreLbl.ForeColor = System.Drawing.Color.Black
+        Me.Answer10ScoreLbl.ForeColor = System.Drawing.Color.FromArgb(255, 240, 190)
         Me.Answer10ScoreLbl.Location = New System.Drawing.Point(937, 453)
         Me.Answer10ScoreLbl.Name = "Answer10ScoreLbl"
         Me.Answer10ScoreLbl.Size = New System.Drawing.Size(71, 76)
@@ -284,10 +284,10 @@ Partial Class BigGameTablo
         '
         Me.Answer7Lbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer7Lbl.Font = New System.Drawing.Font("JetBrains Mono", 26.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer7Lbl.ForeColor = System.Drawing.Color.Black
+        Me.Answer7Lbl.ForeColor = System.Drawing.Color.FromArgb(255, 240, 190)
         Me.Answer7Lbl.Location = New System.Drawing.Point(644, 225)
         Me.Answer7Lbl.Name = "Answer7Lbl"
-        Me.Answer7Lbl.Size = New System.Drawing.Size(300, 76)
+        Me.Answer7Lbl.Size = New System.Drawing.Size(287, 76)
         Me.Answer7Lbl.TabIndex = 15
         Me.Answer7Lbl.Text = "1. ОТВЕТ"
         Me.Answer7Lbl.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -296,10 +296,10 @@ Partial Class BigGameTablo
         '
         Me.Answer8Lbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer8Lbl.Font = New System.Drawing.Font("JetBrains Mono", 26.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer8Lbl.ForeColor = System.Drawing.Color.Black
+        Me.Answer8Lbl.ForeColor = System.Drawing.Color.FromArgb(255, 240, 190)
         Me.Answer8Lbl.Location = New System.Drawing.Point(644, 301)
         Me.Answer8Lbl.Name = "Answer8Lbl"
-        Me.Answer8Lbl.Size = New System.Drawing.Size(300, 76)
+        Me.Answer8Lbl.Size = New System.Drawing.Size(287, 76)
         Me.Answer8Lbl.TabIndex = 16
         Me.Answer8Lbl.Text = "1. ОТВЕТ"
         Me.Answer8Lbl.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -308,10 +308,10 @@ Partial Class BigGameTablo
         '
         Me.Answer9Lbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer9Lbl.Font = New System.Drawing.Font("JetBrains Mono", 26.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer9Lbl.ForeColor = System.Drawing.Color.Black
+        Me.Answer9Lbl.ForeColor = System.Drawing.Color.FromArgb(255, 240, 190)
         Me.Answer9Lbl.Location = New System.Drawing.Point(644, 377)
         Me.Answer9Lbl.Name = "Answer9Lbl"
-        Me.Answer9Lbl.Size = New System.Drawing.Size(300, 76)
+        Me.Answer9Lbl.Size = New System.Drawing.Size(287, 76)
         Me.Answer9Lbl.TabIndex = 17
         Me.Answer9Lbl.Text = "1. ОТВЕТ"
         Me.Answer9Lbl.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -320,10 +320,10 @@ Partial Class BigGameTablo
         '
         Me.Answer10Lbl.BackColor = System.Drawing.Color.Transparent
         Me.Answer10Lbl.Font = New System.Drawing.Font("JetBrains Mono", 26.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me.Answer10Lbl.ForeColor = System.Drawing.Color.Black
+        Me.Answer10Lbl.ForeColor = System.Drawing.Color.FromArgb(255, 240, 190)
         Me.Answer10Lbl.Location = New System.Drawing.Point(644, 453)
         Me.Answer10Lbl.Name = "Answer10Lbl"
-        Me.Answer10Lbl.Size = New System.Drawing.Size(300, 76)
+        Me.Answer10Lbl.Size = New System.Drawing.Size(287, 76)
         Me.Answer10Lbl.TabIndex = 18
         Me.Answer10Lbl.Text = "1. ОТВЕТ"
         Me.Answer10Lbl.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -332,7 +332,7 @@ Partial Class BigGameTablo
         '
         Me.TimerLbl.BackColor = System.Drawing.Color.Transparent
         Me.TimerLbl.Font = New System.Drawing.Font("JetBrains Mono", 36.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TimerLbl.ForeColor = System.Drawing.Color.Black
+        Me.TimerLbl.ForeColor = System.Drawing.Color.FromArgb(255, 240, 190)
         Me.TimerLbl.Location = New System.Drawing.Point(24, 21)
         Me.TimerLbl.Name = "TimerLbl"
         Me.TimerLbl.Size = New System.Drawing.Size(144, 91)
@@ -350,7 +350,7 @@ Partial Class BigGameTablo
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.Green
-        Me.BackgroundImage = Global.StoKOdnomuControl.My.Resources.Resources._26_big
+        Me.BackgroundImage = Global.StoKOdnomuControl.My.Resources.Resources.DefaultBig
         Me.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
         Me.ClientSize = New System.Drawing.Size(1264, 681)
         Me.Controls.Add(Me.TotalTxt)

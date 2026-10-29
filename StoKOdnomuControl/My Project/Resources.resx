@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -122,72 +122,72 @@
     <!-- Здесь только используемые ресурсы; свойства генерирует VS.
          Назначение звуков поясняется в AudioService.OpenResource.
          Старые медиа на диске не встраиваются автоматически. -->
-    <value>..\Resources\bing.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>..\Resources\Audio\bing.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="download" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\download.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="run" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\run.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>..\Resources\Audio\run.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="ff_reveal1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Новые звуки\ff_reveal1.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>..\Resources\Audio\ff_reveal1.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="ff_reveal2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Новые звуки\ff_reveal2.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>..\Resources\Audio\ff_reveal2.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="ff_reveal3" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Новые звуки\ff_reveal3.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>..\Resources\Audio\ff_reveal3.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="ff_reveal4" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Новые звуки\ff_reveal4.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>..\Resources\Audio\ff_reveal4.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="ff_reveal5" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Новые звуки\ff_reveal5.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>..\Resources\Audio\ff_reveal5.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="_26_big" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\2026\26_big.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="DefaultBig" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\..\profiles\default\big-background.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="_26_bigwrong" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\2026\26_bigwrong.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="SoundBigWrong" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Audio\SoundBigWrong.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="_26_buzzer" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\2026\26_buzzer.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="SoundBuzzer" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Audio\SoundBuzzer.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="_26_chance_l" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\2026\26_chance_l.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="DefaultLeftClear" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\..\profiles\default\strike-left-clear.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="_26_chance_r" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\2026\26_chance_r.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="DefaultRightClear" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\..\profiles\default\strike-right-clear.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="_26_main" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\2026\26_main.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="DefaultMain" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\..\profiles\default\main-background.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="_26_noscore" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\2026\26_noscore.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="SoundNoScore" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Audio\SoundNoScore.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="_26_open" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\2026\26_open.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="SoundOpen" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Audio\SoundOpen.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="_26_same" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\2026\26_same.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="SoundSame" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Audio\SoundSame.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="_26_win" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\2026\26_win.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="SoundWin" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Audio\SoundWin.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="_26_wrong" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\2026\26_wrong.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="SoundWrong" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Audio\SoundWrong.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="_26_wrong_l" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\2026\26_wrong_l.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="DefaultLeftStrike" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\..\profiles\default\strike-left-active.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="_26_wrong_r" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\2026\26_wrong_r.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="DefaultRightStrike" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\..\profiles\default\strike-right-active.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="_20sec" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\2026\20sec.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="Countdown20" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Audio\Countdown20.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="_25sec" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\2026\25sec.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="Countdown25" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Audio\Countdown25.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

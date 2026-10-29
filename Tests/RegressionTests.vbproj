@@ -7,6 +7,7 @@
     <RootNamespace>RegressionTests</RootNamespace>
     <AssemblyName>RegressionTests</AssemblyName>
     <StartupObject>RegressionTests.Checks</StartupObject>
+    <AppConfig>..\StoKOdnomuControl\app.config</AppConfig>
     <OptionStrict>On</OptionStrict>
     <OptionExplicit>On</OptionExplicit>
     <OptionInfer>On</OptionInfer>
@@ -26,6 +27,7 @@
     <Compile Include="RegressionTests.vb" />
     <Compile Include="StabilityChecks.vb" />
     <Compile Include="PackageChecks.vb" />
+    <Compile Include="ScreenshotCapture.vb" />
     <Compile Include="AuditRegression.vb" />
     <Compile Include="UsbIoChecks.vb" />
     <Compile Include="DisplayScaleChecks.vb" />
@@ -35,4 +37,12 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <Target Name="CopyApplicationLibraries" AfterTargets="Build">
+    <!-- ProjectReference копирует EXE и Content, но DLL уже перенесены приложением
+         в lib. Чистый тестовый каталог должен получить тот же комплект зависимостей. -->
+    <ItemGroup>
+      <ApplicationLibrary Include="..\StoKOdnomuControl\bin\$(Configuration)\lib\**\*.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ApplicationLibrary)" DestinationFiles="@(ApplicationLibrary->'$(TargetDir)lib\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
 </Project>

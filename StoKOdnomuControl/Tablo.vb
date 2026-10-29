@@ -18,7 +18,9 @@ Public Class Tablo
 
     Public Sub New(preview As Boolean)
         InitializeComponent()
-        ' Designer сохраняет геометрию; массивы заменяют одинаковые ветви рендера.
+        ' В Designer поля ответов заканчиваются до отдельной колонки очков.
+        ' Даже прозрачный Label с длинным текстом иначе перекрывает соседние цифры.
+        ' Массивы заменяют одинаковые ветви рендера.
         ' Картинки берутся из общих ресурсов, без шести копий в Tablo.resx.
         _texts = {Answer1Lbl, Answer2Lbl, Answer3Lbl, Answer4Lbl, Answer5Lbl, Answer6Lbl}
         _scores = {Answer1ScoreLbl, Answer2ScoreLbl, Answer3ScoreLbl, Answer4ScoreLbl, Answer5ScoreLbl, Answer6ScoreLbl}
@@ -39,7 +41,7 @@ Public Class Tablo
         _appearance = appearance
         _appearanceRound = round
         _style = appearance.Profile.MainStyle(round)
-        _layout.ApplyAppearance(appearance.Picture(_style.Background, My.Resources._26_main), Color.FromArgb(_style.TextArgb))
+        _layout.ApplyAppearance(appearance.Picture(_style.Background, My.Resources.DefaultMain), Color.FromArgb(_style.TextArgb))
     End Sub
 
     Public Sub Render(state As MainGameState)
@@ -62,9 +64,9 @@ Public Class Tablo
         Next
         For i = 0 To 2
             _left(i).Image = Marker(state.LeftStrikes(i), _style.LeftClear, _style.LeftStrike,
-                                    My.Resources._26_chance_l, My.Resources._26_wrong_l)
+                                    My.Resources.DefaultLeftClear, My.Resources.DefaultLeftStrike)
             _right(i).Image = Marker(state.RightStrikes(i), _style.RightClear, _style.RightStrike,
-                                     My.Resources._26_chance_r, My.Resources._26_wrong_r)
+                                     My.Resources.DefaultRightClear, My.Resources.DefaultRightStrike)
         Next
         _splash.Render(state.SplashScreen)
         _layout.RefreshText()

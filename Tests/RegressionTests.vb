@@ -32,6 +32,10 @@ Module Checks
             ' Снимки/логи тестов отделены от сохранения реального матча оператора.
             Dim temporary = Path.Combine(Path.GetTempPath(), "StoKOdnomu-tests-" & Guid.NewGuid().ToString("N"))
             Directory.CreateDirectory(temporary)
+            If args.Length > 1 AndAlso args(0) = "--screenshots" Then
+                ScreenshotCapture.Run(args(1), temporary)
+                Return
+            End If
             If args.Contains("--native-dialog") Then
                 Application.EnableVisualStyles()
                 Using owner As New Form With {.Text = "Native dialog test", .Opacity = 0, .ShowInTaskbar = False}
@@ -124,7 +128,7 @@ Module Checks
     Private Sub TestBankDocuments(directory As String)
         Dim folder = Path.Combine(directory, "banks")
         IO.Directory.CreateDirectory(folder)
-        Dim shipped = IO.Path.GetFullPath(IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../StoKOdnomuControl"))
+        Dim shipped = IO.Path.GetFullPath(IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../StoKOdnomuControl/Bases"))
         For Each source In StabilityChecks.BankNames.Select(Function(name) IO.Path.Combine(shipped, name))
             Dim document = BankDocument.Open(source)
             Dim before = BankDocument.Serialize(document.Bank)
@@ -148,7 +152,7 @@ Module Checks
             document.Save(target & ".copy.txt", document.Bank)
             Check(document.FilePath.EndsWith(".copy.txt"), "conflicted draft can Save As")
         Next
-        Dim valid = BankDocument.Open(IO.Path.Combine(shipped, "base.txt")).Bank
+        Dim valid = BankDocument.Open(IO.Path.Combine(shipped, "demo-basic.txt")).Bank
         valid.Rounds(0)(0).Text = "Нельзя&так"
         Reject(Sub() BankDocument.Serialize(valid), "writer rejects ambiguous delimiter")
         valid.Rounds(0)(0).Text = "Две" & vbLf & "строки"
@@ -267,7 +271,7 @@ Module Checks
                 Catch ex As IOException
                     failed = True
                 End Try
-                Check(failed AndAlso denied.Current.Profile.Name = "Тупикон 2026", "profile disk failure keeps active defaults")
+                Check(failed AndAlso denied.Current.Profile.Name = "По умолчанию", "profile disk failure keeps active defaults")
             End Using
             Dim xml = File.ReadAllText(Path.Combine(storage, "config.xml"))
             Dim parsed = System.Xml.Linq.XDocument.Parse(xml)
@@ -301,7 +305,7 @@ Module Checks
         IO.Directory.CreateDirectory(legacyFolder)
         File.WriteAllText(Path.Combine(legacyFolder, "profile.xml"), "<AppearanceProfile><Name>Встроенное оформление</Name><Main><TextArgb>-1</TextArgb></Main></AppearanceProfile>")
         Using legacy As New AppearanceService(legacyFolder)
-            Check(legacy.StartupError = "" AndAlso legacy.Current.Profile.Name = "Тупикон 2026" AndAlso legacy.Current.Profile.Main.TextArgb = Color.White.ToArgb(), "legacy filename and decimal color stay compatible")
+            Check(legacy.StartupError = "" AndAlso legacy.Current.Profile.Name = "По умолчанию" AndAlso legacy.Current.Profile.Main.TextArgb = Color.White.ToArgb(), "legacy filename and decimal color stay compatible")
         End Using
         Console.WriteLine("Preparation storage: " & folder)
     End Sub
@@ -374,8 +378,8 @@ Module Checks
         editor.ShowInTaskbar = False
         DirectCast(FindControl(main, "OpenBankEditor"), Button).PerformClick()
         Check(main.OwnedForms.OfType(Of BankEditor)().Count() = 1, "editor button reuses window")
-        Dim shipped = IO.Path.GetFullPath(IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../StoKOdnomuControl"))
-        editor.OpenDocument(IO.Path.Combine(shipped, "base.txt"))
+        Dim shipped = IO.Path.GetFullPath(IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../StoKOdnomuControl/Bases"))
+        editor.OpenDocument(IO.Path.Combine(shipped, "demo-basic.txt"))
         Dim game = FieldValue(Of GameSession)(main, "_session")
         game.Execute("prepare big game", Sub(state)
                                             GameRules.ShowBigText(state.Big, 0, "СЕМЬЯ")
@@ -439,11 +443,11 @@ Module Checks
             bigBoard.Hide()
             FindControl(settings, "ProfileName").Text = "ПРОФИЛЬ МЕРОПРИЯТИЯ"
             DirectCast(FindControl(settings, "SettingsSound"), CheckBox).Checked = False
-            Dim image = IO.Path.Combine(shipped, "Resources", "2026", "26_main.jpg")
+            Dim image = IO.Path.Combine(ApplicationFiles.ProfilesDirectory, "default", "main-background.png")
             settings.SetAsset(0, image)
             settings.SetTextColor(Color.Navy)
             For i = 1 To 4
-                settings.SetAsset(i, IO.Path.Combine(shipped, "Resources", "2026", New String() {"", "26_chance_l.png", "26_wrong_l.png", "26_chance_r.png", "26_wrong_r.png"}(i)))
+                settings.SetAsset(i, IO.Path.Combine(ApplicationFiles.ProfilesDirectory, "default", New String() {"", "strike-left-clear.png", "strike-left-active.png", "strike-right-clear.png", "strike-right-active.png"}(i)))
             Next
             Check(service.Current.Profile.Main.Background = "", "draft image does not change active profile")
             Dim scope = DirectCast(FindControl(settings, "AppearanceScope"), ComboBox)
@@ -453,7 +457,7 @@ Module Checks
             Check(FindControl(settings, "ChooseAsset0").Enabled, "explicit override unlocks round")
             settings.SetTextColor(Color.DarkRed)
             scope.SelectedIndex = 5
-            settings.SetAsset(0, IO.Path.Combine(shipped, "Resources", "2026", "26_big.jpg"))
+            settings.SetAsset(0, IO.Path.Combine(ApplicationFiles.ProfilesDirectory, "default", "big-background.png"))
             settings.SetTextColor(Color.DarkGreen)
             Check(Not FindControl(settings, "ChooseAsset1").Enabled, "big settings cannot configure strikes")
             Dim lampDelay = DirectCast(FindControl(settings, "SettingsBuzzLampDelay"), NumericUpDown)
@@ -664,11 +668,11 @@ Module Checks
     Private Sub TestCatalogAndAbout(main As Form1, directory As String)
         Dim errors As New List(Of String)()
         Dim choices = ProfileCatalog.Discover(ApplicationFiles.ProfilesDirectory, errors)
-        Check(errors.Count = 0 AndAlso choices.Count = 2, "both complete bundled profiles discoverable next to binary")
+        Check(errors.Count = 0 AndAlso choices.Count = 1, "complete default profile discoverable next to binary")
         For Each choice In choices
             Dim profile = AppearanceStorage.Open(choice.ConfigFile)
             Check(profile.Main.Background <> "" AndAlso profile.Big.Background <> "" AndAlso profile.Main.Assets().All(Function(p) File.Exists(p)), "bundled profile owns six image files " & profile.Name)
-            Check(profile.Main.TextArgb = If(profile.Name.EndsWith("2025"), Color.White.ToArgb(), Color.Black.ToArgb()), "bundled profile color " & profile.Name)
+            Check(profile.Main.TextArgb = Color.FromArgb(255, 240, 190).ToArgb(), "bundled profile color " & profile.Name)
         Next
         Dim oldLocation = main.Location
         Dim secondary = Screen.AllScreens.FirstOrDefault(Function(screen) Not screen.Primary)
@@ -689,23 +693,30 @@ Module Checks
                 Check(cancel.Left < apply.Left AndAlso apply.Left < ok.Left, "footer has cancel left and apply OK right")
                 SaveBitmap(settings, Path.Combine(directory, "SettingsClean.png"))
                 Dim list = DirectCast(FindControl(settings, "ProfileList"), ComboBox)
-                Dim index = Enumerable.Range(0, list.Items.Count).Single(Function(i) list.Items(i).ToString() = "Тупикон 2025")
+                ' Пользовательский вариант создаётся только в тестовом каталоге.
+                Dim alternate = AppearanceStorage.Open(choices.Single().ConfigFile)
+                alternate.Name = "Тестовый профиль"
+                alternate.Main.TextArgb = Color.White.ToArgb()
+                Dim alternateFolder = Path.Combine(directory, "test-profile")
+                Using stored = AppearanceStorage.Save(alternate, alternateFolder)
+                End Using
+                Dim index = list.Items.Add(New ProfileChoice With {.Name = alternate.Name, .ConfigFile = AppearanceStorage.ConfigPath(alternateFolder)})
                 list.SelectedIndex = index
                 Check(settings.Dirty AndAlso settings.Text.StartsWith("● ") AndAlso apply.Enabled, "selected profile marks draft with filled circle")
-                Check(service.Current.Profile.Name = "Тупикон 2026", "selecting profile does not publish")
+                Check(service.Current.Profile.Name = "По умолчанию", "selecting profile does not publish")
                 SaveBitmap(settings, Path.Combine(directory, "SettingsDirty.png"))
                 DirectCast(apply, Button).PerformClick()
                 Check(changes = 1 AndAlso settings.Visible AndAlso Not settings.Dirty AndAlso Not apply.Enabled, "Apply publishes once without closing or confirmation")
-                Check(service.Current.Profile.Name = "Тупикон 2025" AndAlso service.Current.Profile.Main.TextArgb = Color.White.ToArgb(), "2025 profile applied with white text")
-                SaveBitmap(settings, Path.Combine(directory, "Settings2025.png"))
-                CaptureAppearance(settings, "PreviewAppearanceMain", Path.Combine(directory, "Profile2025Main.png"))
-                CaptureAppearance(settings, "PreviewAppearanceBig", Path.Combine(directory, "Profile2025Big.png"))
-                list.SelectedIndex = Enumerable.Range(0, list.Items.Count).Single(Function(i) list.Items(i).ToString() = "Тупикон 2026")
-                CaptureAppearance(settings, "PreviewAppearanceMain", Path.Combine(directory, "Profile2026Main.png"))
+                Check(service.Current.Profile.Name = "Тестовый профиль" AndAlso service.Current.Profile.Main.TextArgb = Color.White.ToArgb(), "custom profile applied with white text")
+                SaveBitmap(settings, Path.Combine(directory, "SettingsCustom.png"))
+                CaptureAppearance(settings, "PreviewAppearanceMain", Path.Combine(directory, "ProfileCustomMain.png"))
+                CaptureAppearance(settings, "PreviewAppearanceBig", Path.Combine(directory, "ProfileCustomBig.png"))
+                list.SelectedIndex = Enumerable.Range(0, list.Items.Count).Single(Function(i) list.Items(i).ToString() = "По умолчанию")
+                CaptureAppearance(settings, "PreviewAppearanceMain", Path.Combine(directory, "ProfileDefaultMain.png"))
                 DirectCast(ok, Button).PerformClick()
-                Check(changes = 2 AndAlso settings.IsDisposed AndAlso service.Current.Profile.Name = "Тупикон 2026", "OK applies then closes")
+                Check(changes = 2 AndAlso settings.IsDisposed AndAlso service.Current.Profile.Name = "По умолчанию", "OK applies then closes")
                 Using restarted As New AppearanceService(service.Folder)
-                    Check(restarted.StartupError = "" AndAlso restarted.Current.Profile.Name = "Тупикон 2026", "catalog selection persists as self contained config")
+                    Check(restarted.StartupError = "" AndAlso restarted.Current.Profile.Name = "По умолчанию", "catalog selection persists as self contained config")
                 End Using
                 Using clean As New AppearanceSettings(service)
                     clean.Opacity = 0
@@ -747,7 +758,7 @@ Module Checks
         Reject(Sub() QuestionBankReader.Parse(valid.Replace("Ответ 1&10", "Ответ&1000")), "reject excessive price")
         Reject(Sub() QuestionBankReader.Parse(valid.Replace("Ответ 1&10", " &10")), "reject empty answer")
         Reject(Sub() QuestionBankReader.Parse(valid.Replace("Ответ 1&10", "Ответ&10&20")), "reject ambiguous separator")
-        Dim source = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../StoKOdnomuControl"))
+        Dim source = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../StoKOdnomuControl/Bases"))
         For Each file In StabilityChecks.BankNames.Select(Function(name) IO.Path.Combine(source, name))
             Check(QuestionBankReader.ReadFile(file).Rounds.Length = 4, "read shipped bank " & Path.GetFileName(file))
         Next
@@ -1516,6 +1527,10 @@ Module Checks
                     Dim price = FindControl(board, If(state Is rightState, "Answer6ScoreLbl", "Answer1ScoreLbl"))
                     Check(Math.Abs(total.Right - price.Right) <= 1 AndAlso caption.Top = total.Top, "moving total scales and stays aligned at " & size.ToString())
                     Check(caption.Top >= FindControl(board, "Answer10Lbl").Bottom, "total stays below answers at " & size.ToString())
+                    Check(caption.Right <= total.Left, "total caption does not cover its number at " & size.ToString())
+                    For i = 6 To 10
+                        Check(FindControl(board, "Answer" & i & "Lbl").Right <= FindControl(board, "Answer" & i & "ScoreLbl").Left, "second-player text does not cover points at " & size.ToString())
+                    Next
                     Check(StateXml(snapshot) = before, "position render has no model side effects at " & size.ToString())
                 Next
             Next
@@ -1553,11 +1568,14 @@ Module Checks
             For Each size In New Size() {New Size(640, 360), New Size(1264, 681), New Size(1920, 1080), New Size(800, 1000)}
                 main.ClientSize = size
                 main.Render(state)
+                For i = 1 To 6
+                    Check(FindControl(main, "Answer" & i & "Lbl").Right <= FindControl(main, "Answer" & i & "ScoreLbl").Left, "main answer does not cover points at " & size.ToString())
+                Next
                 For Each side In New String() {"Left", "Right"}
                     For i = 1 To 3
                         Dim marker = DirectCast(FindControl(main, side & "Strike" & i & "Lbl"), PictureBox)
                         Dim original = marker.Image
-                        Check(marker.SizeMode = PictureBoxSizeMode.Zoom AndAlso original.Size = New Size(156, 134), "strike uses unmodified shared image with proportional scaling")
+                        Check(marker.SizeMode = PictureBoxSizeMode.Zoom AndAlso original.Size = New Size(312, 268), "strike uses unmodified shared image with proportional scaling")
                         Try
                             marker.Image = probe
                             Using rendered As New Bitmap(marker.Width, marker.Height)

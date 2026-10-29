@@ -109,13 +109,50 @@ Public Module PackageChecks
         check(File.Exists(IO.Path.Combine(ApplicationFiles.FontsDirectory, "JetBrainsMono-Regular.ttf")) AndAlso File.Exists(IO.Path.Combine(ApplicationFiles.FontsDirectory, "JetBrainsMono-Bold.ttf")) AndAlso File.Exists(IO.Path.Combine(ApplicationFiles.FontsDirectory, "OFL.txt")), "both fonts and OFL supplied")
         check(File.Exists(IO.Path.Combine(ApplicationFiles.LibraryDirectory, "THIRD_PARTY_NOTICES.txt")) AndAlso File.Exists(IO.Path.Combine(ApplicationFiles.LibraryDirectory, "licenses", "NAudio.txt")), "third-party notices supplied")
         check(IO.Directory.GetFiles(root, "*.dll").Length = 0, "no runtime DLLs beside executable")
-        For Each name In {"README.MD", "OPERATOR_GUIDE.MD", "ARCHITECTURE.MD", "VERIFY.md", "LICENSE"}
+        For Each name In {"README.MD", "OPERATOR_GUIDE.MD", "ARCHITECTURE.MD", "VERIFY.md", "DESIGN_DOCUMENT.MD", "LICENSE"}
             check(File.Exists(IO.Path.Combine(ApplicationFiles.LibraryDirectory, "docs", name)), "packaged documentation " & name)
         Next
         check(File.ReadAllText(IO.Path.Combine(ApplicationFiles.LibraryDirectory, "docs", "LICENSE")).Contains("Vasily Makrov"), "MIT copyright included")
         Dim errors As New List(Of String)()
         Dim themes = ProfileCatalog.Discover(ApplicationFiles.ProfilesDirectory, errors)
-        check(errors.Count = 0 AndAlso themes.Count = 2, "both themes load after folder relocation")
+        check(errors.Count = 0 AndAlso themes.Count = 1 AndAlso themes(0).Name = "По умолчанию", "only default theme supplied after folder relocation")
+        check(IO.Directory.GetDirectories(ApplicationFiles.ProfilesDirectory).Length = 1, "no extra profile folders in package")
+        check(IO.Directory.GetFiles(ApplicationFiles.BanksDirectory).Select(Function(p) IO.Path.GetFileName(p)).OrderBy(Function(p) p).SequenceEqual(StabilityChecks.BankNames.OrderBy(Function(p) p)), "only demonstration banks supplied")
+        Dim defaultProfile = AppearanceStorage.Open(themes.Single().ConfigFile)
+        Using appearance As New LoadedAppearance(defaultProfile), embedded As New LoadedAppearance(New AppearanceProfile()),
+              portableMain As New Tablo(True), embeddedMain As New Tablo(True),
+              portableBig As New BigGameTablo(True), embeddedBig As New BigGameTablo(True)
+            ' Сравниваем весь рендер, включая прозрачные маркеры. Резерв не должен
+            ' незаметно возвращать другую графику или цвет при потере config.xml.
+            portableMain.ApplyAppearance(appearance, 1)
+            embeddedMain.ApplyAppearance(embedded, 1)
+            portableBig.ApplyAppearance(appearance)
+            embeddedBig.ApplyAppearance(embedded)
+            Dim state As New MatchState()
+            state.Main.LeftStrikes(0) = True
+            state.Main.RightStrikes(1) = True
+            For Each board In New Tablo() {portableMain, embeddedMain}
+                board.Opacity = 0
+                board.ShowInTaskbar = False
+                board.Show()
+                board.Render(state.Main)
+            Next
+            For Each board In New BigGameTablo() {portableBig, embeddedBig}
+                board.Opacity = 0
+                board.ShowInTaskbar = False
+                board.Show()
+                board.Render(state.Big)
+            Next
+            Save(portableMain, IO.Path.Combine(reports, "portable-default-main.png"))
+            Save(embeddedMain, IO.Path.Combine(reports, "embedded-default-main.png"))
+            Save(portableBig, IO.Path.Combine(reports, "portable-default-big.png"))
+            Save(embeddedBig, IO.Path.Combine(reports, "embedded-default-big.png"))
+            check(SameRender(portableMain, embeddedMain), "embedded main fallback matches portable default theme")
+            check(SameRender(portableBig, embeddedBig), "embedded big fallback matches portable default theme")
+        End Using
+        For Each name In {"operator-main.png", "operator-big.png", "board-main.png", "board-big.png"}
+            check(File.Exists(IO.Path.Combine(ApplicationFiles.LibraryDirectory, "docs", "screenshots", name)), "README screenshot supplied " & name)
+        Next
         ' Декодирование проверяет все WAV и зависимости NAudio, не открывая аудиоустройство.
         Dim decode = GetType(AudioService).GetMethod("Decode", BindingFlags.Instance Or BindingFlags.NonPublic)
         For Each cue As SoundCue In [Enum].GetValues(GetType(SoundCue))
@@ -144,7 +181,7 @@ Public Module PackageChecks
                     big.Render(state.Big)
                     big.RenderTimer(17, True)
                     Application.DoEvents()
-                    Dim suffix = If(choice.Name.EndsWith("2025"), "2025", "2026")
+                    Dim suffix = "default"
                     Save(main, IO.Path.Combine(reports, "package-main-" & suffix & ".png"))
                     Save(big, IO.Path.Combine(reports, "package-big-" & suffix & ".png"))
                     check(Find(big, "TotalLbl").Left > Find(big, "Answer6Lbl").Left, "moving total preserved in packaged theme " & suffix)
@@ -155,7 +192,7 @@ Public Module PackageChecks
             DirectCast(Find(control, "OpenSettings"), Button).PerformClick()
             Dim settings = control.OwnedForms.OfType(Of AppearanceSettings)().Single()
             settings.Opacity = 0
-            check(DirectCast(Find(settings, "ProfileList"), ComboBox).Items.Count = 3, "settings discovers relocated themes")
+            check(DirectCast(Find(settings, "ProfileList"), ComboBox).Items.Count = 2, "settings discovers relocated default theme")
             Save(settings, IO.Path.Combine(reports, "package-settings.png"))
             settings.Close()
         End Using
@@ -179,4 +216,35 @@ Public Module PackageChecks
             image.Save(path)
         End Using
     End Sub
+
+    Private Function SameRender(left As Form, right As Form) As Boolean
+        If left.Size <> right.Size Then Return False
+        Using a As New Bitmap(left.Width, left.Height), b As New Bitmap(right.Width, right.Height)
+            left.DrawToBitmap(a, New Rectangle(Point.Empty, a.Size))
+            right.DrawToBitmap(b, New Rectangle(Point.Empty, b.Size))
+            Dim area As New Rectangle(Point.Empty, a.Size)
+            Dim dataA = a.LockBits(area, Imaging.ImageLockMode.ReadOnly, Imaging.PixelFormat.Format32bppArgb)
+            Try
+                Dim dataB = b.LockBits(area, Imaging.ImageLockMode.ReadOnly, Imaging.PixelFormat.Format32bppArgb)
+                Try
+                    Dim length = Math.Abs(dataA.Stride) * a.Height
+                    Dim pixelsA(length - 1) As Byte
+                    Dim pixelsB(length - 1) As Byte
+                    Marshal.Copy(dataA.Scan0, pixelsA, 0, length)
+                    Marshal.Copy(dataB.Scan0, pixelsB, 0, length)
+                    ' ResX сериализует Bitmap, внешний PNG читается с ICC-профилем.
+                    ' GDI+ слегка округляет оттенки при этих разных путях загрузки;
+                    ' допускаем 6/255, но проверяем каждый канал каждого пикселя.
+                    For i = 0 To length - 1
+                        If Math.Abs(CInt(pixelsA(i)) - pixelsB(i)) > 6 Then Return False
+                    Next
+                    Return True
+                Finally
+                    b.UnlockBits(dataB)
+                End Try
+            Finally
+                a.UnlockBits(dataA)
+            End Try
+        End Using
+    End Function
 End Module

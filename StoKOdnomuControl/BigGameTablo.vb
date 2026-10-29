@@ -16,6 +16,7 @@ Public Class BigGameTablo
         InitializeComponent()
         _texts = {Answer1Lbl, Answer2Lbl, Answer3Lbl, Answer4Lbl, Answer5Lbl, Answer6Lbl, Answer7Lbl, Answer8Lbl, Answer9Lbl, Answer10Lbl}
         _scores = {Answer1ScoreLbl, Answer2ScoreLbl, Answer3ScoreLbl, Answer4ScoreLbl, Answer5ScoreLbl, Answer6ScoreLbl, Answer7ScoreLbl, Answer8ScoreLbl, Answer9ScoreLbl, Answer10ScoreLbl}
+        ' В Designer текст второго игрока и подпись суммы не заходят в колонку цифр.
         ' Запоминаем геометрию до масштабирования. Справа итог выравнивается
         ' по правому краю цен второго участника; обе подписи перемещаются вместе.
         _totalCaptionLeft = TotalTxt.Bounds
@@ -32,7 +33,7 @@ Public Class BigGameTablo
 
     Public Sub ApplyAppearance(appearance As LoadedAppearance)
         Dim style = appearance.Profile.Big
-        _layout.ApplyAppearance(appearance.Picture(style.Background, My.Resources._26_big), Color.FromArgb(style.TextArgb))
+        _layout.ApplyAppearance(appearance.Picture(style.Background, My.Resources.DefaultBig), Color.FromArgb(style.TextArgb))
     End Sub
 
     Public Sub Render(state As BigGameState)

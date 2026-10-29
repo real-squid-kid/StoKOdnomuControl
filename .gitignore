@@ -272,3 +272,18 @@ __pycache__/
 !/ARCHITECTURE.MD
 !/VERIFY.md
 !/LICENSE
+
+# Public specification for theme layout.
+!/DESIGN_DOCUMENT.MD
+
+# Local theme review assets.
+/INTERNAL_default/
+
+# Private local source archives and former root artwork.
+/INTERNAL_private/
+/*.[pP][nN][gG]
+/*.[xX][cC][fF]
+
+# Public application screenshots.
+!/screenshots/
+!/screenshots/*.png

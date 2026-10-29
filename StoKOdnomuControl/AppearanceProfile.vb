@@ -13,7 +13,7 @@ Public Class BoardStyle
     Public Property RightClear As String = ""
     Public Property RightStrike As String = ""
     <XmlIgnore>
-    Public Property TextArgb As Integer = Color.Black.ToArgb()
+    Public Property TextArgb As Integer = Color.FromArgb(255, 240, 190).ToArgb()
     Public Property TextColor As String
         Get
             Return "#" & (TextArgb And &HFFFFFF).ToString("X6", Globalization.CultureInfo.InvariantCulture)
@@ -58,7 +58,7 @@ End Class
 
 Public Class AppearanceProfile
     Public Property Version As Integer = 1
-    Public Property Name As String = "Тупикон 2026"
+    Public Property Name As String = "По умолчанию"
     Public Property Main As New BoardStyle()
     Public Property Rounds As BoardStyle() = {New BoardStyle(), New BoardStyle(), New BoardStyle(), New BoardStyle()}
     Public Property Big As New BoardStyle()
@@ -197,7 +197,7 @@ Public Module AppearanceStorage
         Using reader = XmlReader.Create(path, New XmlReaderSettings With {.DtdProcessing = DtdProcessing.Prohibit, .XmlResolver = Nothing, .MaxCharactersInDocument = 128000})
             profile = DirectCast(Serializer.Deserialize(reader), AppearanceProfile)
         End Using
-        If profile.Name = "Встроенное оформление" Then profile.Name = "Тупикон 2026"
+        If profile.Name = "Встроенное оформление" Then profile.Name = "По умолчанию"
         Validate(profile)
         Dim folder = IO.Path.GetDirectoryName(IO.Path.GetFullPath(path))
         For Each style In profile.Styles()

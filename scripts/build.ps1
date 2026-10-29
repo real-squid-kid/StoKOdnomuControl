@@ -12,6 +12,9 @@ if ($Package) {
     $buildArguments += "/p:OutputPath=$packageRoot/app/"
     $buildArguments += "/p:BaseIntermediateOutputPath=$packageRoot/obj/"
     $buildArguments += "/p:IntermediateOutputPath=$packageRoot/obj/$Configuration/"
+    # Готовый архив не содержит отладочных путей рабочего компьютера в PE/PDB.
+    $buildArguments += '/p:DebugType=None'
+    $buildArguments += '/p:DebugSymbols=false'
 }
 & $msbuildPath @buildArguments
 if ($LASTEXITCODE -ne 0) { throw "Сборка завершилась с кодом $LASTEXITCODE." }
@@ -20,9 +23,10 @@ if ($Package) {
     $libPath = Join-Path $appPath 'lib'
     $docsPath = Join-Path $libPath 'docs'
     New-Item -ItemType Directory -Path $docsPath -Force | Out-Null
-    foreach ($document in @('README.MD', 'OPERATOR_GUIDE.MD', 'ARCHITECTURE.MD', 'VERIFY.md', 'LICENSE')) {
+    foreach ($document in @('README.MD', 'OPERATOR_GUIDE.MD', 'ARCHITECTURE.MD', 'VERIFY.md', 'DESIGN_DOCUMENT.MD', 'LICENSE')) {
         Copy-Item -LiteralPath (Join-Path $projectRoot $document) -Destination (Join-Path $docsPath $document)
     }
+    Copy-Item -LiteralPath (Join-Path $projectRoot 'screenshots') -Destination $docsPath -Recurse
     & (Join-Path $PSScriptRoot 'copy-notices.ps1') -LibraryDirectory $libPath
     # Убираем только отладочные файлы из НОВОГО комплекта, не из рабочего bin.
     foreach ($generated in Get-ChildItem -LiteralPath $appPath -Recurse -File) {

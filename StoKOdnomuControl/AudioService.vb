@@ -136,16 +136,16 @@ Public NotInheritable Class AudioService
     Private Shared Function OpenResource(cue As SoundCue) As Stream
         ' Сюда вынесены все зависимости от имён .resx. Возвращённым потоком владеет Decode.
         Select Case cue
-            Case SoundCue.OpenAnswer : Return My.Resources._26_open
-            Case SoundCue.NoScore : Return My.Resources._26_noscore
-            Case SoundCue.WrongAnswer : Return My.Resources._26_wrong
-            Case SoundCue.BigWrong : Return My.Resources._26_bigwrong
-            Case SoundCue.SameAnswer : Return My.Resources._26_same
+            Case SoundCue.OpenAnswer : Return My.Resources.SoundOpen
+            Case SoundCue.NoScore : Return My.Resources.SoundNoScore
+            Case SoundCue.WrongAnswer : Return My.Resources.SoundWrong
+            Case SoundCue.BigWrong : Return My.Resources.SoundBigWrong
+            Case SoundCue.SameAnswer : Return My.Resources.SoundSame
             Case SoundCue.Transfer : Return My.Resources.bing
-            Case SoundCue.Victory : Return My.Resources._26_win
-            Case SoundCue.Buzzer : Return My.Resources._26_buzzer
-            Case SoundCue.Countdown20 : Return My.Resources._20sec
-            Case SoundCue.Countdown25 : Return My.Resources._25sec
+            Case SoundCue.Victory : Return My.Resources.SoundWin
+            Case SoundCue.Buzzer : Return My.Resources.SoundBuzzer
+            Case SoundCue.Countdown20 : Return My.Resources.Countdown20
+            Case SoundCue.Countdown25 : Return My.Resources.Countdown25
             Case SoundCue.Reveal1 : Return My.Resources.ff_reveal1
             Case SoundCue.Reveal2 : Return My.Resources.ff_reveal2
             Case SoundCue.Reveal3 : Return My.Resources.ff_reveal3

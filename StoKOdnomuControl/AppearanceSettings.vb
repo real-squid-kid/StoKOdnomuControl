@@ -73,8 +73,8 @@ Public NotInheritable Class AppearanceSettings
         OperatorUi.Cell(colors, OperatorUi.Label("Цвет текста"), 0, 0)
         _color = Command("Выбрать цвет…", "AppearanceColor", AddressOf ChooseColor)
         OperatorUi.Cell(colors, _color, 1, 0)
-        OperatorUi.Cell(colors, Command("Цвет 2026", "ResetTextColor", Sub()
-                                                                                   Style().TextArgb = Color.Black.ToArgb()
+        OperatorUi.Cell(colors, Command("Стандартный цвет", "ResetTextColor", Sub()
+                                                                                   Style().TextArgb = New BoardStyle().TextArgb
                                                                                    MarkDirty()
                                                                                    FillStyle()
                                                                                End Sub), 2, 0)
@@ -82,8 +82,8 @@ Public NotInheritable Class AppearanceSettings
         previews.Controls.Add(Command("Превью табло", "PreviewAppearanceMain", Sub() Preview(False, False), 170))
         previews.Controls.Add(Command("Превью заставки", "PreviewAppearanceSplash", Sub() Preview(False, True), 185))
         previews.Controls.Add(Command("Превью большой игры", "PreviewAppearanceBig", Sub() Preview(True, False), 230))
-        previews.Controls.Add(Command("Вернуть Тупикон 2026…", "ResetAppearance", Sub()
-                                                                                     If OperatorWindows.Message(Me, "Вернуть оформление «Тупикон 2026» для всех раундов? Имя профиля, экран и звук сохранятся.", "Оформление", MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then Return
+        previews.Controls.Add(Command("Сброс оформления…", "ResetAppearance", Sub()
+                                                                                     If OperatorWindows.Message(Me, "Вернуть оформление «По умолчанию» для всех раундов? Имя профиля, экран и звук сохранятся.", "Оформление", MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then Return
                                                                                      _draft.Main = New BoardStyle()
                                                                                      _draft.Rounds = New AppearanceProfile().Rounds
                                                                                      _draft.Big = New BoardStyle()
@@ -230,7 +230,7 @@ Public NotInheritable Class AppearanceSettings
             Dim shown = If(_inherit.Checked, _draft.Main, Style())
             Dim assets = shown.Assets()
             For i = 0 To 4
-                _paths(i).Text = If(assets(i) = "", "Тупикон 2026", Path.GetFileName(assets(i)))
+                _paths(i).Text = If(assets(i) = "", "По умолчанию", Path.GetFileName(assets(i)))
                 _paths(i).AccessibleDescription = assets(i)
                 _paths(i).Enabled = enabled AndAlso (i = 0 OrElse _scope.SelectedIndex <> 5)
                 _assetButtons(i * 2).Enabled = _paths(i).Enabled
